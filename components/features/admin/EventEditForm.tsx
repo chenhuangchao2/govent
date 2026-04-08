@@ -48,18 +48,21 @@ export default function EventEditForm({ event }: { event: EventData }) {
       isPaid,
       price: isPaid ? fd.get('price') : null,
     }
-    const res = await fetch(`/api/events/${event.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    })
-    const data = await res.json()
-    setLoading(false)
-    if (!res.ok) {
-      toast.error(data.error ?? 'Failed to save changes')
-    } else {
-      toast.success('Event updated')
-      router.refresh()
+    try {
+      const res = await fetch(`/api/events/${event.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        toast.error(data.error ?? 'Failed to save changes')
+      } else {
+        toast.success('Event updated')
+        router.refresh()
+      }
+    } finally {
+      setLoading(false)
     }
   }
 
