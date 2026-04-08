@@ -1,7 +1,7 @@
 # Data Flow Reference — GovEvent
 
-> Walkthrough preparation material.
-> High-level flows are documented now. Specific Prisma queries and exact response shapes will be filled in during Phase 2 as each API route is built.
+> Walkthrough preparation material — covers all data flows end-to-end.
+> Updated through Phase 2.2 (UI overhaul + public UX).
 
 ---
 
@@ -30,11 +30,11 @@ API Route: /api/registrations
 Response: { data: { registration, status } }
   │
   ▼
-UI: Show success state with status badge (PENDING or WAITLISTED + position)
+UI: Rich success screen — status badge, "What happens next" card (free/paid/waitlisted), CTA to My Registrations
 ```
 
 **English walkthrough script**:
-> "When a participant submits the form, the API runs four checks in order before touching the database — blacklist, eligibility, deadline, then capacity. The capacity check uses a database transaction to prevent two people from grabbing the last seat simultaneously. Once saved, Resend sends a confirmation email automatically."
+> "When a participant submits the form, the API runs four checks in order before touching the database — blacklist, eligibility, deadline, then capacity. The capacity check uses a database transaction to prevent two people from grabbing the last seat simultaneously. Once saved, Resend sends a confirmation email automatically. Before submission, the form shows a real-time eligibility preview — the participant's email domain is checked client-side against the event's allowedDomains list."
 
 ---
 
@@ -270,6 +270,57 @@ UI: Toast "Title updated", router.refresh() reloads server data
 
 ---
 
+## Flow 10: Venue Hiding
+
+**Context**: Government events may need to hide the venue until a participant is approved (security-sensitive locations).
+
+```
+Event.venueHidden = true (set by admin on create/edit)
+  │
+  ▼
+Public pages (/events, /events/[id]):
+  → Show "Venue revealed upon approval" (italic placeholder)
+
+My Registrations (/my-registrations):
+  → APPROVED registrations: show actual venue
+  → All other statuses: show "Venue details available after approval"
+
+Admin pages:
+  → Always show full venue (admin has full access)
+```
+
+No API change needed — `venueHidden` is a field on Event, checked in UI rendering logic only.
+
+---
+
+## Flow 11: My Registrations — Payment + CPD
+
+**User action**: Participant looks up their registrations by email
+
+```
+Browser ('use client' page)
+  │  GET /api/my-registrations?email=user@gov.sg
+  ▼
+API Route
+  1. Query registrations by email
+  2. Include event details (title, startTime, venue, venueHidden, cpdHours, isPaid)
+  3. Include stripeSessionId for payment link
+  │
+  ▼
+Response: { data: Registration[] }
+  │
+  ▼
+UI renders:
+  - CPD summary: total hours across ATTENDED registrations (if > 0)
+  - Per registration card:
+    - PENDING_PAYMENT → "Pay Now →" button (opens stripeSessionId URL)
+    - APPROVED → venue + QR code
+    - WAITLISTED → position number
+    - ATTENDED → checkmark + CPD hours earned
+```
+
+---
+
 ## API Route Summary
 
 | Method | Path | Description |
@@ -277,6 +328,8 @@ UI: Toast "Title updated", router.refresh() reloads server data
 | POST | `/api/auth/login` | Admin login (iron-session) |
 | POST | `/api/auth/logout` | Admin logout (destroy session, redirect) |
 | GET | `/api/events` | List published events |
+| GET | `/api/events/[id]` | Get single event detail |
+| GET | `/api/my-registrations` | Participant registration lookup by email |
 | POST | `/api/events` | Create event (admin) |
 | PATCH | `/api/events/[id]` | Edit / cancel event (admin) |
 | GET | `/api/registrations` | List registrations (admin, filterable) |

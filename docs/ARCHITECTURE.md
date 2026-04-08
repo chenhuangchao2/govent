@@ -13,10 +13,10 @@ Government agencies run internal workshops and training sessions using Google Fo
 │                         User's Browser                           │
 │                                                                  │
 │   Public Pages                      Admin Pages                  │
-│   /events          (Server)         /admin/events     (Server)   │
-│   /events/[id]     (Server)         /admin/events/[id](S+Client) │
-│   /register        (Client)         /admin/audit-log  (S+Client) │
-│   /my-registrations(Server)         /admin/blacklist  (S+Client) │
+│   /events          (Server)         /admin            (Server)   │
+│   /events/[id]     (S+Client)      /admin/events     (Server)   │
+│   /register/[id]   (Client)        /admin/events/[id](S+Client) │
+│   /my-registrations(Client)        /admin/audit-log  (S+Client) │
 └──────────────┬───────────────────────────────┬───────────────────┘
                │ HTTP                           │ HTTP
                ▼                               ▼
@@ -66,18 +66,21 @@ Government agencies run internal workshops and training sessions using Google Fo
 ### Frontend
 - **Technology**: Next.js 15 App Router, React Server Components
 - **UI**: shadcn/ui + Tailwind CSS
-- **Pattern**: Server Components for all read paths; `'use client'` only for interactive islands (registration form, QR scanner, real-time check-in)
+- **Icons**: lucide-react for admin sidebar and dashboard
+- **Pattern**: Server Components for all read paths; `'use client'` only for interactive islands (registration form, QR scanner, real-time check-in, countdown, mobile nav)
+- **Loading**: Next.js `loading.tsx` skeletons on key pages (events listing, event detail, admin events, audit log)
+- **Responsive**: Mobile hamburger nav on public pages; admin remains desktop-only
 
 | Page | Type | Description |
 |------|------|-------------|
-| `/events` | Server | Public event listing with live seat counts |
-| `/events/[id]` | Server | Event detail + registration form entry |
-| `/register/[id]` | Client | Registration form with inline eligibility validation |
-| `/my-registrations` | Server | Participant's registration history + QR codes |
-| `/admin` | Server | Dashboard overview |
-| `/admin/events` | Server | Event management list |
-| `/admin/events/[id]` | Server+Client | Event detail with 3-tab layout (Overview / Registrations / Check-in). Overview fields are inline-editable (click to edit). |
-| `/admin/audit-log` | Server+Client | Audit log — card-based list grouped by date, color-coded action badges, filter by action/event/time-period, pagination |
+| `/events` | Server | Public event listing — redesigned cards with CapacityBar, venue hiding, price badges. Loading skeleton. |
+| `/events/[id]` | Server+Client | Event detail — info card with DeadlineCountdown (live), CapacityBar, venue hiding, eligibility display. Loading skeleton. |
+| `/register/[id]` | Client | Registration form — real-time eligibility preview (domain check), rich success screen with "what happens next" CTA |
+| `/my-registrations` | Client | Registration history — typed interface, Pay Now button (PENDING_PAYMENT), CPD hours summary, venue display for APPROVED, QR codes |
+| `/admin` | Server | Dashboard — 4 icon stat cards (events, pending, check-ins, total registrations) + quick-action links |
+| `/admin/events` | Server | Event list — clickable titles, date+time, capacity colors (green/amber/red), polished status badges, empty state |
+| `/admin/events/[id]` | Server+Client | Event detail — 3-tab layout (Overview / Registrations / Check-in). Overview: inline click-to-edit fields, venueHidden toggle. |
+| `/admin/audit-log` | Server+Client | Audit log — card-based list grouped by date, color-coded action badges, filter by action/event/time-period, pagination. Loading skeleton. |
 | `/admin/blacklist` | Server+Client | Blacklist management with AlertDialog confirmation |
 
 ### Backend (API Routes)
