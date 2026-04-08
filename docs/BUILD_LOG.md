@@ -120,16 +120,38 @@ Full requirements in `docs/REQUIREMENTS.md`.
 ---
 
 ## Phase 4 — Integration
-**Date**: _TBD (Resend + Stripe keys required)_ | **Tool**: _TBD_
+**Date**: 2026-04-08 | **Tool**: Claude Code
 
-Integration code is written and ready. Pending:
-- Add Resend API key to `.env` (`RESEND_API_KEY`)
-- Add Stripe test keys to `.env` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`)
-- Run `stripe listen --forward-to localhost:3000/api/webhook/stripe` to test webhook locally
+Resend and Stripe keys added. Stripe CLI running locally for webhook forwarding.
+
+| Service | Status | Key detail |
+|---------|--------|------------|
+| Resend | ✅ Verified — test email delivered | Using `onboarding@resend.dev` as FROM (no domain verification needed) |
+| Stripe | ✅ Key configured | Test mode `sk_test_51T...` |
+| Stripe Webhook (local) | ✅ CLI listener active | `whsec_c68f...` forwarding to `localhost:3000/api/webhook/stripe` |
+| Stripe Webhook (prod) | ⏳ Pending NorthFlank URL | Will register via Stripe API after deploy |
+
+**Issue found**: `/admin/login` was inside the admin layout which checked session → infinite redirect loop. Fixed by moving protected pages into `app/admin/(protected)/` route group, leaving login outside auth guard.
 
 ---
 
-## Phase 5 — Deployment
+## v1.0-mvp Tag — Gap Assessment
+**Date**: 2026-04-08
+
+Git tag `v1.0-mvp` created. Full gap analysis conducted across all pages, API routes, and components. See `docs/V1_STATUS.md` for the complete breakdown.
+
+**Summary**: All core data flows work end-to-end. The main gaps are UX completeness — missing event editing, no admin action feedback, no confirmation dialogs, and several flows that exist in the API but have no UI surface (publish/cancel events).
+
+---
+
+## Phase 5 — v2.0 UX Pass
+**Date**: 2026-04-08 (in progress) | **Tool**: Claude Code
+
+Designing v2.0 improvements based on full gap analysis. Key areas: event management completeness, UX feedback layer, payment visibility, check-in resilience, admin polish. See `docs/superpowers/specs/` for spec.
+
+---
+
+## Phase 6 — Deployment
 **Date**: _TBD_ | **Tool**: _TBD_
 
 ---

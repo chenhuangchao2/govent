@@ -72,20 +72,29 @@ app/
 └── docker-compose.yml
 ```
 
+## Version History
+- **v1.0-mvp** (git tag) — 2026-04-08 — Bare-bones MVP. All core flows wired up but rough edges throughout. See `docs/V1_STATUS.md` for known gaps.
+- **v2.0** — _in progress_ — Full UX pass: event editing, publish/cancel controls, payment status visibility, confirmation dialogs, toast feedback, auto-refresh, check-in fallback. See `docs/superpowers/specs/` for design spec.
+
 ## Current Status
-**Phase**: 1-3 complete — full app built and running locally
-**Next step**: Phase 4 — add real Resend + Stripe API keys, test email/payment flows end-to-end
+**Version**: v1.0-mvp tagged → v2.0 in design/planning
+**Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
 
-**What's working**
-- All 14 API routes + 3 cron endpoints operational
-- Public pages: event listing, event detail, registration form (with eligibility validation), my-registrations with QR display
-- Admin pages: dashboard, event list, create event, registration approval (approve/reject inline), QR check-in scanner, audit log timeline, blacklist management
-- `npm run build` passes — 28 routes, 0 TypeScript errors
+**What's working (v1.0)**
+- 15 API routes + 3 cron endpoints operational
+- Public: event listing, event detail, registration form (eligibility + capacity), my-registrations + QR display
+- Admin: dashboard stats, event list, create event, registration approve/reject inline, QR check-in scanner, audit log, blacklist CRUD
+- `npm run build` 0 TypeScript errors · 30 routes compiled
 
-**Pending**
-- Real API keys needed: `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
-- NorthFlank deployment (Phase 5)
-- BUILD_LOG.md Phase 5 section to be filled after deployment
+**Known gaps in v1.0 — upgrading in v2.0**
+See `docs/V1_STATUS.md` for full gap list. Critical items:
+- No event edit form (admin can only create, not update)
+- No publish / unpublish / cancel buttons on event detail page
+- Payment status not shown in My Registrations
+- No confirmation dialogs on destructive actions (blacklist add/remove, event cancel)
+- No toast/feedback after approve/reject — table doesn't auto-refresh
+- Check-in has no camera-failure fallback beyond manual ID entry
+- Audit log not filterable, no pagination beyond 200 records
 
 ## Files to Maintain
 - **`docs/BUILD_LOG.md`** — update every phase (auto-updated by Claude)
