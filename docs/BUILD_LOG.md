@@ -2,123 +2,6 @@
 
 ---
 
-## Phase 2.5 — Security Fixes, Print QR, Docs Polish (2026-04-08)
-**Date**: 2026-04-08 | **Tool**: Claude Code (16 verification agents + fixes)
-
-### Verification process
-Dispatched 16 parallel agents to audit every layer: Prisma schema, all 26 API routes, admin/public pages, auth system, services, components, registration flow, cron endpoints, Stripe integration, Docker setup, ARCHITECTURE.md, DATA_FLOW.md, security, seed data, and missing features.
-
-### Security fixes
-| File | Change |
-|------|--------|
-| `app/api/my-registrations/route.ts` | **Critical**: Added `getParticipantSession()` auth check — previously accepted any email as query param without verification. Now uses session email only. |
-| `app/api/registrations/self-cancel/route.ts` | Added session verification — checks logged-in user's email matches the cancellation request |
-| `components/features/EventRegistrationStatus.tsx` | Updated to call `/api/my-registrations` without email param (session-based) |
-| `app/(public)/my-registrations/page.tsx` | Removed email query param from fetch call, now relies on session-authenticated API |
-
-### New feature: Print QR Code (Block 8)
-| File | Change |
-|------|--------|
-| `components/features/QrDisplay.tsx` | Added print button with `Printer` icon. Opens print-friendly window with event title, QR code, and registration ID. Accepts optional `eventTitle` prop. |
-| `app/(public)/my-registrations/page.tsx` | Passes `eventTitle` to QrDisplay component |
-
-### UI fix
-| File | Change |
-|------|--------|
-| `components/layout/AdminSidebar.tsx` | Added Analytics link with `BarChart3` icon between Events and Blacklist |
-
-### Documentation updates
-| File | Change |
-|------|--------|
-| `docs/DATA_FLOW.md` | Added 12 missing API routes to summary table (participant auth x5, broadcast, checkin-stats, bulk-approve, self-cancel, export, analytics, audit) |
-| `docs/ARCHITECTURE.md` | Fixed `/register/[id]` page type (Client to Server+Client), added `/admin/events/new` and `/admin/analytics` pages, updated description for My Registrations |
-
-**Build**: 0 TypeScript errors, 36 routes compiled.
-
----
-
-## Phase 2.4 — Participant Auth + UX Polish
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-### Participant Authentication
-- **Participant model** in Prisma: email, passwordHash, name, isVerified, verificationCode, codeExpiresAt
-- **Sign Up flow**: name + email + password → OTP sent via Resend → verify code → account created
-- **Sign In flow**: email + password → session created (iron-session, separate cookie `govent-participant`)
-- **5 new API routes**: `/api/auth/participant/{signup,verify,login,logout,me}`
-- **2 new pages**: `/signup` (two-step with OTP), `/login` (with redirect support)
-- **PublicNav**: auth-aware — shows Sign In/Sign Up for guests, Hi {name} + Sign Out for logged-in users
-- **My Registrations**: requires login, shows friendly prompt if not authenticated
-- **Registration form**: pre-fills name + email from session if logged in, email field read-only
-
-### Data Model Cleanup
-- Renamed `department` → `organisation` across full stack (schema, 5 APIs, 9 components, seed data)
-- Renamed `allowedDepartments` → `allowedOrganisations` on Event model
-- Updated seed organisations to realistic Singapore agencies: GovTech, IMDA, CSA
-- Removed `venueHidden` — always show venue, display "To Be Confirmed" if empty
-
-### UX Improvements
-- **Event listing filters**: search by title + time (Upcoming/This Week/All) + cost (Free/Paid) + organisation tags
-- **Re-registration**: CANCELLED/REJECTED registrations can re-register (reuses existing record)
-- **EventOverview tags editor**: chip-based add/remove UI with Enter key, replaces plain text input
-- **Eligibility display**: shows Organisation name not email domain
-- **7 seed events** with varied configurations for demo
-
-### Bug Fixes
-- Stripe `expires_at` capped at 24h (Stripe limit)
-- Stripe Checkout URL stored directly (not double-prefixed)
-- API error handling: try/catch on registration PATCH, event PATCH returns real errors
-- Check-in defaults to Search tab (no auto camera permission prompt)
-
-### Design decisions
-- Guests browse events freely, login only for My Registrations
-- Registration form works without login (for one-off registrations)
-- Separate session cookie from admin — no interference
-- OTP via Resend (already integrated), 6-digit code, 10-minute expiry
-
----
-
-## Phase 2.3 — Power Features (Consolidated Summary)
-**Date**: 2026-04-08 | **Tool**: Claude Code (15 parallel agents)
-
-**All features implemented, build verified: 0 TypeScript errors, 36 routes compiled.**
-
-### New API Endpoints (6)
-- `GET /api/analytics` — aggregated dashboard stats (9 data points)
-- `POST /api/events/[id]/broadcast` — email broadcast to APPROVED/WAITLISTED
-- `GET /api/events/[id]/checkin-stats` — live check-in progress for polling
-- `GET /api/registrations/export` — CSV download of attendees
-- `POST /api/registrations/bulk-approve` — batch approve PENDING registrations
-- `POST /api/registrations/self-cancel` — participant self-cancel (public)
-
-### New Pages (1)
-- `/admin/analytics` — Recharts dashboard with 6 visualizations
-
-### New Components (8)
-- `AnalyticsDashboard.tsx` — 4 stat cards + pie/bar/line charts
-- `BroadcastModal.tsx` — email subject + message modal
-- `CheckInStatsPanel.tsx` — polling sidebar with progress bar + last 5 scans
-- `CheckInSearch.tsx` — name/email lookup with one-click check-in
-- `CsvExportButton.tsx` — secondary download button
-- `BulkApproveBar.tsx` — floating selection bar with AlertDialog
-- `AdminNotesField.tsx` — auto-saving textarea on blur
-- `SelfCancelButton.tsx` — red cancel link with confirm dialog
-
-### Modified Files (8)
-- `prisma/schema.prisma` — added `adminNotes String?` to Registration
-- `services/email.ts` — added `sendBroadcastEmail`
-- `api/registrations/[id]/route.ts` — added `add-note` action
-- `api/registrations/[id]/checkin/route.ts` — added ±2h time-window validation
-- `CheckinScanner.tsx` — tabbed layout (QR/Search/Manual), camera error handling, Enter key
-- `RegistrationsPanel.tsx` — toolbar with CSV export + bulk select + BulkApproveBar
-- `AdminSidebar.tsx` — added Analytics link with BarChart3 icon
-- `my-registrations/page.tsx` — added SelfCancelButton per registration
-- `admin/(protected)/page.tsx` — added View Analytics quick action
-- `admin/events/[id]/page.tsx` — added BroadcastModal to header
-
----
-
----
-
 ## Phase 0 — Project Setup & Architecture Design
 **Date**: 2026-04-08 | **Tool**: Claude Code
 
@@ -579,6 +462,89 @@ Made all public-facing pages mobile-responsive.
 - `app/(public)/layout.tsx` — responsive padding + footer
 
 - `npx tsc --noEmit` — 0 errors in changed files (1 pre-existing error in unrelated admin file)
+
+---
+
+## v2.3 — Power Features
+**Date**: 2026-04-08 | **Tool**: Claude Code (15 parallel agents)
+
+**All features implemented, build verified: 0 TypeScript errors, 36 routes compiled.**
+
+### New API Endpoints (6)
+- `GET /api/analytics` — aggregated dashboard stats
+- `POST /api/events/[id]/broadcast` — email broadcast to APPROVED/WAITLISTED
+- `GET /api/events/[id]/checkin-stats` — live check-in progress for polling
+- `GET /api/registrations/export` — CSV download of attendees
+- `POST /api/registrations/bulk-approve` — batch approve PENDING registrations
+- `POST /api/registrations/self-cancel` — participant self-cancel
+
+### New Components (8)
+- `AnalyticsDashboard.tsx` — Recharts: status pie, fill rates, org breakdown, upcoming schedule
+- `BroadcastModal.tsx` — email subject + message modal
+- `CheckInStatsPanel.tsx` — polling sidebar with progress bar + last 5 scans
+- `CheckInSearch.tsx` — name/email lookup with one-click check-in
+- `CsvExportButton.tsx` — CSV download button
+- `BulkApproveBar.tsx` — floating selection bar with AlertDialog
+- `AdminNotesField.tsx` — auto-saving textarea on blur
+- `SelfCancelButton.tsx` — cancel link with confirm dialog
+
+### Key Changes
+- Analytics dashboard embedded directly in admin dashboard page
+- Check-in scanner: tabbed layout (QR/Search/Manual), camera error handling, Enter key, live stats panel
+- Registrations panel: toolbar with CSV export + bulk select
+- QR check-in: ±2h time-window validation
+- Schema: added `adminNotes String?` to Registration
+
+---
+
+## v2.4 — Participant Auth + UX Polish
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+### Participant Authentication
+- **Participant model** in Prisma: email, passwordHash, name, isVerified, verificationCode, codeExpiresAt
+- **Sign Up flow**: name + email + password → OTP via Resend → verify → session
+- **Sign In flow**: email + password → iron-session (separate cookie `govent-participant`)
+- **5 new API routes**: `/api/auth/participant/{signup,verify,login,logout,me}`
+- **2 new pages**: `/signup` (two-step OTP), `/login` (with redirect support)
+- **PublicNav**: auth-aware — Sign In/Sign Up for guests, Hi {name} + Sign Out for users
+- **My Registrations**: requires login, auto-loads from session
+- **Registration form**: pre-fills from session if logged in, email read-only
+
+### Data Model Cleanup
+- Renamed `department` → `organisation` across full stack (schema, 5 APIs, 9 components, seed)
+- Renamed `allowedDepartments` → `allowedOrganisations` on Event model
+- Removed `venueHidden` — always show venue, "To Be Confirmed" if empty
+- Updated seed: realistic Singapore agencies (GovTech, IMDA, CSA), 7 events
+
+### UX Improvements
+- Event listing filters: search + time + cost + organisation
+- Re-registration allowed after CANCELLED/REJECTED
+- EventOverview: chip-based tags editor, checkbox auto-save
+- Eligibility display: shows Organisation not domain
+
+### Bug Fixes
+- Stripe `expires_at` max 24h, Stripe URL fix
+- API error handling: try/catch on PATCH routes with real error messages
+- Check-in defaults to Search tab (no auto camera prompt)
+
+---
+
+## v2.5 — Security Fixes, Print QR, Docs Polish
+**Date**: 2026-04-08 | **Tool**: Claude Code (16 verification agents)
+
+### Security fixes
+- `/api/my-registrations`: added session auth (was open to any email query)
+- `/api/registrations/self-cancel`: verifies session email matches
+- `EventRegistrationStatus`: uses session-based API
+
+### New feature: Print QR Code
+- QrDisplay: print button opens print-friendly window with event title + QR + registration ID
+
+### Documentation
+- DATA_FLOW.md: added 12 missing API routes
+- ARCHITECTURE.md: fixed page types, added missing pages
+
+**Build**: 0 TypeScript errors, 36 routes compiled.
 
 ---
 
