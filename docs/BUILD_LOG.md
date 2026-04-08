@@ -180,6 +180,55 @@ Conducted full gap analysis across all pages and user journeys. Ran brainstormin
 
 ---
 
+## v2.0 Block 1 — Event Edit Form + Publish/Unpublish/Cancel Buttons
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**What was built**
+
+| File | Change |
+|------|--------|
+| `components/features/admin/EventActionButtons.tsx` | New client component — Publish, Unpublish, Cancel Event buttons each wrapped in AlertDialog confirmation modals; calls `PATCH /api/events/[id]` with `{ action }` |
+| `components/features/admin/EventEditForm.tsx` | New client component — collapsible `<details>` form to edit all event fields inline; calls `PATCH /api/events/[id]` with updated fields; disabled when event is cancelled |
+| `app/admin/(protected)/events/[id]/page.tsx` | Replaced stub page — now shows status badge, integrates both new components, and passes serialized event data to `EventEditForm` |
+
+**Issue encountered and resolved**
+
+| Issue | Resolution |
+|-------|-----------|
+| `AlertDialogTrigger` does not accept `asChild` prop — project uses `@base-ui/react`, not `@radix-ui/react` | Removed `asChild` and applied Tailwind classes directly on `AlertDialogTrigger` (which renders a `<button>` natively and accepts `className`/`disabled` via `NativeButtonProps`) |
+
+**Result**: `npx tsc --noEmit` — 0 errors. Committed as `feat: add event edit form and publish/unpublish/cancel action buttons`.
+
+---
+
+## v2.0 Block 3b — RejectModal, RegistrationRow toast feedback, RegistrationsPage search + status counts
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**What changed**
+- Created `components/features/admin/RejectModal.tsx` — shadcn Dialog with required reason textarea; blocks close while loading; clears reason on cancel
+- Replaced `components/features/admin/RegistrationRow.tsx` — wired `toast.success` / `toast.error` from sonner; uses RejectModal instead of inline inline input; adds `disabled` on all buttons while loading
+- Replaced `app/admin/(protected)/events/[id]/registrations/page.tsx` — loads all registrations once, filters/searches client-side; status filter tabs show live counts; added `PENDING_PAYMENT` to status list; search by name or email
+
+**Result**: `npx tsc --noEmit` — 0 errors. Committed as `feat: RejectModal, toast feedback in RegistrationRow, search + status counts in registrations page`.
+
+---
+
+## v2.0 Block 6 — Audit log: filter by action/event, pagination, human timestamps
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**What changed**
+
+| File | Change |
+|------|--------|
+| `lib/utils.ts` | Appended `formatRelativeTime(iso)` — converts ISO timestamp to human-friendly relative strings ("just now", "5m ago", "3h ago", "2d ago") with fallback to `en-SG` locale date for entries older than 7 days |
+| `components/features/admin/AuditTimeline.tsx` | Updated to use `formatRelativeTime`; added empty-state message; full ISO timestamp preserved in `title` attribute on hover |
+| `components/features/admin/AuditLogFilters.tsx` | New `'use client'` component — two `<select>` dropdowns to filter by action type and event; "Clear filters" button; updates URL search params via `useRouter` |
+| `app/admin/(protected)/audit-log/page.tsx` | Replaced stub — now async with `searchParams: Promise<{...}>` (Next.js 15 pattern); DB queries for logs, count, events, distinct actions run in parallel via `Promise.all`; pagination at 50 per page with Previous/Next links; `AuditLogFilters` wrapped in `<Suspense>` |
+
+**Result**: `npm run build` — 0 errors, 0 TypeScript errors. `/admin/audit-log` compiled at 639 B. Committed as `feat: audit log — filter by action/event, pagination, human timestamps`.
+
+---
+
 ## Phase 6 — Deployment
 **Date**: _TBD_ | **Tool**: _TBD_
 
