@@ -60,6 +60,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       venue: body.venue,
       capacity: body.capacity ? Number(body.capacity) : undefined,
       registrationDeadline: body.registrationDeadline ? new Date(body.registrationDeadline) : undefined,
+      allowedDomains: body.allowedDomains ?? undefined,
+      allowedDepartments: body.allowedDepartments ?? undefined,
+      cpdHours: body.cpdHours != null ? Number(body.cpdHours) : undefined,
+      isPaid: body.isPaid != null ? Boolean(body.isPaid) : undefined,
+      price: body.price != null ? Number(body.price) : undefined,
     },
   })
   await logAction({ action: 'EDIT_EVENT', actorId: session.userId, eventId: id, req })
