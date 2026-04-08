@@ -7,7 +7,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, name } = await req.json()
+    const { email, password, name, organisation } = await req.json()
 
     // Validate required fields
     if (!email || !password || !name) {
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       // Update existing unverified account
       await db.participant.update({
         where: { email },
-        data: { passwordHash, name, verificationCode, codeExpiresAt },
+        data: { passwordHash, name, organisation: organisation || undefined, verificationCode, codeExpiresAt },
       })
     } else {
       // Create new participant
@@ -60,6 +60,7 @@ export async function POST(req: NextRequest) {
         data: {
           email,
           name,
+          organisation: organisation || null,
           passwordHash,
           isVerified: false,
           verificationCode,

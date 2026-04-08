@@ -101,6 +101,7 @@ model Participant {
   id                String    @id @default(cuid())
   email             String    @unique
   name              String
+  organisation      String?
   passwordHash      String
   isVerified        Boolean   @default(false)
   verificationCode  String?

@@ -26,7 +26,12 @@ export default function RegistrationForm({ eventId, eventTitle, allowedDomains, 
       .then(res => res.json())
       .then(json => {
         if (json.data?.email) {
-          setForm(f => ({ ...f, name: json.data.name, email: json.data.email }))
+          setForm(f => ({
+            ...f,
+            name: json.data.name,
+            email: json.data.email,
+            organisation: json.data.organisation || f.organisation,
+          }))
           setIsLoggedIn(true)
         }
       })

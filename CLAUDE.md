@@ -77,9 +77,16 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v3.4 complete (QR scanner UX, sidebar fix, filter labels, capacity display)
+**Version**: v3.5 complete (organisation auto-fill on signup + registration)
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
 **Next step**: Deployment to NorthFlank
+
+**v3.5 — Organisation Auto-fill ✅ (2026-04-08)**
+- Participant schema: added `organisation String?`
+- Signup page: added Organisation field (saved on account creation)
+- Registration form: pre-fills organisation from participant profile
+- Registration API: saves organisation back to participant profile on submit
+- `/api/auth/participant/me`: returns organisation from DB
 
 **v3.4 — QR Scanner, Sidebar, Filter & Capacity UX ✅ (2026-04-08)**
 - QR Scanner: camera only starts on explicit "Start Camera" click (no auto-request on tab load)

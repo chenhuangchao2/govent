@@ -31,6 +31,7 @@ export default function SignupPage() {
   // Step 1 fields
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [organisation, setOrganisation] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -60,7 +61,7 @@ export default function SignupPage() {
       const res = await fetch('/api/auth/participant/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, organisation, password }),
       });
 
       const data = await res.json();
@@ -115,7 +116,7 @@ export default function SignupPage() {
       const res = await fetch('/api/auth/participant/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, organisation, password }),
       });
 
       const data = await res.json();
@@ -154,6 +155,21 @@ export default function SignupPage() {
                   onChange={(e) => setName(e.target.value)}
                   className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Your full name"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="organisation" className="block text-sm font-medium text-gray-700 mb-1">
+                  Organisation
+                </label>
+                <input
+                  id="organisation"
+                  type="text"
+                  required
+                  value={organisation}
+                  onChange={(e) => setOrganisation(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g. GovTech, IMDA, CSA"
                 />
               </div>
 

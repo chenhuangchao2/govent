@@ -647,6 +647,24 @@ Dispatched 5 specialist agents (UX/Demo reviewer, Backend architect, GovTech ass
 
 ---
 
+## v3.5 — Organisation Auto-fill
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+### Changes
+
+| File | Change |
+|------|--------|
+| `prisma/schema.prisma` | Added `organisation String?` to Participant model |
+| `app/(public)/signup/page.tsx` | Added Organisation input field to signup form, sent to API |
+| `app/api/auth/participant/signup/route.ts` | Saves organisation to Participant on account creation |
+| `app/api/auth/participant/me/route.ts` | Returns organisation from DB (not just session) |
+| `components/features/RegistrationForm.tsx` | Pre-fills organisation from participant profile |
+| `app/api/registrations/route.ts` | Saves organisation back to participant profile on registration submit |
+
+**Build**: 0 TypeScript errors, 45 routes compiled.
+
+---
+
 ## Phase 6 — Deployment
 **Date**: _TBD_ | **Target**: NorthFlank
 

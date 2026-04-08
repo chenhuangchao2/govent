@@ -156,6 +156,14 @@ export async function POST(req: NextRequest) {
     return reg
   })
 
+  // Save organisation to participant profile (if logged in)
+  if (organisation) {
+    await db.participant.updateMany({
+      where: { email },
+      data: { organisation },
+    }).catch(() => {}) // best-effort, participant may not exist
+  }
+
   // Send confirmation email (best-effort)
   await sendRegistrationConfirmation({
     to: email,
