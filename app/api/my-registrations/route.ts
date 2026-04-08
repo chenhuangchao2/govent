@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
+import { getParticipantSession } from '@/lib/participant-auth'
 
 export async function GET(req: NextRequest) {
-  const email = new URL(req.url).searchParams.get('email')
-  if (!email) return NextResponse.json({ data: [], error: null })
+  const session = await getParticipantSession()
+  if (!session.isLoggedIn || !session.email) {
+    return NextResponse.json({ data: [], error: 'Not authenticated' }, { status: 401 })
+  }
+  const email = session.email
 
   const registrations = await db.registration.findMany({
     where: { email },

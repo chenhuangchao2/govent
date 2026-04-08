@@ -23,9 +23,8 @@
 | Block 6 | Audit log: human-readable timestamps |
 | Block 6 | Audit log: pagination (50/page, remove 200-row hard limit) |
 
-**Schema changes**: None  
-**New API endpoints**: None (all existing)  
-**Plan file**: `docs/superpowers/plans/2026-04-08-v2.1-admin-core.md`
+**Schema changes**: None
+**New API endpoints**: None (all existing)
 
 ---
 
@@ -43,62 +42,68 @@
 | Block 2 | My Registrations: PENDING_PAYMENT badge + "Pay Now" button |
 | Block 7 | Registration success screen: clear "what happens next" CTA |
 | Block 7 | Real-time email eligibility check on registration form |
-| Block 9 | Venue hiding: `venueHidden` field, revealed only to APPROVED |
 | Feature D | Registration deadline countdown on event detail |
 | Feature E | Capacity progress bar on event listing + detail |
 
-**Schema changes**: `Event.venueHidden Boolean @default(false)`  
-**New API endpoints**: None  
-**Plan file**: `docs/superpowers/plans/2026-04-08-v2.2-ui-overhaul.md`
+**Schema changes**: `Event.venueHidden Boolean @default(false)`
+**New API endpoints**: None
 
 ---
 
-## Phase 2.3 — New Power Features ← NEXT
+## Phase 2.3 — Power Features ✅ COMPLETE (2026-04-08)
 
-**Goal**: Add high-value features that go beyond the MVP scope — analytics, broadcast, CPD tracking, check-in resilience.
-
-| Feature | Description |
-|---------|-------------|
-| Feature I | Admin analytics dashboard `/admin/analytics` (Recharts) |
-| Feature C | Event broadcast notification (admin → APPROVED/WAITLISTED) |
-| Feature A | CPD hours accumulation on My Registrations |
-| Feature B | Admin internal notes on registrations |
-| Block 5 | Check-in: camera error handling + Enter key on manual entry |
-| Block 5 | Check-in: name/email search tab as alternative to QR |
-| Feature H | Check-in: real-time stats panel (checked in / total) |
-| Feature F | QR time-window validation (±2h from event start) |
-
-**Schema changes**: `Registration.adminNotes String?`  
-**New API endpoints**: `POST /api/events/[id]/broadcast`, `GET /api/analytics`, `GET /api/events/[id]/checkin-stats`  
-**Plan file**: `docs/superpowers/plans/2026-04-08-v2.3-power-features.md`
-
----
-
-## Phase 2.4 — Utility & Deployment Prep
-
-**Goal**: Finish remaining utility features and prepare for NorthFlank deployment.
+**Goal**: Add high-value features — analytics, broadcast, check-in resilience, bulk operations.
 
 | Feature | Description |
 |---------|-------------|
+| Feature I | Admin analytics dashboard on main dashboard (Recharts: status pie, fill rates, org breakdown, upcoming schedule) |
+| Feature C | Event broadcast notification (admin → APPROVED/WAITLISTED via Resend) |
+| Feature B | Admin internal notes on registrations (auto-save) |
+| Block 5 | Check-in: tabbed layout (QR Scanner / Search / Manual ID) |
+| Block 5 | Check-in: name/email search with one-click check-in |
+| Block 5 | Check-in: camera error handling + Enter key support |
+| Feature H | Check-in: real-time stats panel with 10s polling |
+| Feature F | QR time-window validation (±2h from event start/end) |
 | Block 8 | CSV export of attendee list |
+| Block 8 | Bulk approve (select PENDING → batch approve with confirmation) |
 | Block 8 | Participant self-cancel (My Registrations) |
-| Block 8 | Print QR code (My Registrations) |
-| Block 8 | Bulk approve (select multiple PENDING → approve all) |
-| — | NorthFlank deployment (Docker build, managed DB, env vars, Stripe webhook prod) |
-| — | Finalise ARCHITECTURE.md and DATA_FLOW.md for submission |
-| — | Complete "What I Would Do Differently" in BUILD_LOG.md |
 
-**Schema changes**: None  
-**New API endpoints**: `GET /api/registrations/[eventId]/export`  
-**Plan file**: `docs/superpowers/plans/2026-04-08-v2.4-utility.md`
+**Schema changes**: `Registration.adminNotes String?`
+**New API endpoints**: `POST /api/events/[id]/broadcast`, `GET /api/analytics`, `GET /api/events/[id]/checkin-stats`, `GET /api/registrations/export`, `POST /api/registrations/bulk-approve`, `POST /api/registrations/self-cancel`
+
+---
+
+## Phase 2.4 — Auth, UX Polish & Data Cleanup ✅ COMPLETE (2026-04-08)
+
+**Goal**: Add participant authentication, polish UX, fix data model issues.
+
+| Feature | Description |
+|---------|-------------|
+| Participant Auth | Email + password signup with OTP verification (Resend) |
+| Participant Auth | Login/logout with iron-session (separate cookie from admin) |
+| Participant Auth | Auth-aware nav: Sign In/Up for guests, Hi {name} + Sign Out for users |
+| Participant Auth | My Registrations requires login, auto-loads from session |
+| Participant Auth | Registration form pre-fills from session if logged in |
+| Data Model | `department` → `organisation` rename (full stack: schema, API, UI, seed) |
+| Data Model | `venueHidden` removed — always show venue, TBC if empty |
+| Data Model | `Participant` model added to schema |
+| UX | Event listing filters: search + time + cost + organisation |
+| UX | Re-registration allowed after CANCELLED/REJECTED |
+| UX | EventOverview: tags editor with chips (add/remove), checkbox auto-save |
+| UX | Eligibility display: shows Organisation not domain |
+| Fixes | Stripe `expires_at` max 24h, Stripe URL fix, API error handling |
+| Seed | 7 realistic events with Singapore government context |
+
+**Schema changes**: `Participant` model, `Registration.department` → `organisation`, `Event.allowedDepartments` → `allowedOrganisations`
+**New API endpoints**: `POST /api/auth/participant/{signup,verify,login,logout}`, `GET /api/auth/participant/me`
 
 ---
 
 ## Summary
 
-| Phase | Focus | Schema | New APIs |
-|-------|-------|--------|----------|
-| **2.1** | Admin core completion ✅ | None | None |
-| **2.2** | UI overhaul + public UX ✅ | `venueHidden` | None |
-| **2.3** | New power features | `adminNotes` | 3 |
-| **2.4** | Utility + deployment | None | 1 |
+| Phase | Focus | Status | Key Deliverables |
+|-------|-------|--------|------------------|
+| **2.1** | Admin core completion | ✅ | Event edit, toast system, registrations table, audit log |
+| **2.2** | UI overhaul + public UX | ✅ | Responsive design, loading skeletons, capacity bar, countdown |
+| **2.3** | Power features | ✅ | Analytics, broadcast, check-in upgrade, CSV, bulk approve |
+| **2.4** | Auth + UX polish | ✅ | Participant auth, org rename, event filters, re-registration |

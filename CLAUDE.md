@@ -77,9 +77,18 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v2.4 complete (participant auth + UX polish)
+**Version**: v2.5 complete (security fixes + print QR + docs polish)
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
-**Next step**: Deployment to NorthFlank, final documentation
+**Next step**: Deployment to NorthFlank
+
+**Phase 2.5 — Security Fixes + Print QR + Docs Polish ✅ (2026-04-08)**
+- Security: `/api/my-registrations` now session-authenticated (was open to any email query)
+- Security: `/api/registrations/self-cancel` now verifies session email matches
+- Print QR: QrDisplay component with print-friendly popup window
+- Admin sidebar: Added Analytics link with BarChart3 icon
+- DATA_FLOW.md: Added 12 missing API routes to summary table
+- ARCHITECTURE.md: Fixed page types, added missing pages
+- Build: 0 TypeScript errors, 36 routes compiled
 
 **Phase 2.4 — Participant Auth + UX Polish ✅ (2026-04-08)**
 - Participant model: email + password + OTP email verification

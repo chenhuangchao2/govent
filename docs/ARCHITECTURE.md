@@ -85,13 +85,15 @@ Government agencies run workshops and training sessions using Google Forms. This
 |------|------|-------------|
 | `/events` | Server+Client | Event listing with search, time/cost/organisation filters |
 | `/events/[id]` | Server+Client | Event detail with registration status check (session-aware) |
-| `/register/[id]` | Client | Registration form — pre-fills from session if logged in |
-| `/my-registrations` | Client | Requires login. Upcoming/past split, self-cancel, QR codes, CPD summary |
+| `/register/[id]` | Server+Client | Registration form — pre-fills from session if logged in |
+| `/my-registrations` | Client | Requires login. Upcoming/past split, self-cancel, print QR, CPD summary |
 | `/login` | Client | Participant sign-in with redirect support |
 | `/signup` | Client | Two-step: credentials → OTP email verification |
-| `/admin` | Server+Client | Dashboard: 4 stat cards + 4 analytics charts (Recharts) |
+| `/admin` | Server+Client | Dashboard: 4 stat cards + quick actions |
 | `/admin/events` | Server | Event list with status badges and capacity indicators |
+| `/admin/events/new` | Server+Client | Create event form |
 | `/admin/events/[id]` | Server+Client | 3-tab layout: Overview (inline edit) / Registrations (bulk approve, CSV export, notes) / Check-in (QR/search/manual + live stats) |
+| `/admin/analytics` | Server+Client | Recharts dashboard: 6 visualizations (pie, bar, line charts) |
 | `/admin/audit-log` | Server+Client | Card-based timeline, grouped by date, filterable |
 | `/admin/blacklist` | Server+Client | CRUD with AlertDialog confirmation |
 

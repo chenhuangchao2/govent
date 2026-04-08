@@ -2,11 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { logAction } from '@/lib/audit'
 import { promoteWaitlist } from '@/services/waitlist'
+import { getParticipantSession } from '@/lib/participant-auth'
 
 export async function POST(req: NextRequest) {
   const { registrationId, email } = await req.json()
   if (!registrationId || !email) {
     return NextResponse.json({ data: null, error: 'registrationId and email required' }, { status: 400 })
+  }
+
+  // Verify authenticated user matches the email
+  const session = await getParticipantSession()
+  if (session.isLoggedIn && session.email && session.email.toLowerCase() !== email.toLowerCase()) {
+    return NextResponse.json({ data: null, error: 'Email does not match your session' }, { status: 403 })
   }
 
   const reg = await db.registration.findUnique({ where: { id: registrationId } })

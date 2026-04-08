@@ -24,7 +24,7 @@ export default function EventRegistrationStatus({ eventId, isFull, isPastDeadlin
           return
         }
         setIsLoggedIn(true)
-        return fetch(`/api/my-registrations?email=${encodeURIComponent(json.data.email)}`)
+        return fetch('/api/my-registrations')
           .then(res => res.json())
           .then(regJson => {
             const regs = regJson.data ?? []

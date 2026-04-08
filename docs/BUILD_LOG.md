@@ -2,6 +2,41 @@
 
 ---
 
+## Phase 2.5 — Security Fixes, Print QR, Docs Polish (2026-04-08)
+**Date**: 2026-04-08 | **Tool**: Claude Code (16 verification agents + fixes)
+
+### Verification process
+Dispatched 16 parallel agents to audit every layer: Prisma schema, all 26 API routes, admin/public pages, auth system, services, components, registration flow, cron endpoints, Stripe integration, Docker setup, ARCHITECTURE.md, DATA_FLOW.md, security, seed data, and missing features.
+
+### Security fixes
+| File | Change |
+|------|--------|
+| `app/api/my-registrations/route.ts` | **Critical**: Added `getParticipantSession()` auth check — previously accepted any email as query param without verification. Now uses session email only. |
+| `app/api/registrations/self-cancel/route.ts` | Added session verification — checks logged-in user's email matches the cancellation request |
+| `components/features/EventRegistrationStatus.tsx` | Updated to call `/api/my-registrations` without email param (session-based) |
+| `app/(public)/my-registrations/page.tsx` | Removed email query param from fetch call, now relies on session-authenticated API |
+
+### New feature: Print QR Code (Block 8)
+| File | Change |
+|------|--------|
+| `components/features/QrDisplay.tsx` | Added print button with `Printer` icon. Opens print-friendly window with event title, QR code, and registration ID. Accepts optional `eventTitle` prop. |
+| `app/(public)/my-registrations/page.tsx` | Passes `eventTitle` to QrDisplay component |
+
+### UI fix
+| File | Change |
+|------|--------|
+| `components/layout/AdminSidebar.tsx` | Added Analytics link with `BarChart3` icon between Events and Blacklist |
+
+### Documentation updates
+| File | Change |
+|------|--------|
+| `docs/DATA_FLOW.md` | Added 12 missing API routes to summary table (participant auth x5, broadcast, checkin-stats, bulk-approve, self-cancel, export, analytics, audit) |
+| `docs/ARCHITECTURE.md` | Fixed `/register/[id]` page type (Client to Server+Client), added `/admin/events/new` and `/admin/analytics` pages, updated description for My Registrations |
+
+**Build**: 0 TypeScript errors, 36 routes compiled.
+
+---
+
 ## Participant Authentication System (2026-04-08)
 **Date**: 2026-04-08 | **Tool**: Claude Code
 
@@ -76,143 +111,6 @@
 - `admin/events/[id]/page.tsx` — added BroadcastModal to header
 
 ---
-
-## Phase 2.3j — Participant Self-Cancel Feature
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/api/registrations/self-cancel/route.ts` | New POST endpoint. Public (no admin auth). Accepts `{ registrationId, email }`. Verifies email matches registrant (case-insensitive). Only allows cancel for PENDING, APPROVED, WAITLISTED, PENDING_PAYMENT statuses. Updates status to CANCELLED. Promotes waitlist if was APPROVED or PENDING. Logs SELF_CANCEL to audit. |
-| `components/features/SelfCancelButton.tsx` | New `'use client'` component. Red underlined text button "Cancel Registration". Only renders for cancellable statuses. window.confirm dialog before action. Loading state during API call. Sonner toast on success/error. Calls onCancel callback to update parent state. |
-| `app/(public)/my-registrations/page.tsx` | Added SelfCancelButton import. Renders SelfCancelButton in each registration card after status-specific content. onCancel updates local state to reflect CANCELLED status immediately. |
-
----
-
-## Phase 2.3i — Check-in Experience Upgrade
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `components/features/admin/CheckInStatsPanel.tsx` | New `'use client'` component. Polls GET /api/events/{id}/checkin-stats every 10s. Shows progress bar (X/Y checked in), remaining count, last 5 check-ins with name + time. Loading skeleton while fetching. Compact sidebar layout. |
-| `components/features/admin/CheckInSearch.tsx` | New `'use client'` component. Fetches all APPROVED registrations on mount, client-side filters by name/email as user types. One-click "Check In" button per row calls POST /api/registrations/{id}/checkin. Green/red flash + sonner toast on success/error. Removes checked-in entry from list. |
-| `components/features/admin/CheckinScanner.tsx` | Rewritten with tabbed layout (QR Scanner / Search / Manual ID) using lucide-react icons. Desktop flex-row layout: tabs on left, CheckInStatsPanel sidebar on right. Added Enter key support on manual ID input. Camera error handling with try/catch — shows fallback message suggesting Search or Manual ID tab. Imports and renders CheckInSearch and CheckInStatsPanel. |
-
----
-
-## Phase 2.3h — Admin Notes on Registrations
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/api/registrations/[id]/route.ts` | Added `add-note` action to PATCH handler. Updates `adminNotes` field on the registration and logs `ADD_NOTE` to audit with notes metadata. |
-| `components/features/admin/AdminNotesField.tsx` | New `'use client'` component. Compact textarea (2 rows, gray-50 bg, text-xs) that auto-saves admin notes on blur via PATCH to registrations API. Shows "Saving..." indicator, toast on error. |
-
----
-
-## Phase 2.3g — Bulk Approve Feature
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/api/registrations/bulk-approve/route.ts` | New POST endpoint for bulk-approving registrations. Requires admin auth. Accepts `{ registrationIds: string[] }`. For each PENDING registration: paid events get Stripe checkout session + PENDING_PAYMENT status + payment email; free events get APPROVED status + QR code + approval email. Uses Promise.allSettled for parallel processing. Logs each approval to audit. Returns `{ approved, skipped }` counts. |
-| `components/features/admin/BulkApproveBar.tsx` | New `'use client'` floating bar component. Appears at bottom of screen when registrations are selected. Shows count, "Approve All" (green) and "Clear" (gray) buttons. AlertDialog confirmation before approve. Posts to bulk-approve API, shows toast with results. Loading state during processing. |
-
----
-
-## Phase 2.3f — Admin Analytics Page + Dashboard Component
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/admin/(protected)/analytics/page.tsx` | New server component page — renders heading + AnalyticsDashboard |
-| `components/features/admin/AnalyticsDashboard.tsx` | New `'use client'` component — fetches GET /api/analytics on mount, shows loading skeletons, renders 6 panels: 4 summary cards, PieChart status breakdown, horizontal BarChart fill rates, LineChart check-in trend, ranked top events list, BarChart department breakdown. Recharts + lucide-react. |
-
----
-
-## Phase 2.3e — CSV Export Feature
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/api/registrations/export/route.ts` | Created GET endpoint for CSV download. Requires admin auth, accepts `eventId` query param. Fetches all registrations for the event, generates CSV with columns: Name, Email, Department, Status, Registered At, Checked In At, CPD Hours. Returns `text/csv` with Content-Disposition header. CSV values are properly escaped. |
-| `components/features/admin/CsvExportButton.tsx` | New client component — secondary-styled button with Download icon from lucide-react. Opens CSV export endpoint in new window via `window.open()`. |
-
----
-
-## Phase 2.3d — Analytics API Endpoint
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/api/analytics/route.ts` | Created GET endpoint returning 9 aggregated stats: totalEvents, activeEvents, totalRegistrations, registrationsByStatus, eventFillRates (top 10), checkinTrend (30 days), departmentBreakdown, totalCpdHours, topEvents (top 5). Protected with requireAdmin(). Uses Promise.all for parallel Prisma queries. |
-
-**TypeScript**: `npx tsc --noEmit` passes with 0 analytics route errors.
-
----
-## Phase 2.3c — BroadcastModal Component + Admin Integration
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `components/features/admin/BroadcastModal.tsx` | New client component — "Send Broadcast" button opens modal overlay with subject/message fields, POSTs to broadcast API, shows loading spinner, success/error toast via Sonner |
-| `app/admin/(protected)/events/[id]/page.tsx` | Added BroadcastModal import; wrapped action buttons area in flex container to place BroadcastModal alongside EventActionButtons |
-
----
-
-## Phase 2.3b — Check-in Stats API Endpoint
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/api/events/[id]/checkin-stats/route.ts` | New GET endpoint — requires admin auth, returns real-time check-in stats (approved/attended/total/remaining counts + last 5 check-ins) for frontend polling |
-
-**Details**: Uses three parallel Prisma queries (two counts + one findMany) for performance. Response shape includes `approved`, `attended`, `total` (approved + attended), `remaining` (those still approved but not yet checked in), and `lastFive` array with name and checkedInAt timestamp.
-
----
-
-## Phase 2.3a — Broadcast API Endpoint + Email Function
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/api/events/[id]/broadcast/route.ts` | New POST endpoint — requires admin auth, validates subject/message, fetches APPROVED+WAITLISTED registrations, sends broadcast email via `Promise.allSettled`, logs BROADCAST action to audit, returns sent/failed counts |
-| `services/email.ts` | Added `sendBroadcastEmail` function — sends custom subject+message to a recipient with event title in subject line and newline-to-br conversion in body |
-
-**TypeScript**: `npx tsc --noEmit` — no new errors (1 pre-existing unrelated error from missing AnalyticsDashboard component).
-
----
-
-## Phase 2.2 — My Registrations: Payment Button, Type Safety, CPD Summary
-**Date**: 2026-04-08 | **Tool**: Claude Code
-
-**Changes made**
-
-| File | Change |
-|------|--------|
-| `app/api/my-registrations/route.ts` | Extended event `select` to include `venue`, `venueHidden`, `isPaid`; `stripeSessionId` already returned by default from Registration model |
-| `app/(public)/my-registrations/page.tsx` | Replaced `type Registration = any` with a proper typed interface; added CPD summary banner (only shown if total > 0); added Pay Now button for PENDING_PAYMENT with stripeSessionId; APPROVED cards show venue (or placeholder if venueHidden) + QR; ATTENDED cards show checkmark + CPD hours earned |
-
-**TypeScript**: `npx tsc --noEmit` passes with 0 errors.
 
 ---
 
@@ -680,9 +578,26 @@ Made all public-facing pages mobile-responsive.
 ---
 
 ## Phase 6 — Deployment
-**Date**: _TBD_ | **Tool**: _TBD_
+**Date**: _TBD_ | **Target**: NorthFlank
+
+- Docker multi-stage build (`output: "standalone"` in next.config.ts)
+- NorthFlank managed PostgreSQL
+- NorthFlank Cron Job (hourly) for `/api/cron/*` endpoints
+- Stripe webhook production endpoint registration
+- Environment variables via NorthFlank secrets
 
 ---
 
 ## What I Would Do Differently
-_To be filled before submission._
+
+| Area | What I'd change | Why |
+|------|-----------------|-----|
+| Auth | Use Singpass/Corppass instead of email+password | Government identity verification is stronger than email OTP |
+| Validation | Add Zod schema validation on all API inputs | Currently trusting client input shape; Zod catches malformed data at boundary |
+| Email | Move to background queue (BullMQ or similar) | Email sending blocks the API response; queue decouples latency |
+| Rate limiting | Add rate limits on auth + registration endpoints | Prevent brute-force and abuse |
+| Real-time | WebSocket for check-in stats and seat updates | Current polling creates unnecessary load; WebSocket gives instant feedback |
+| Testing | Add integration tests for critical flows | Registration + approval + payment is the core flow; needs automated validation |
+| Error monitoring | Add Sentry or equivalent | Currently logging to console; production needs alerting |
+| Approval workflow | Multi-level approval (registrant → manager → coordinator) | Some government events require hierarchical sign-off |
+| Accessibility | WCAG 2.1 AA audit | Government services must be accessible; current UI hasn't been audited |

@@ -2,11 +2,12 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Calendar, Shield, FileText, LogOut } from 'lucide-react'
+import { LayoutDashboard, Calendar, Shield, FileText, BarChart3, LogOut } from 'lucide-react'
 
 const links = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/events', label: 'Events', icon: Calendar },
+  { href: '/admin/analytics', label: 'Analytics', icon: BarChart3 },
   { href: '/admin/blacklist', label: 'Blacklist', icon: Shield },
   { href: '/admin/audit-log', label: 'Audit Log', icon: FileText },
 ]

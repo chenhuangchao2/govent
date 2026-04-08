@@ -327,19 +327,31 @@ UI renders:
 |--------|------|-------------|
 | POST | `/api/auth/login` | Admin login (iron-session) |
 | POST | `/api/auth/logout` | Admin logout (destroy session, redirect) |
+| POST | `/api/auth/participant/signup` | Participant signup (email + password → OTP sent) |
+| POST | `/api/auth/participant/verify` | Verify OTP code, create session |
+| POST | `/api/auth/participant/login` | Participant login (email + password) |
+| POST | `/api/auth/participant/logout` | Participant logout (destroy session) |
+| GET | `/api/auth/participant/me` | Get current participant session info |
 | GET | `/api/events` | List published events |
 | GET | `/api/events/[id]` | Get single event detail |
-| GET | `/api/my-registrations` | Participant registration lookup by email |
 | POST | `/api/events` | Create event (admin) |
-| PATCH | `/api/events/[id]` | Edit / cancel event (admin) |
+| PATCH | `/api/events/[id]` | Edit / publish / cancel event (admin) |
+| POST | `/api/events/[id]/broadcast` | Email broadcast to APPROVED/WAITLISTED (admin) |
+| GET | `/api/events/[id]/checkin-stats` | Live check-in progress for polling (admin) |
 | GET | `/api/registrations` | List registrations (admin, filterable) |
 | POST | `/api/registrations` | Submit registration (participant) |
-| PATCH | `/api/registrations/[id]` | Approve / reject (admin) |
-| POST | `/api/registrations/[id]/checkin` | Mark attended (admin) |
+| PATCH | `/api/registrations/[id]` | Approve / reject / cancel / add-note (admin) |
+| POST | `/api/registrations/[id]/checkin` | Mark attended with ±2h time-window (admin) |
+| POST | `/api/registrations/bulk-approve` | Batch approve PENDING registrations (admin) |
+| POST | `/api/registrations/self-cancel` | Participant self-cancel (session-verified) |
+| GET | `/api/registrations/export` | CSV download of attendee list (admin) |
+| GET | `/api/my-registrations` | Participant registrations (session-authenticated) |
+| GET | `/api/analytics` | Aggregated stats for admin dashboard |
+| GET | `/api/audit` | Audit log entries (admin, filterable, paginated) |
 | GET | `/api/blacklist` | List blacklist (admin) |
 | POST | `/api/blacklist` | Manual add (admin) |
 | DELETE | `/api/blacklist/[id]` | Remove entry (admin) |
-| POST | `/api/webhook/stripe` | Stripe payment webhook |
-| GET | `/api/cron/reminders` | T-48h reminder job |
-| GET | `/api/cron/payment-timeout` | Payment expiry cleanup |
-| GET | `/api/cron/no-shows` | Post-event NO_SHOW marking |
+| POST | `/api/webhook/stripe` | Stripe payment webhook (signature-verified) |
+| GET | `/api/cron/reminders` | T-48h reminder job (CRON_SECRET) |
+| GET | `/api/cron/payment-timeout` | Payment expiry cleanup (CRON_SECRET) |
+| GET | `/api/cron/no-shows` | Post-event NO_SHOW marking (CRON_SECRET) |

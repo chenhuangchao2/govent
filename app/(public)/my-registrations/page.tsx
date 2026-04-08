@@ -33,10 +33,10 @@ export default function MyRegistrationsPage() {
   const [loading, setLoading] = useState(true)
   const [authChecked, setAuthChecked] = useState(false)
 
-  const fetchRegistrations = useCallback(async (lookupEmail: string) => {
-    const res = await fetch(`/api/my-registrations?email=${encodeURIComponent(lookupEmail)}`)
+  const fetchRegistrations = useCallback(async () => {
+    const res = await fetch('/api/my-registrations')
     const data = await res.json()
-    setRegistrations(data.data ?? [])
+    if (res.ok) setRegistrations(data.data ?? [])
   }, [])
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function MyRegistrationsPage() {
         if (json.data?.email) {
           setEmail(json.data.email)
           setUserName(json.data.name)
-          await fetchRegistrations(json.data.email)
+          await fetchRegistrations()
         }
         setAuthChecked(true)
         setLoading(false)
@@ -194,7 +194,7 @@ function RegistrationCard({ r, email, setRegistrations }: {
       {r.status === 'APPROVED' && (
         <div className="mt-2 space-y-2">
           <p className="text-xs text-gray-500">Show this QR code at the entrance</p>
-          <QrDisplay registrationId={r.id} />
+          <QrDisplay registrationId={r.id} eventTitle={r.event.title} />
         </div>
       )}
 
