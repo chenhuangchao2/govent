@@ -22,15 +22,39 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ data: null, error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
+
+  // Validate required fields
+  if (!body.title || !body.startTime || !body.endTime || !body.venue || !body.capacity || !body.registrationDeadline) {
+    return NextResponse.json({ data: null, error: 'Missing required fields' }, { status: 400 })
+  }
+
+  // Validate date logic
+  const startTime = new Date(body.startTime)
+  const endTime = new Date(body.endTime)
+  const registrationDeadline = new Date(body.registrationDeadline)
+
+  if (endTime <= startTime) {
+    return NextResponse.json({ data: null, error: 'End time must be after start time' }, { status: 400 })
+  }
+  if (registrationDeadline >= startTime) {
+    return NextResponse.json({ data: null, error: 'Registration deadline must be before event start time' }, { status: 400 })
+  }
+  if (Number(body.capacity) <= 0) {
+    return NextResponse.json({ data: null, error: 'Capacity must be greater than 0' }, { status: 400 })
+  }
+  if (body.isPaid && (!body.price || Number(body.price) <= 0)) {
+    return NextResponse.json({ data: null, error: 'Paid events must have a price greater than 0' }, { status: 400 })
+  }
+
   const event = await db.event.create({
     data: {
       title: body.title,
       description: body.description,
-      startTime: new Date(body.startTime),
-      endTime: new Date(body.endTime),
+      startTime,
+      endTime,
       venue: body.venue,
       capacity: Number(body.capacity),
-      registrationDeadline: new Date(body.registrationDeadline),
+      registrationDeadline,
       allowedDomains: body.allowedDomains ?? [],
       allowedOrganisations: body.allowedOrganisations ?? [],
       isPaid: body.isPaid ?? false,

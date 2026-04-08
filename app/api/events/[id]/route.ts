@@ -65,6 +65,23 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.isPaid !== undefined) data.isPaid = Boolean(body.isPaid)
   if (body.price !== undefined) data.price = body.price != null ? Number(body.price) : null
 
+  // Validate date logic if time fields are being updated
+  if (data.startTime || data.endTime || data.registrationDeadline) {
+    const existing = await db.event.findUnique({ where: { id } })
+    if (!existing) return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
+
+    const start = (data.startTime as Date) || existing.startTime
+    const end = (data.endTime as Date) || existing.endTime
+    const deadline = (data.registrationDeadline as Date) || existing.registrationDeadline
+
+    if (end <= start) {
+      return NextResponse.json({ data: null, error: 'End time must be after start time' }, { status: 400 })
+    }
+    if (deadline >= start) {
+      return NextResponse.json({ data: null, error: 'Registration deadline must be before event start time' }, { status: 400 })
+    }
+  }
+
   try {
     const event = await db.event.update({ where: { id }, data })
     await logAction({ action: 'EDIT_EVENT', actorId: session.userId, eventId: id, req })

@@ -548,6 +548,29 @@ Made all public-facing pages mobile-responsive.
 
 ---
 
+## Phase 3.1 — Critical Fixes (Tier 1)
+**Date**: 2026-04-08 | **Tool**: Claude Code (5 brainstorming agents + direct fixes)
+
+### Process
+Dispatched 5 specialist agents (UX/Demo reviewer, Backend architect, GovTech assessor, Admin workflow reviewer, Participant journey reviewer) to identify design gaps. Consolidated findings into 3 priority tiers, then fixed all Tier 1 (critical) items.
+
+### Changes
+
+| File | Change |
+|------|--------|
+| `app/api/auth/participant/reset-password/route.ts` | **New**: Password reset API — two-step flow: `send-code` (generates 6-digit OTP, sends via Resend) and `reset` (validates OTP, updates passwordHash). Same 10-min expiry as signup. |
+| `app/(public)/forgot-password/page.tsx` | **New**: Forgot password page — step 1: enter email, step 2: enter OTP + new password + confirm. Redirects to login on success. |
+| `app/(public)/login/page.tsx` | Added "Forgot password?" link below login form |
+| `app/api/events/route.ts` | **Event date validation**: POST rejects `endTime <= startTime`, `registrationDeadline >= startTime`, `capacity <= 0`, paid events with no price |
+| `app/api/events/[id]/route.ts` | **Event edit validation**: PATCH validates date consistency when time fields are updated |
+| `app/api/registrations/[id]/route.ts` | **Approve guard**: blocks approval of registrations on cancelled events |
+| `app/api/registrations/route.ts` | **Zod validation**: registration POST now uses Zod schema for input validation (email format, string lengths) |
+| `components/features/SelfCancelButton.tsx` | Replaced `window.confirm()` with shadcn `AlertDialog` — consistent with admin destructive actions |
+
+**Build**: 0 TypeScript errors, 37 routes compiled.
+
+---
+
 ## Phase 6 — Deployment
 **Date**: _TBD_ | **Target**: NorthFlank
 

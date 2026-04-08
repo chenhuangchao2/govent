@@ -77,9 +77,17 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v2.5 complete (security fixes + print QR + docs polish)
+**Version**: v3.1 complete (critical fixes + password reset + Zod validation)
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
-**Next step**: Deployment to NorthFlank
+**Next step**: Phase 3.2 (Tier 2 improvements)
+
+**Phase 3.1 — Critical Fixes ✅ (2026-04-08)**
+- Password reset: forgot-password page + API with OTP verification + "Forgot password?" link on login
+- Event date validation: POST + PATCH reject invalid dates (end < start, deadline > start, capacity <= 0)
+- SelfCancelButton: replaced window.confirm with shadcn AlertDialog
+- Approve guard: cannot approve registrations for cancelled events
+- Zod validation: registration POST uses Zod schema for input validation
+- Build: 0 TypeScript errors, 37 routes compiled
 
 **Phase 2.5 — Security Fixes + Print QR + Docs Polish ✅ (2026-04-08)**
 - Security: `/api/my-registrations` now session-authenticated (was open to any email query)

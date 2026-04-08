@@ -3,6 +3,15 @@ import { db } from '@/lib/db'
 import { requireAdmin } from '@/lib/auth'
 import { checkBlacklist } from '@/services/blacklist'
 import { sendRegistrationConfirmation } from '@/services/email'
+import { z } from 'zod'
+
+const registrationSchema = z.object({
+  eventId: z.string().min(1),
+  name: z.string().min(1).max(255),
+  email: z.string().email('Invalid email format'),
+  organisation: z.string().min(1).max(255),
+  remarks: z.string().max(1000).optional().default(''),
+})
 
 // GET /api/registrations — admin only, filterable by eventId and status
 export async function GET(req: NextRequest) {
@@ -29,11 +38,14 @@ export async function GET(req: NextRequest) {
 // POST /api/registrations — participant submits
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { eventId, name, email, organisation, remarks } = body
 
-  if (!eventId || !name || !email || !organisation) {
-    return NextResponse.json({ data: null, error: 'Missing required fields' }, { status: 400 })
+  const parsed = registrationSchema.safeParse(body)
+  if (!parsed.success) {
+    const firstError = parsed.error.issues[0]?.message || 'Invalid input'
+    return NextResponse.json({ data: null, error: firstError }, { status: 400 })
   }
+
+  const { eventId, name, email, organisation, remarks } = parsed.data
 
   // Check 1: Blacklist
   const isBlacklisted = await checkBlacklist(email)

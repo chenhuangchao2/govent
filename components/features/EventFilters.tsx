@@ -18,8 +18,8 @@ interface EventData {
 }
 
 const TIME_FILTERS = [
-  { key: 'upcoming', label: 'Upcoming' },
   { key: 'this-week', label: 'This Week' },
+  { key: 'this-month', label: 'This Month' },
   { key: 'all', label: 'All' },
 ] as const
 
@@ -31,7 +31,7 @@ const COST_FILTERS = [
 
 export default function EventFilters({ events }: { events: EventData[] }) {
   const [search, setSearch] = useState('')
-  const [timeFilter, setTimeFilter] = useState<'upcoming' | 'this-week' | 'all'>('upcoming')
+  const [timeFilter, setTimeFilter] = useState<'this-week' | 'this-month' | 'all'>('this-week')
   const [costFilter, setCostFilter] = useState<'all' | 'free' | 'paid'>('all')
   const [orgFilter, setOrgFilter] = useState<string>('all')
 
@@ -49,9 +49,12 @@ export default function EventFilters({ events }: { events: EventData[] }) {
 
   const filtered = useMemo(() => {
     const now = new Date()
-    const weekEnd = new Date()
-    weekEnd.setDate(weekEnd.getDate() + (7 - weekEnd.getDay()))
+    const weekEnd = new Date(now)
+    weekEnd.setDate(weekEnd.getDate() + 7)
     weekEnd.setHours(23, 59, 59, 999)
+    const monthEnd = new Date(now)
+    monthEnd.setDate(monthEnd.getDate() + 30)
+    monthEnd.setHours(23, 59, 59, 999)
 
     return events.filter(e => {
       // Search
@@ -60,10 +63,11 @@ export default function EventFilters({ events }: { events: EventData[] }) {
         if (!e.title.toLowerCase().includes(q) && !e.venue.toLowerCase().includes(q)) return false
       }
 
-      // Time
+      // Time — all filters only show future events
       const start = new Date(e.startTime)
-      if (timeFilter === 'upcoming' && start < now) return false
-      if (timeFilter === 'this-week' && (start < now || start > weekEnd)) return false
+      if (start < now) return false
+      if (timeFilter === 'this-week' && start > weekEnd) return false
+      if (timeFilter === 'this-month' && start > monthEnd) return false
 
       // Cost
       if (costFilter === 'free' && e.isPaid) return false
@@ -179,7 +183,7 @@ export default function EventFilters({ events }: { events: EventData[] }) {
           <div className="text-center py-12">
             <p className="text-gray-400 text-sm">No events match your filters.</p>
             <button
-              onClick={() => { setSearch(''); setTimeFilter('upcoming'); setCostFilter('all'); setOrgFilter('all') }}
+              onClick={() => { setSearch(''); setTimeFilter('this-week'); setCostFilter('all'); setOrgFilter('all') }}
               className="text-sm text-blue-600 hover:underline mt-2"
             >
               Clear all filters

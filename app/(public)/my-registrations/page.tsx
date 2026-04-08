@@ -100,11 +100,6 @@ export default function MyRegistrationsPage() {
     <div className="max-w-2xl">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">My Registrations</h1>
 
-      <div className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-8">
-        <p className="text-sm text-gray-700">
-          Signed in as <span className="font-semibold">{userName}</span> ({email})
-        </p>
-      </div>
 
       {totalCpdHours > 0 && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-3">

@@ -23,6 +23,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (!reg) return NextResponse.json({ data: null, error: 'Not found' }, { status: 404 })
 
   if (action === 'approve') {
+    if (reg.event.isCancelled) {
+      return NextResponse.json({ data: null, error: 'Cannot approve registrations for a cancelled event' }, { status: 400 })
+    }
     if (reg.status !== 'PENDING') {
       return NextResponse.json({ data: null, error: 'Can only approve PENDING registrations' }, { status: 400 })
     }
