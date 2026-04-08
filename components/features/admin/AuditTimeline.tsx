@@ -1,3 +1,5 @@
+import { formatRelativeTime } from '@/lib/utils'
+
 interface Entry {
   id: string
   action: string
@@ -8,6 +10,10 @@ interface Entry {
 }
 
 export default function AuditTimeline({ entries }: { entries: Entry[] }) {
+  if (entries.length === 0) {
+    return <p className="text-sm text-gray-400 text-center py-4">No entries found</p>
+  }
+
   return (
     <div className="space-y-0">
       {entries.map((e, i) => (
@@ -19,7 +25,10 @@ export default function AuditTimeline({ entries }: { entries: Entry[] }) {
           <div className="pb-4">
             <p className="text-sm font-medium text-gray-900">{e.action}</p>
             <p className="text-xs text-gray-400">
-              {e.actor?.name ?? 'System'} · {new Date(e.createdAt).toLocaleString('en-SG')}
+              {e.actor?.name ?? 'System'} ·{' '}
+              <span title={new Date(e.createdAt).toLocaleString('en-SG')}>
+                {formatRelativeTime(e.createdAt)}
+              </span>
             </p>
             {e.metadata && (
               <pre className="text-xs text-gray-500 mt-1 bg-gray-50 rounded px-2 py-1 overflow-auto max-w-sm">
