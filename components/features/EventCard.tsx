@@ -1,10 +1,12 @@
 import Link from 'next/link'
+import CapacityBar from '@/components/features/CapacityBar'
 
 interface EventCardProps {
   id: string
   title: string
   startTime: string
   venue: string
+  venueHidden: boolean
   capacity: number
   registeredCount: number
   isPaid: boolean
@@ -13,39 +15,81 @@ interface EventCardProps {
   allowedDepartments: string[]
 }
 
-export default function EventCard({ id, title, startTime, venue, capacity, registeredCount, isPaid, price, allowedDomains, allowedDepartments }: EventCardProps) {
-  const available = capacity - registeredCount
-  const isFull = available <= 0
-  const eligibilityLabel = allowedDomains.length > 0
-    ? `${allowedDomains.join(', ')} only`
-    : allowedDepartments.length > 0
-    ? `${allowedDepartments.join(', ')} dept only`
-    : null
+function formatEventTime(startTime: string): string {
+  const date = new Date(startTime)
+  const dayDate = date.toLocaleDateString('en-SG', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })
+  const time = date.toLocaleTimeString('en-SG', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  })
+  return `${dayDate} · ${time}`
+}
 
+export default function EventCard({
+  id,
+  title,
+  startTime,
+  venue,
+  venueHidden,
+  capacity,
+  registeredCount,
+  isPaid,
+  price,
+  allowedDomains,
+  allowedDepartments,
+}: EventCardProps) {
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-5 hover:shadow-sm transition-shadow">
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-semibold text-gray-900">{title}</h3>
-        {isPaid && price
-          ? <span className="text-sm font-medium text-purple-700">SGD {price}</span>
-          : <span className="text-sm text-green-700">Free</span>
-        }
-      </div>
-      <p className="text-sm text-gray-500 mb-1">📅 {new Date(startTime).toLocaleDateString('en-SG', { dateStyle: 'full' })}</p>
-      <p className="text-sm text-gray-500 mb-3">📍 {venue}</p>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className={`text-sm font-medium ${isFull ? 'text-red-600' : 'text-gray-700'}`}>
-            {isFull ? 'Full — waitlist available' : `${available} / ${capacity} seats left`}
-          </span>
-          {eligibilityLabel && (
-            <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full">{eligibilityLabel}</span>
-          )}
+    <Link href={`/events/${id}`} className="block">
+      <div className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow p-5">
+        {/* Top row: title + price badge */}
+        <div className="flex justify-between items-start mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 leading-snug">{title}</h3>
+          {isPaid && price != null
+            ? (
+              <span className="ml-3 shrink-0 text-sm font-medium bg-blue-100 text-blue-700 px-2.5 py-0.5 rounded-full">
+                SGD {price.toFixed(2)}
+              </span>
+            )
+            : (
+              <span className="ml-3 shrink-0 text-sm font-medium bg-green-100 text-green-700 px-2.5 py-0.5 rounded-full">
+                FREE
+              </span>
+            )
+          }
         </div>
-        <Link href={`/events/${id}`} className="text-sm text-blue-600 hover:underline font-medium">
-          View →
-        </Link>
+
+        {/* Date row */}
+        <p className="text-sm text-gray-500 mb-1">{formatEventTime(startTime)}</p>
+
+        {/* Venue row */}
+        {venueHidden
+          ? <p className="text-sm italic text-gray-400 mb-3">Venue revealed upon approval</p>
+          : <p className="text-sm text-gray-500 mb-3">{venue}</p>
+        }
+
+        {/* Capacity bar */}
+        <div className="mb-3">
+          <CapacityBar registered={registeredCount} capacity={capacity} />
+        </div>
+
+        {/* Domain restriction notice */}
+        {allowedDomains.length > 0 && (
+          <p className="text-xs text-amber-600 mb-3">
+            Restricted: {allowedDomains.join(', ')}
+          </p>
+        )}
+
+        {/* View Details link */}
+        <div className="text-sm font-medium text-blue-600 hover:text-blue-700">
+          View Details →
+        </div>
       </div>
-    </div>
+    </Link>
   )
 }

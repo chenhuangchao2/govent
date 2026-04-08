@@ -1,13 +1,21 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 import StatusBadge from './StatusBadge'
 
-export default function RegistrationForm({ eventId, eventTitle }: { eventId: string; eventTitle: string }) {
+interface Props {
+  eventId: string
+  eventTitle: string
+  allowedDomains: string[]
+  isPaid: boolean
+}
+
+export default function RegistrationForm({ eventId, eventTitle, allowedDomains, isPaid }: Props) {
   const [form, setForm] = useState({ name: '', email: '', department: '', remarks: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [result, setResult] = useState<{ status: string } | null>(null)
+  const [result, setResult] = useState<{ status: string; waitlistPosition?: number | null } | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -29,17 +37,54 @@ export default function RegistrationForm({ eventId, eventTitle }: { eventId: str
     setResult(data.data)
   }
 
+  // Compute eligibility hint from email while typing
+  function getEligibilityHint(): 'eligible' | 'ineligible' | null {
+    if (allowedDomains.length === 0) return null
+    const atIndex = form.email.indexOf('@')
+    if (atIndex === -1) return null
+    const domain = form.email.slice(atIndex + 1).toLowerCase().trim()
+    if (!domain) return null
+    const match = allowedDomains.some(d => d.toLowerCase() === domain)
+    return match ? 'eligible' : 'ineligible'
+  }
+
+  const eligibilityHint = getEligibilityHint()
+
   if (result) {
+    let nextStepsText: string
+    if (result.status === 'WAITLISTED') {
+      nextStepsText = `You're on the waitlist at position ${result.waitlistPosition ?? '—'}. We'll notify you by email if a spot opens up.`
+    } else if (isPaid) {
+      nextStepsText = "The organiser will review your registration. Once approved, you'll receive a payment link via email."
+    } else {
+      nextStepsText = "The organiser will review your registration. You'll receive an email notification when approved."
+    }
+
     return (
-      <div className="text-center py-8">
-        <div className="text-4xl mb-3">✅</div>
-        <h2 className="text-xl font-semibold mb-2">Registration received!</h2>
-        <div className="mb-2"><StatusBadge status={result.status} /></div>
-        <p className="text-gray-500 text-sm">
-          {result.status === 'WAITLISTED'
-            ? 'You are on the waitlist. We will notify you if a spot opens.'
-            : 'Your registration is pending approval. Check your email for confirmation.'}
-        </p>
+      <div className="text-center py-6">
+        <div className="text-5xl mb-3 text-green-600 font-bold">✓</div>
+        <h2 className="text-xl font-semibold text-gray-900 mb-3">Registration Submitted!</h2>
+        <div className="mb-4 flex justify-center">
+          <StatusBadge status={result.status} />
+        </div>
+
+        <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 text-left mb-6">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">What happens next</p>
+          <p className="text-sm text-gray-700">{nextStepsText}</p>
+        </div>
+
+        <Link
+          href="/my-registrations"
+          className="block w-full bg-blue-600 text-white text-sm font-medium py-2.5 rounded-lg hover:bg-blue-700 text-center mb-3"
+        >
+          View My Registrations →
+        </Link>
+        <Link
+          href="/events"
+          className="text-sm text-blue-600 hover:underline"
+        >
+          Register for another event →
+        </Link>
       </div>
     )
   }
@@ -55,6 +100,12 @@ export default function RegistrationForm({ eventId, eventTitle }: { eventId: str
         <label className="block text-sm font-medium text-gray-700 mb-1">Work Email</label>
         <input type="email" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} required />
+        {eligibilityHint === 'eligible' && (
+          <p className="mt-1 text-green-600 text-xs">✓ Eligible</p>
+        )}
+        {eligibilityHint === 'ineligible' && (
+          <p className="mt-1 text-amber-600 text-xs">⚠ This domain may not be eligible</p>
+        )}
       </div>
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>

@@ -7,7 +7,18 @@ export async function GET(req: NextRequest) {
 
   const registrations = await db.registration.findMany({
     where: { email },
-    include: { event: { select: { title: true, startTime: true, cpdHours: true } } },
+    include: {
+      event: {
+        select: {
+          title: true,
+          startTime: true,
+          venue: true,
+          venueHidden: true,
+          cpdHours: true,
+          isPaid: true,
+        },
+      },
+    },
     orderBy: { createdAt: 'desc' },
   })
   return NextResponse.json({ data: registrations, error: null })

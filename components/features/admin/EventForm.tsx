@@ -8,6 +8,7 @@ export default function EventForm() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isPaid, setIsPaid] = useState(false)
+  const [venueHidden, setVenueHidden] = useState(false)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -19,6 +20,7 @@ export default function EventForm() {
       startTime: fd.get('startTime'),
       endTime: fd.get('endTime'),
       venue: fd.get('venue'),
+      venueHidden,
       capacity: fd.get('capacity'),
       registrationDeadline: fd.get('registrationDeadline'),
       allowedDomains: (fd.get('allowedDomains') as string).split(',').map(s => s.trim()).filter(Boolean),
@@ -51,6 +53,10 @@ export default function EventForm() {
         <div><label className={labelClass}>End Time</label><input type="datetime-local" name="endTime" className={inputClass} required /></div>
       </div>
       <div><label className={labelClass}>Venue</label><input name="venue" className={inputClass} required /></div>
+      <div className="flex items-center gap-2">
+        <input type="checkbox" id="venueHidden" checked={venueHidden} onChange={e => setVenueHidden(e.target.checked)} />
+        <label htmlFor="venueHidden" className="text-sm text-gray-700">Hide venue from public (revealed only to approved registrants)</label>
+      </div>
       <div className="grid grid-cols-2 gap-4">
         <div><label className={labelClass}>Capacity</label><input type="number" name="capacity" className={inputClass} required /></div>
         <div><label className={labelClass}>Registration Deadline</label><input type="datetime-local" name="registrationDeadline" className={inputClass} required /></div>

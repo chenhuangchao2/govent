@@ -24,6 +24,7 @@ export default async function EventsPage() {
             title={e.title}
             startTime={e.startTime.toISOString()}
             venue={e.venue}
+            venueHidden={e.venueHidden}
             capacity={e.capacity}
             registeredCount={e._count.registrations}
             isPaid={e.isPaid}

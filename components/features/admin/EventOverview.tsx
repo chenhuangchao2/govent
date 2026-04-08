@@ -11,6 +11,7 @@ interface EventData {
   startTime: string
   endTime: string
   venue: string
+  venueHidden: boolean
   capacity: number
   registrationDeadline: string
   allowedDomains: string[]
@@ -32,6 +33,7 @@ const FIELDS: FieldConfig[] = [
   { key: 'title', label: 'Title', type: 'text' },
   { key: 'description', label: 'Description', type: 'textarea' },
   { key: 'venue', label: 'Venue', type: 'text' },
+  { key: 'venueHidden', label: 'Hide Venue Until Approved', type: 'checkbox' },
   { key: 'startTime', label: 'Start Time', type: 'datetime' },
   { key: 'endTime', label: 'End Time', type: 'datetime' },
   { key: 'capacity', label: 'Capacity', type: 'number' },

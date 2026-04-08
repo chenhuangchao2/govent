@@ -13,7 +13,7 @@ export default async function RegisterPage({ params }: { params: Promise<{ id: s
       <p className="text-sm text-gray-500 mb-6">
         {event.startTime.toLocaleDateString('en-SG', { dateStyle: 'long' })} · {event.venue}
       </p>
-      <RegistrationForm eventId={id} eventTitle={event.title} />
+      <RegistrationForm eventId={id} eventTitle={event.title} allowedDomains={event.allowedDomains} isPaid={event.isPaid} />
     </div>
   )
 }
