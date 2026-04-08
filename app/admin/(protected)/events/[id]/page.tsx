@@ -6,6 +6,7 @@ import EventOverview from '@/components/features/admin/EventOverview'
 import EventDetailTabs from '@/components/features/admin/EventDetailTabs'
 import RegistrationsPanel from '@/components/features/admin/RegistrationsPanel'
 import CheckinScanner from '@/components/features/admin/CheckinScanner'
+import BroadcastModal from '@/components/features/admin/BroadcastModal'
 
 export default async function AdminEventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -52,11 +53,14 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
             {event.startTime.toLocaleDateString('en-SG', { dateStyle: 'full' })} · {event.venue}
           </p>
         </div>
-        <EventActionButtons
-          eventId={id}
-          isPublished={event.isPublished}
-          isCancelled={event.isCancelled}
-        />
+        <div className="flex items-center gap-2">
+          <BroadcastModal eventId={id} eventTitle={event.title} />
+          <EventActionButtons
+            eventId={id}
+            isPublished={event.isPublished}
+            isCancelled={event.isCancelled}
+          />
+        </div>
       </div>
 
       <EventDetailTabs tabs={tabs}>
@@ -68,11 +72,10 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
           startTime: event.startTime.toISOString(),
           endTime: event.endTime.toISOString(),
           venue: event.venue,
-          venueHidden: event.venueHidden,
           capacity: event.capacity,
           registrationDeadline: event.registrationDeadline.toISOString(),
           allowedDomains: event.allowedDomains,
-          allowedDepartments: event.allowedDepartments,
+          allowedOrganisations: event.allowedOrganisations,
           cpdHours: event.cpdHours,
           isPaid: event.isPaid,
           price: event.price,

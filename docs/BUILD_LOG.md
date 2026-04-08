@@ -2,6 +2,206 @@
 
 ---
 
+## Participant Authentication System (2026-04-08)
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+### What was added
+- **Participant model** in Prisma: email, passwordHash, name, isVerified, verificationCode, codeExpiresAt
+- **Sign Up flow**: name + email + password → OTP sent via Resend → verify code → account created
+- **Sign In flow**: email + password → session created (iron-session, separate cookie from admin)
+- **5 new API routes**: `/api/auth/participant/{signup,verify,login,logout,me}`
+- **2 new pages**: `/signup` (two-step with OTP), `/login` (with redirect support)
+- **PublicNav upgrade**: shows Sign In/Sign Up for guests, user name + Sign Out for authenticated users
+- **My Registrations**: requires login, shows friendly prompt if not authenticated, auto-loads registrations from session
+- **Registration form**: pre-fills name + email from session if logged in, email field becomes read-only
+- **Event detail page**: uses session to check registration status, shows "Sign in for faster experience" hint
+
+### Design decisions
+- Guests can freely browse events without login
+- Login only required for My Registrations and recommended for registration
+- Registration form still works without login (for quick one-off registrations)
+- OTP via Resend (already integrated), 6-digit code, 10-minute expiry
+- Separate session cookie (`govent-participant`) from admin (`govent-session`)
+
+---
+
+## Rename: department → organisation (2026-04-08)
+**Scope**: Seed data + page files
+
+- Renamed `allowedDepartments` → `allowedOrganisations` in public events page, admin event detail page, and seed data
+- Renamed `department` → `organisation` in all seed participant records
+- Updated seed organisations to realistic agency names: GovTech, IMDA, CSA
+- Event 2 (Cloud Workshop) restricted to `['GovTech']` only
+- Event 3 participants now have mixed orgs (GovTech, IMDA, CSA) with matching email domains
+- Re-seeded database successfully
+
+---
+
+## Phase 2.3 — Power Features (Consolidated Summary)
+**Date**: 2026-04-08 | **Tool**: Claude Code (15 parallel agents)
+
+**All features implemented, build verified: 0 TypeScript errors, 36 routes compiled.**
+
+### New API Endpoints (6)
+- `GET /api/analytics` — aggregated dashboard stats (9 data points)
+- `POST /api/events/[id]/broadcast` — email broadcast to APPROVED/WAITLISTED
+- `GET /api/events/[id]/checkin-stats` — live check-in progress for polling
+- `GET /api/registrations/export` — CSV download of attendees
+- `POST /api/registrations/bulk-approve` — batch approve PENDING registrations
+- `POST /api/registrations/self-cancel` — participant self-cancel (public)
+
+### New Pages (1)
+- `/admin/analytics` — Recharts dashboard with 6 visualizations
+
+### New Components (8)
+- `AnalyticsDashboard.tsx` — 4 stat cards + pie/bar/line charts
+- `BroadcastModal.tsx` — email subject + message modal
+- `CheckInStatsPanel.tsx` — polling sidebar with progress bar + last 5 scans
+- `CheckInSearch.tsx` — name/email lookup with one-click check-in
+- `CsvExportButton.tsx` — secondary download button
+- `BulkApproveBar.tsx` — floating selection bar with AlertDialog
+- `AdminNotesField.tsx` — auto-saving textarea on blur
+- `SelfCancelButton.tsx` — red cancel link with confirm dialog
+
+### Modified Files (8)
+- `prisma/schema.prisma` — added `adminNotes String?` to Registration
+- `services/email.ts` — added `sendBroadcastEmail`
+- `api/registrations/[id]/route.ts` — added `add-note` action
+- `api/registrations/[id]/checkin/route.ts` — added ±2h time-window validation
+- `CheckinScanner.tsx` — tabbed layout (QR/Search/Manual), camera error handling, Enter key
+- `RegistrationsPanel.tsx` — toolbar with CSV export + bulk select + BulkApproveBar
+- `AdminSidebar.tsx` — added Analytics link with BarChart3 icon
+- `my-registrations/page.tsx` — added SelfCancelButton per registration
+- `admin/(protected)/page.tsx` — added View Analytics quick action
+- `admin/events/[id]/page.tsx` — added BroadcastModal to header
+
+---
+
+## Phase 2.3j — Participant Self-Cancel Feature
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `app/api/registrations/self-cancel/route.ts` | New POST endpoint. Public (no admin auth). Accepts `{ registrationId, email }`. Verifies email matches registrant (case-insensitive). Only allows cancel for PENDING, APPROVED, WAITLISTED, PENDING_PAYMENT statuses. Updates status to CANCELLED. Promotes waitlist if was APPROVED or PENDING. Logs SELF_CANCEL to audit. |
+| `components/features/SelfCancelButton.tsx` | New `'use client'` component. Red underlined text button "Cancel Registration". Only renders for cancellable statuses. window.confirm dialog before action. Loading state during API call. Sonner toast on success/error. Calls onCancel callback to update parent state. |
+| `app/(public)/my-registrations/page.tsx` | Added SelfCancelButton import. Renders SelfCancelButton in each registration card after status-specific content. onCancel updates local state to reflect CANCELLED status immediately. |
+
+---
+
+## Phase 2.3i — Check-in Experience Upgrade
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `components/features/admin/CheckInStatsPanel.tsx` | New `'use client'` component. Polls GET /api/events/{id}/checkin-stats every 10s. Shows progress bar (X/Y checked in), remaining count, last 5 check-ins with name + time. Loading skeleton while fetching. Compact sidebar layout. |
+| `components/features/admin/CheckInSearch.tsx` | New `'use client'` component. Fetches all APPROVED registrations on mount, client-side filters by name/email as user types. One-click "Check In" button per row calls POST /api/registrations/{id}/checkin. Green/red flash + sonner toast on success/error. Removes checked-in entry from list. |
+| `components/features/admin/CheckinScanner.tsx` | Rewritten with tabbed layout (QR Scanner / Search / Manual ID) using lucide-react icons. Desktop flex-row layout: tabs on left, CheckInStatsPanel sidebar on right. Added Enter key support on manual ID input. Camera error handling with try/catch — shows fallback message suggesting Search or Manual ID tab. Imports and renders CheckInSearch and CheckInStatsPanel. |
+
+---
+
+## Phase 2.3h — Admin Notes on Registrations
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `app/api/registrations/[id]/route.ts` | Added `add-note` action to PATCH handler. Updates `adminNotes` field on the registration and logs `ADD_NOTE` to audit with notes metadata. |
+| `components/features/admin/AdminNotesField.tsx` | New `'use client'` component. Compact textarea (2 rows, gray-50 bg, text-xs) that auto-saves admin notes on blur via PATCH to registrations API. Shows "Saving..." indicator, toast on error. |
+
+---
+
+## Phase 2.3g — Bulk Approve Feature
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `app/api/registrations/bulk-approve/route.ts` | New POST endpoint for bulk-approving registrations. Requires admin auth. Accepts `{ registrationIds: string[] }`. For each PENDING registration: paid events get Stripe checkout session + PENDING_PAYMENT status + payment email; free events get APPROVED status + QR code + approval email. Uses Promise.allSettled for parallel processing. Logs each approval to audit. Returns `{ approved, skipped }` counts. |
+| `components/features/admin/BulkApproveBar.tsx` | New `'use client'` floating bar component. Appears at bottom of screen when registrations are selected. Shows count, "Approve All" (green) and "Clear" (gray) buttons. AlertDialog confirmation before approve. Posts to bulk-approve API, shows toast with results. Loading state during processing. |
+
+---
+
+## Phase 2.3f — Admin Analytics Page + Dashboard Component
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `app/admin/(protected)/analytics/page.tsx` | New server component page — renders heading + AnalyticsDashboard |
+| `components/features/admin/AnalyticsDashboard.tsx` | New `'use client'` component — fetches GET /api/analytics on mount, shows loading skeletons, renders 6 panels: 4 summary cards, PieChart status breakdown, horizontal BarChart fill rates, LineChart check-in trend, ranked top events list, BarChart department breakdown. Recharts + lucide-react. |
+
+---
+
+## Phase 2.3e — CSV Export Feature
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `app/api/registrations/export/route.ts` | Created GET endpoint for CSV download. Requires admin auth, accepts `eventId` query param. Fetches all registrations for the event, generates CSV with columns: Name, Email, Department, Status, Registered At, Checked In At, CPD Hours. Returns `text/csv` with Content-Disposition header. CSV values are properly escaped. |
+| `components/features/admin/CsvExportButton.tsx` | New client component — secondary-styled button with Download icon from lucide-react. Opens CSV export endpoint in new window via `window.open()`. |
+
+---
+
+## Phase 2.3d — Analytics API Endpoint
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `app/api/analytics/route.ts` | Created GET endpoint returning 9 aggregated stats: totalEvents, activeEvents, totalRegistrations, registrationsByStatus, eventFillRates (top 10), checkinTrend (30 days), departmentBreakdown, totalCpdHours, topEvents (top 5). Protected with requireAdmin(). Uses Promise.all for parallel Prisma queries. |
+
+**TypeScript**: `npx tsc --noEmit` passes with 0 analytics route errors.
+
+---
+## Phase 2.3c — BroadcastModal Component + Admin Integration
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `components/features/admin/BroadcastModal.tsx` | New client component — "Send Broadcast" button opens modal overlay with subject/message fields, POSTs to broadcast API, shows loading spinner, success/error toast via Sonner |
+| `app/admin/(protected)/events/[id]/page.tsx` | Added BroadcastModal import; wrapped action buttons area in flex container to place BroadcastModal alongside EventActionButtons |
+
+---
+
+## Phase 2.3b — Check-in Stats API Endpoint
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `app/api/events/[id]/checkin-stats/route.ts` | New GET endpoint — requires admin auth, returns real-time check-in stats (approved/attended/total/remaining counts + last 5 check-ins) for frontend polling |
+
+**Details**: Uses three parallel Prisma queries (two counts + one findMany) for performance. Response shape includes `approved`, `attended`, `total` (approved + attended), `remaining` (those still approved but not yet checked in), and `lastFive` array with name and checkedInAt timestamp.
+
+---
+
+## Phase 2.3a — Broadcast API Endpoint + Email Function
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**Changes made**
+
+| File | Change |
+|------|--------|
+| `app/api/events/[id]/broadcast/route.ts` | New POST endpoint — requires admin auth, validates subject/message, fetches APPROVED+WAITLISTED registrations, sends broadcast email via `Promise.allSettled`, logs BROADCAST action to audit, returns sent/failed counts |
+| `services/email.ts` | Added `sendBroadcastEmail` function — sends custom subject+message to a recipient with event title in subject line and newline-to-br conversion in body |
+
+**TypeScript**: `npx tsc --noEmit` — no new errors (1 pre-existing unrelated error from missing AnalyticsDashboard component).
+
+---
+
 ## Phase 2.2 — My Registrations: Payment Button, Type Safety, CPD Summary
 **Date**: 2026-04-08 | **Tool**: Claude Code
 

@@ -24,7 +24,7 @@ export default function EventForm() {
       capacity: fd.get('capacity'),
       registrationDeadline: fd.get('registrationDeadline'),
       allowedDomains: (fd.get('allowedDomains') as string).split(',').map(s => s.trim()).filter(Boolean),
-      allowedDepartments: (fd.get('allowedDepartments') as string).split(',').map(s => s.trim()).filter(Boolean),
+      allowedOrganisations: (fd.get('allowedOrganisations') as string).split(',').map(s => s.trim()).filter(Boolean),
       isPaid,
       price: isPaid ? fd.get('price') : null,
       cpdHours: fd.get('cpdHours'),
@@ -62,7 +62,7 @@ export default function EventForm() {
         <div><label className={labelClass}>Registration Deadline</label><input type="datetime-local" name="registrationDeadline" className={inputClass} required /></div>
       </div>
       <div><label className={labelClass}>Allowed Email Domains (comma-separated, empty = all)</label><input name="allowedDomains" placeholder="govtech.gov.sg, tech.gov.sg" className={inputClass} /></div>
-      <div><label className={labelClass}>Allowed Departments (comma-separated, empty = all)</label><input name="allowedDepartments" placeholder="Engineering, Policy" className={inputClass} /></div>
+      <div><label className={labelClass}>Allowed Organisations (comma-separated, empty = all)</label><input name="allowedOrganisations" placeholder="GovTech, IMDA" className={inputClass} /></div>
       <div><label className={labelClass}>CPD Hours</label><input type="number" name="cpdHours" defaultValue="0" step="0.5" className={inputClass} /></div>
       <div className="flex items-center gap-2">
         <input type="checkbox" id="isPaid" checked={isPaid} onChange={e => setIsPaid(e.target.checked)} />

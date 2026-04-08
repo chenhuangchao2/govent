@@ -49,28 +49,28 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ data: event, error: null })
   }
 
-  // General update
+  // General update — only include fields that are actually present in the body
+  const data: Record<string, unknown> = {}
+  if (body.title !== undefined) data.title = body.title
+  if (body.description !== undefined) data.description = body.description
+  if (body.startTime !== undefined) data.startTime = new Date(body.startTime)
+  if (body.endTime !== undefined) data.endTime = new Date(body.endTime)
+  if (body.venue !== undefined) data.venue = body.venue
+  if (body.venueHidden !== undefined) data.venueHidden = Boolean(body.venueHidden)
+  if (body.capacity !== undefined) data.capacity = Number(body.capacity)
+  if (body.registrationDeadline !== undefined) data.registrationDeadline = new Date(body.registrationDeadline)
+  if (body.allowedDomains !== undefined) data.allowedDomains = body.allowedDomains
+  if (body.allowedOrganisations !== undefined) data.allowedOrganisations = body.allowedOrganisations
+  if (body.cpdHours !== undefined) data.cpdHours = Number(body.cpdHours)
+  if (body.isPaid !== undefined) data.isPaid = Boolean(body.isPaid)
+  if (body.price !== undefined) data.price = body.price != null ? Number(body.price) : null
+
   try {
-    const event = await db.event.update({
-      where: { id },
-      data: {
-        title: body.title,
-        description: body.description,
-        startTime: body.startTime ? new Date(body.startTime) : undefined,
-        endTime: body.endTime ? new Date(body.endTime) : undefined,
-        venue: body.venue,
-        capacity: body.capacity ? Number(body.capacity) : undefined,
-        registrationDeadline: body.registrationDeadline ? new Date(body.registrationDeadline) : undefined,
-        allowedDomains: body.allowedDomains ?? undefined,
-        allowedDepartments: body.allowedDepartments ?? undefined,
-        cpdHours: body.cpdHours != null ? Number(body.cpdHours) : undefined,
-        isPaid: body.isPaid != null ? Boolean(body.isPaid) : undefined,
-        price: body.price != null ? Number(body.price) : undefined,
-      },
-    })
+    const event = await db.event.update({ where: { id }, data })
     await logAction({ action: 'EDIT_EVENT', actorId: session.userId, eventId: id, req })
     return NextResponse.json({ data: event, error: null })
-  } catch {
-    return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
+  } catch (err) {
+    console.error('Event update error:', err)
+    return NextResponse.json({ data: null, error: 'Failed to update event' }, { status: 500 })
   }
 }

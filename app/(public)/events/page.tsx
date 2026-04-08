@@ -1,5 +1,5 @@
 import { db } from '@/lib/db'
-import EventCard from '@/components/features/EventCard'
+import EventFilters from '@/components/features/EventFilters'
 
 export const revalidate = 30
 
@@ -12,28 +12,27 @@ export default async function EventsPage() {
     orderBy: { startTime: 'asc' },
   })
 
+  const serialized = events.map(e => ({
+    id: e.id,
+    title: e.title,
+    startTime: e.startTime.toISOString(),
+    venue: e.venue,
+    capacity: e.capacity,
+    registeredCount: e._count.registrations,
+    isPaid: e.isPaid,
+    price: e.price,
+    allowedDomains: e.allowedDomains,
+    allowedOrganisations: e.allowedOrganisations,
+  }))
+
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Upcoming Events</h1>
-      {events.length === 0 && <p className="text-gray-500">No upcoming events.</p>}
-      <div className="space-y-4">
-        {events.map(e => (
-          <EventCard
-            key={e.id}
-            id={e.id}
-            title={e.title}
-            startTime={e.startTime.toISOString()}
-            venue={e.venue}
-            venueHidden={e.venueHidden}
-            capacity={e.capacity}
-            registeredCount={e._count.registrations}
-            isPaid={e.isPaid}
-            price={e.price}
-            allowedDomains={e.allowedDomains}
-            allowedDepartments={e.allowedDepartments}
-          />
-        ))}
-      </div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Events</h1>
+      {serialized.length === 0 ? (
+        <p className="text-gray-500">No events available.</p>
+      ) : (
+        <EventFilters events={serialized} />
+      )}
     </div>
   )
 }

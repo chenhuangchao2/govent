@@ -77,9 +77,36 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v2.2 complete → v2.3 next
+**Version**: v2.4 complete (participant auth + UX polish)
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
-**Next step**: Phase 2.3 — Power features (analytics, broadcast, CPD, check-in reliability)
+**Next step**: Deployment to NorthFlank, final documentation
+
+**Phase 2.4 — Participant Auth + UX Polish ✅ (2026-04-08)**
+- Participant model: email + password + OTP email verification
+- Sign Up: name/email/password → OTP via Resend → verify → session
+- Sign In: email/password → session (iron-session, separate from admin)
+- PublicNav: auth-aware (Sign In/Up for guests, name + Sign Out for users)
+- My Registrations: requires login, auto-loads from session
+- Registration form: pre-fills from session, email read-only when logged in
+- Event detail: session-based registration status check
+- Department → Organisation rename (whole stack)
+- Venue hiding removed (always show venue, TBC if empty)
+- Event filters: search + time + cost + organisation
+- Re-registration: CANCELLED/REJECTED can re-register
+- Stripe expires_at fix (max 24h), Stripe URL fix, API error handling
+
+**Phase 2.3 — Power Features ✅ (2026-04-08)**
+- Schema: added `adminNotes String?` to Registration
+- Analytics: `/admin/analytics` page with 6 Recharts visualizations (pie, bar, line charts)
+- Broadcast: `POST /api/events/[id]/broadcast` + BroadcastModal in event detail header
+- Check-in upgrade: tabbed layout (QR/Search/Manual), camera error handling, Enter key, live stats panel with 10s polling
+- QR time-window: ±2h validation on check-in API
+- CSV export: `GET /api/registrations/export` + download button in registrations toolbar
+- Bulk approve: `POST /api/registrations/bulk-approve` + selection bar with AlertDialog
+- Admin notes: `add-note` action + auto-saving AdminNotesField component
+- Self-cancel: `POST /api/registrations/self-cancel` + SelfCancelButton in My Registrations
+- Navigation: Analytics link in sidebar + quick action on dashboard
+- Build: 0 TypeScript errors, 36 routes compiled
 
 **Phase 2.2 — UI Overhaul + Public UX ✅ (2026-04-08)**
 - Schema: added `venueHidden Boolean @default(false)` to Event

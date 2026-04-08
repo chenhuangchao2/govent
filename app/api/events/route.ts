@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
       capacity: Number(body.capacity),
       registrationDeadline: new Date(body.registrationDeadline),
       allowedDomains: body.allowedDomains ?? [],
-      allowedDepartments: body.allowedDepartments ?? [],
+      allowedOrganisations: body.allowedOrganisations ?? [],
       isPaid: body.isPaid ?? false,
       price: body.isPaid ? Number(body.price) : null,
       paymentDeadlineHours: body.paymentDeadlineHours ?? 48,

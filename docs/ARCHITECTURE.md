@@ -2,7 +2,7 @@
 
 ## Problem Statement
 
-Government agencies run internal workshops and training sessions using Google Forms. This creates three problems: registration data sits on foreign third-party servers, there is no server-side eligibility enforcement, and there is no audit trail when compliance officers ask who attended what. GovEvent solves all three on the agency's own infrastructure.
+Government agencies run workshops and training sessions using Google Forms. This creates three problems: registration data sits on third-party servers, there is no server-side eligibility enforcement, and there is no audit trail for compliance. GovEvent solves all three on the agency's own infrastructure.
 
 ---
 
@@ -13,10 +13,12 @@ Government agencies run internal workshops and training sessions using Google Fo
 │                         User's Browser                           │
 │                                                                  │
 │   Public Pages                      Admin Pages                  │
-│   /events          (Server)         /admin            (Server)   │
-│   /events/[id]     (S+Client)      /admin/events     (Server)   │
-│   /register/[id]   (Client)        /admin/events/[id](S+Client) │
-│   /my-registrations(Client)        /admin/audit-log  (S+Client) │
+│   /events          (Server+Client) /admin            (Server+C)  │
+│   /events/[id]     (Server+Client) /admin/events     (Server)    │
+│   /register/[id]   (Client)        /admin/events/[id](S+Client)  │
+│   /my-registrations(Client)        /admin/audit-log  (S+Client)  │
+│   /login           (Client)        /admin/blacklist  (S+Client)  │
+│   /signup          (Client)                                      │
 └──────────────┬───────────────────────────────┬───────────────────┘
                │ HTTP                           │ HTTP
                ▼                               ▼
@@ -24,33 +26,41 @@ Government agencies run internal workshops and training sessions using Google Fo
 │                  Next.js 15 Server (NorthFlank)                   │
 │                                                                  │
 │   API Routes                                                     │
-│   POST /api/registrations          ← submit registration         │
-│   PATCH /api/registrations/[id]    ← approve / reject            │
+│   POST /api/registrations              ← submit registration     │
+│   PATCH /api/registrations/[id]        ← approve/reject/notes    │
 │   POST /api/registrations/[id]/checkin ← QR scan check-in       │
-│   POST /api/events                 ← create event                │
-│   PATCH /api/events/[id]           ← edit / cancel event         │
-│   POST /api/webhook/stripe         ← receive Stripe events       │
-│   GET  /api/cron/reminders         ← T-48h reminder job          │
-│   GET  /api/cron/no-shows          ← post-event NO_SHOW marking  │
-│   GET  /api/cron/payment-timeout   ← expired payment cleanup     │
+│   POST /api/registrations/bulk-approve ← batch approve           │
+│   POST /api/registrations/self-cancel  ← participant cancel      │
+│   GET  /api/registrations/export       ← CSV download            │
+│   POST /api/events                     ← create event            │
+│   PATCH /api/events/[id]               ← edit/cancel/publish     │
+│   POST /api/events/[id]/broadcast      ← email all attendees     │
+│   GET  /api/events/[id]/checkin-stats  ← live check-in progress  │
+│   GET  /api/analytics                  ← dashboard stats         │
+│   POST /api/auth/participant/*         ← signup/verify/login     │
+│   POST /api/webhook/stripe             ← Stripe payment events   │
+│   GET  /api/cron/*                     ← scheduled jobs          │
 │                                                                  │
 │   ┌──────────────────────────────────────────────────────────┐  │
 │   │  services/                                               │  │
-│   │  email.ts     → Resend API wrapper                       │  │
-│   │  stripe.ts    → Stripe session + webhook handler         │  │
-│   │  blacklist.ts → Blacklist check + auto-trigger logic     │  │
+│   │  email.ts     → Resend API (confirm, approve, broadcast) │  │
+│   │  stripe.ts    → Stripe Checkout session creation         │  │
+│   │  blacklist.ts → Blacklist check + auto-trigger           │  │
+│   │  waitlist.ts  → Auto-promote on vacancy                  │  │
+│   │  qr.ts        → QR code generation                       │  │
 │   └──────────────────────────┬───────────────────────────────┘  │
 │                              │                                   │
 │   ┌──────────────────────────▼───────────────────────────────┐  │
-│   │  Prisma 5 ORM                                            │  │
+│   │  Prisma 5 ORM (6 models: User, Participant, Event,      │  │
+│   │  Registration, Blacklist, AuditLog)                       │  │
 │   └──────────────────────────┬───────────────────────────────┘  │
-└─────────────────────────────-│───────────────────────────────────┘
+└──────────────────────────────│───────────────────────────────────┘
                                │
               ┌────────────────┼──────────────────────┐
               ▼                ▼                      ▼
    ┌──────────────────┐  ┌──────────────┐  ┌──────────────────────┐
    │  PostgreSQL DB   │  │  Resend API  │  │  Stripe API          │
-   │  (NorthFlank)    │  │  (email)     │  │  (payments+webhooks) │
+   │  (NorthFlank)    │  │  (email+OTP) │  │  (payments+webhooks) │
    └──────────────────┘  └──────────────┘  └──────────────────────┘
               ▲
    ┌──────────┴───────────┐
@@ -64,41 +74,55 @@ Government agencies run internal workshops and training sessions using Google Fo
 ## Key Components
 
 ### Frontend
-- **Technology**: Next.js 15 App Router, React Server Components
+- **Technology**: Next.js 15 App Router, React Server Components + Client Components
 - **UI**: shadcn/ui + Tailwind CSS
-- **Icons**: lucide-react for admin sidebar and dashboard
-- **Pattern**: Server Components for all read paths; `'use client'` only for interactive islands (registration form, QR scanner, real-time check-in, countdown, mobile nav)
-- **Loading**: Next.js `loading.tsx` skeletons on key pages (events listing, event detail, admin events, audit log)
-- **Responsive**: Mobile hamburger nav on public pages; admin remains desktop-only
+- **Charts**: Recharts (pie, bar charts on admin dashboard)
+- **Icons**: lucide-react
+- **Pattern**: Server Components for data fetching; `'use client'` for interactive features
+- **Auth**: Participant auth (email+password+OTP), Admin auth (session-based)
 
 | Page | Type | Description |
 |------|------|-------------|
-| `/events` | Server | Public event listing — redesigned cards with CapacityBar, venue hiding, price badges. Loading skeleton. |
-| `/events/[id]` | Server+Client | Event detail — info card with DeadlineCountdown (live), CapacityBar, venue hiding, eligibility display. Loading skeleton. |
-| `/register/[id]` | Client | Registration form — real-time eligibility preview (domain check), rich success screen with "what happens next" CTA |
-| `/my-registrations` | Client | Registration history — typed interface, Pay Now button (PENDING_PAYMENT), CPD hours summary, venue display for APPROVED, QR codes |
-| `/admin` | Server | Dashboard — 4 icon stat cards (events, pending, check-ins, total registrations) + quick-action links |
-| `/admin/events` | Server | Event list — clickable titles, date+time, capacity colors (green/amber/red), polished status badges, empty state |
-| `/admin/events/[id]` | Server+Client | Event detail — 3-tab layout (Overview / Registrations / Check-in). Overview: inline click-to-edit fields, venueHidden toggle. |
-| `/admin/audit-log` | Server+Client | Audit log — card-based list grouped by date, color-coded action badges, filter by action/event/time-period, pagination. Loading skeleton. |
-| `/admin/blacklist` | Server+Client | Blacklist management with AlertDialog confirmation |
+| `/events` | Server+Client | Event listing with search, time/cost/organisation filters |
+| `/events/[id]` | Server+Client | Event detail with registration status check (session-aware) |
+| `/register/[id]` | Client | Registration form — pre-fills from session if logged in |
+| `/my-registrations` | Client | Requires login. Upcoming/past split, self-cancel, QR codes, CPD summary |
+| `/login` | Client | Participant sign-in with redirect support |
+| `/signup` | Client | Two-step: credentials → OTP email verification |
+| `/admin` | Server+Client | Dashboard: 4 stat cards + 4 analytics charts (Recharts) |
+| `/admin/events` | Server | Event list with status badges and capacity indicators |
+| `/admin/events/[id]` | Server+Client | 3-tab layout: Overview (inline edit) / Registrations (bulk approve, CSV export, notes) / Check-in (QR/search/manual + live stats) |
+| `/admin/audit-log` | Server+Client | Card-based timeline, grouped by date, filterable |
+| `/admin/blacklist` | Server+Client | CRUD with AlertDialog confirmation |
 
 ### Backend (API Routes)
 - All routes return `{ data, error }` format
-- Admin routes check session before processing
-- Cron routes check `CRON_SECRET` header
+- Admin routes protected by `requireAdmin()` session check
+- Participant routes protected by `requireParticipant()` session check
+- Cron routes protected by `CRON_SECRET` header
 
 ### Data Storage
-- **PostgreSQL** on NorthFlank managed database (prod) / Docker (local)
-- **Prisma 5** as ORM — schema is the single source of truth; TypeScript types generated from schema
+- **PostgreSQL** on NorthFlank (prod) / Docker (local)
+- **Prisma 5** as ORM — schema is single source of truth
+- **6 models**: User (admin), Participant (public users), Event, Registration, Blacklist, AuditLog
 
 ### External Integrations
 
 | Service | Purpose | Direction |
 |---------|---------|-----------|
-| **Resend** | Transactional email (confirmation, approval, payment link, reminder, blacklist notice) | Outbound |
-| **Stripe Checkout** | Paid event registration payment | Outbound (create session) + Inbound (webhook) |
-| **NorthFlank Cron** | Scheduled jobs: T-48h reminders, payment timeout cleanup, post-event NO_SHOW marking | Triggers `/api/cron/*` |
+| **Resend** | Transactional email + OTP verification codes | Outbound |
+| **Stripe Checkout** | Paid event payment collection | Outbound (session) + Inbound (webhook) |
+| **NorthFlank Cron** | Reminders, payment timeout, NO_SHOW marking | Triggers `/api/cron/*` |
+
+---
+
+## Authentication
+
+| Role | Method | Session |
+|------|--------|---------|
+| **Admin** | Email + password (seeded account) | `govent-session` cookie |
+| **Participant** | Email + password + OTP verification | `govent-participant` cookie |
+| **Guest** | No auth required | Browse events freely |
 
 ---
 
@@ -119,24 +143,26 @@ docker-compose.yml               Single Docker service (multi-stage build)
 
 ## Key Assumptions
 
-- Users are internal staff identified by email domain (no Singpass/Corppass for this prototype)
-- Admin authentication is simple session-based; single admin role (no multi-level permissions)
-- Stripe is in test mode during assessment; real money is never charged
-- NorthFlank Cron fires hourly; reminder emails may arrive up to 1 hour early/late relative to the 48h window
-- Paid event refunds are manual (no automated Stripe refund flow)
+- Participants identified by email + password (no Singpass/Corppass for this prototype)
+- Admin authentication is single-role (no multi-level permissions)
+- Stripe is in test mode; real money is never charged
+- NorthFlank Cron fires hourly; reminders may arrive ±1 hour of the 48h window
+- Paid event refunds are manual
 
 ## Known Limitations
 
-- No real-time push (waitlist promotion and seat counter use polling / page refresh)
-- No multi-level approval chain (single organizer approve/reject only)
-- No Singpass/Corppass identity verification (email domain check only)
-- No mobile-native QR scanner app — uses browser camera API
+- No real-time push (uses polling / page refresh)
+- No multi-level approval chain (single organizer only)
+- No Singpass/Corppass identity verification
+- No mobile-native QR scanner — uses browser camera API
+- Check-in requires ±2h time window from event start/end
 
 ## What I Would Improve for Production
 
-- Replace session auth with Singpass/Corppass for verified government identity
+- Replace email+password with Singpass/Corppass for verified government identity
 - Add Zod schema validation on all API inputs
-- Move email sending to a background queue (avoid blocking API response on Resend latency)
-- Add rate limiting on registration endpoints
+- Move email sending to a background queue
+- Add rate limiting on registration and auth endpoints
 - Add error monitoring (Sentry)
-- Implement multi-level approval workflow (registrant → manager → training coordinator)
+- Implement WebSocket for real-time check-in stats and seat updates
+- Multi-level approval workflow (registrant → manager → coordinator)

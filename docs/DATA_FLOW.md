@@ -1,7 +1,7 @@
 # Data Flow Reference — GovEvent
 
 > Walkthrough preparation material — covers all data flows end-to-end.
-> Updated through Phase 2.2 (UI overhaul + public UX).
+> Updated through Phase 2.4 (participant auth + power features).
 
 ---
 
@@ -12,7 +12,7 @@
 ```
 Browser (Client Component)
   │  POST /api/registrations
-  │  Body: { eventId, name, email, department, remarks }
+  │  Body: { eventId, name, email, organisation, remarks }
   ▼
 API Route: /api/registrations
   1. Check blacklist          → if found: return 403 "Please contact the organiser"

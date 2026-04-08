@@ -10,10 +10,11 @@ export async function GET(req: NextRequest) {
     include: {
       event: {
         select: {
+          id: true,
           title: true,
           startTime: true,
+          endTime: true,
           venue: true,
-          venueHidden: true,
           cpdHours: true,
           isPaid: true,
         },

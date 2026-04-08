@@ -9,13 +9,13 @@ interface Props {
   id: string
   name: string
   email: string
-  department: string
+  organisation: string
   status: string
   createdAt: string
   onUpdate: () => void
 }
 
-export default function RegistrationRow({ id, name, email, department, status, createdAt, onUpdate }: Props) {
+export default function RegistrationRow({ id, name, email, organisation, status, createdAt, onUpdate }: Props) {
   const [loading, setLoading] = useState(false)
   const [showReject, setShowReject] = useState(false)
 
@@ -53,7 +53,7 @@ export default function RegistrationRow({ id, name, email, department, status, c
           <p className="font-medium text-gray-900 text-sm">{name}</p>
           <p className="text-xs text-gray-500">{email}</p>
         </td>
-        <td className="px-4 py-3 text-sm text-gray-600">{department}</td>
+        <td className="px-4 py-3 text-sm text-gray-600">{organisation}</td>
         <td className="px-4 py-3"><StatusBadge status={status} /></td>
         <td className="px-4 py-3 text-xs text-gray-400">
           {new Date(createdAt).toLocaleDateString('en-SG')}

@@ -29,9 +29,9 @@ export async function GET(req: NextRequest) {
 // POST /api/registrations — participant submits
 export async function POST(req: NextRequest) {
   const body = await req.json()
-  const { eventId, name, email, department, remarks } = body
+  const { eventId, name, email, organisation, remarks } = body
 
-  if (!eventId || !name || !email || !department) {
+  if (!eventId || !name || !email || !organisation) {
     return NextResponse.json({ data: null, error: 'Missing required fields' }, { status: 400 })
   }
 
@@ -58,11 +58,11 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Check 2b: Eligibility (department)
-  if (event.allowedDepartments.length > 0 && !event.allowedDepartments.includes(department)) {
+  // Check 2b: Eligibility (organisation)
+  if (event.allowedOrganisations.length > 0 && !event.allowedOrganisations.includes(organisation)) {
     return NextResponse.json({
       data: null,
-      error: `This event is restricted to: ${event.allowedDepartments.join(', ')} departments`,
+      error: `This event is restricted to: ${event.allowedOrganisations.join(', ')} organisations`,
     }, { status: 400 })
   }
 
@@ -71,9 +71,49 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ data: null, error: 'Registration has closed for this event' }, { status: 400 })
   }
 
-  // Check 4: Duplicate
+  // Check 4: Duplicate — allow re-registration if previous was CANCELLED or REJECTED
   const existing = await db.registration.findUnique({ where: { eventId_email: { eventId, email } } })
   if (existing) {
+    if (existing.status === 'CANCELLED' || existing.status === 'REJECTED') {
+      // Re-register: reset the existing record
+      const registration = await db.$transaction(async (tx) => {
+        const count = await tx.registration.count({
+          where: { eventId, status: { in: ['PENDING', 'APPROVED', 'PENDING_PAYMENT'] } },
+        })
+        const regStatus = count >= event.capacity ? 'WAITLISTED' : 'PENDING'
+        const waitlistPosition = regStatus === 'WAITLISTED'
+          ? await tx.registration.count({ where: { eventId, status: 'WAITLISTED' } }) + 1
+          : null
+
+        const reg = await tx.registration.update({
+          where: { id: existing.id },
+          data: {
+            name, organisation, remarks,
+            status: regStatus,
+            waitlistPosition,
+            paymentStatus: 'NOT_REQUIRED',
+            stripeSessionId: null,
+            paymentDeadline: null,
+            paidAt: null,
+            checkedInAt: null,
+            adminNotes: null,
+          },
+        })
+
+        await tx.auditLog.create({
+          data: { action: 'RE_REGISTER', eventId, registrationId: reg.id, metadata: { email, status: regStatus, previousStatus: existing.status } },
+        })
+
+        return reg
+      })
+
+      await sendRegistrationConfirmation({
+        to: email, name, eventTitle: event.title,
+        eventDate: event.startTime.toLocaleDateString('en-SG'), status: registration.status,
+      }).catch(console.error)
+
+      return NextResponse.json({ data: registration, error: null }, { status: 201 })
+    }
     return NextResponse.json({ data: null, error: 'You are already registered for this event' }, { status: 400 })
   }
 
@@ -90,7 +130,7 @@ export async function POST(req: NextRequest) {
 
     const reg = await tx.registration.create({
       data: {
-        eventId, name, email, department, remarks,
+        eventId, name, email, organisation, remarks,
         status: regStatus,
         waitlistPosition,
         paymentStatus: 'NOT_REQUIRED',

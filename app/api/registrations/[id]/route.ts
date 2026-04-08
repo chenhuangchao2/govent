@@ -8,6 +8,7 @@ import { createCheckoutSession } from '@/services/stripe'
 import { promoteWaitlist } from '@/services/waitlist'
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
   const { id } = await params
   const session = await requireAdmin()
   if (!session) return NextResponse.json({ data: null, error: 'Unauthorized' }, { status: 401 })
@@ -112,5 +113,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ data: { ok: true }, error: null })
   }
 
+  if (action === 'add-note') {
+    const { notes } = body
+    const updated = await db.registration.update({
+      where: { id },
+      data: { adminNotes: notes ?? null },
+    })
+    await logAction({ action: 'ADD_NOTE', actorId: session.userId, registrationId: id, metadata: { notes }, req })
+    return NextResponse.json({ data: updated, error: null })
+  }
+
   return NextResponse.json({ data: null, error: 'Unknown action' }, { status: 400 })
+  } catch (err) {
+    console.error('[Registration PATCH Error]', err)
+    const message = err instanceof Error ? err.message : 'Internal server error'
+    return NextResponse.json({ data: null, error: message }, { status: 500 })
+  }
 }

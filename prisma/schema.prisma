@@ -32,8 +32,8 @@ model Event {
   noShowProcessed      Boolean       @default(false)
 
   // Eligibility
-  allowedDomains      String[]      // e.g. ["govtech.gov.sg", "mci.gov.sg"]
-  allowedDepartments  String[]      // e.g. ["Engineering", "Policy"] — empty = all
+  allowedDomains        String[]      // e.g. ["tech.gov.sg"] — empty = open to all
+  allowedOrganisations  String[]      // e.g. ["GovTech", "IMDA"] — empty = all
 
   // Payment
   isPaid              Boolean       @default(false)
@@ -58,7 +58,7 @@ model Registration {
   // Participant info
   name            String
   email           String
-  department      String
+  organisation    String
   remarks         String?
 
   // Status
@@ -74,6 +74,9 @@ model Registration {
   // Check-in
   checkedInAt     DateTime?
 
+  // Admin notes
+  adminNotes      String?
+
   // Reminders
   reminderSent    Boolean            @default(false)
 
@@ -83,6 +86,17 @@ model Registration {
   auditLogs       AuditLog[]
 
   @@unique([eventId, email])
+}
+
+model Participant {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String
+  passwordHash      String
+  isVerified        Boolean   @default(false)
+  verificationCode  String?
+  codeExpiresAt     DateTime?
+  createdAt         DateTime  @default(now())
 }
 
 model Blacklist {

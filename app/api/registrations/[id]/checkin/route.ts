@@ -27,6 +27,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ data: null, error: 'Registration is not approved' }, { status: 400 })
   }
 
+  // Time-window validation: ±2 hours from event start
+  const now = new Date()
+  const eventStart = new Date(reg.event.startTime)
+  const eventEnd = new Date(reg.event.endTime)
+  const windowStart = new Date(eventStart.getTime() - 2 * 60 * 60 * 1000) // 2h before
+  const windowEnd = new Date(eventEnd.getTime() + 2 * 60 * 60 * 1000)     // 2h after
+
+  if (now < windowStart) {
+    return NextResponse.json({ data: null, error: 'Check-in is not open yet. Opens 2 hours before event start.' }, { status: 400 })
+  }
+  if (now > windowEnd) {
+    return NextResponse.json({ data: null, error: 'Check-in window has closed. Event has ended.' }, { status: 400 })
+  }
+
   const updated = await db.registration.update({
     where: { id },
     data: { status: 'ATTENDED', checkedInAt: new Date() },

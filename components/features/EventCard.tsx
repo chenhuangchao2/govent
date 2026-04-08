@@ -6,13 +6,12 @@ interface EventCardProps {
   title: string
   startTime: string
   venue: string
-  venueHidden: boolean
   capacity: number
   registeredCount: number
   isPaid: boolean
   price?: number | null
   allowedDomains: string[]
-  allowedDepartments: string[]
+  allowedOrganisations: string[]
 }
 
 function formatEventTime(startTime: string): string {
@@ -36,13 +35,12 @@ export default function EventCard({
   title,
   startTime,
   venue,
-  venueHidden,
   capacity,
   registeredCount,
   isPaid,
   price,
   allowedDomains,
-  allowedDepartments,
+  allowedOrganisations,
 }: EventCardProps) {
   return (
     <Link href={`/events/${id}`} className="block">
@@ -68,20 +66,17 @@ export default function EventCard({
         <p className="text-sm text-gray-500 mb-1">{formatEventTime(startTime)}</p>
 
         {/* Venue row */}
-        {venueHidden
-          ? <p className="text-sm italic text-gray-400 mb-3">Venue revealed upon approval</p>
-          : <p className="text-sm text-gray-500 mb-3">{venue}</p>
-        }
+        <p className="text-sm text-gray-500 mb-3">{venue || 'To Be Confirmed'}</p>
 
         {/* Capacity bar */}
         <div className="mb-3">
           <CapacityBar registered={registeredCount} capacity={capacity} />
         </div>
 
-        {/* Domain restriction notice */}
-        {allowedDomains.length > 0 && (
+        {/* Eligibility restriction notice */}
+        {allowedOrganisations.length > 0 && (
           <p className="text-xs text-amber-600 mb-3">
-            Restricted: {allowedDomains.join(', ')}
+            Open to: {allowedOrganisations.join(', ')}
           </p>
         )}
 

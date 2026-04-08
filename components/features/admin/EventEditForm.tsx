@@ -14,7 +14,7 @@ interface EventData {
   capacity: number
   registrationDeadline: string
   allowedDomains: string[]
-  allowedDepartments: string[]
+  allowedOrganisations: string[]
   cpdHours: number
   isPaid: boolean
   price: number | null
@@ -43,7 +43,7 @@ export default function EventEditForm({ event }: { event: EventData }) {
       capacity: fd.get('capacity'),
       registrationDeadline: fd.get('registrationDeadline'),
       allowedDomains: (fd.get('allowedDomains') as string).split(',').map(s => s.trim()).filter(Boolean),
-      allowedDepartments: (fd.get('allowedDepartments') as string).split(',').map(s => s.trim()).filter(Boolean),
+      allowedOrganisations: (fd.get('allowedOrganisations') as string).split(',').map(s => s.trim()).filter(Boolean),
       cpdHours: fd.get('cpdHours'),
       isPaid,
       price: isPaid ? fd.get('price') : null,
@@ -114,8 +114,8 @@ export default function EventEditForm({ event }: { event: EventData }) {
           <input name="allowedDomains" defaultValue={event.allowedDomains.join(', ')} placeholder="govtech.gov.sg, tech.gov.sg" className={inputClass} disabled={event.isCancelled} />
         </div>
         <div>
-          <label className={labelClass}>Allowed Departments (comma-separated, empty = all)</label>
-          <input name="allowedDepartments" defaultValue={event.allowedDepartments.join(', ')} placeholder="Engineering, Policy" className={inputClass} disabled={event.isCancelled} />
+          <label className={labelClass}>Allowed Organisations (comma-separated, empty = all)</label>
+          <input name="allowedOrganisations" defaultValue={event.allowedOrganisations.join(', ')} placeholder="GovTech, IMDA" className={inputClass} disabled={event.isCancelled} />
         </div>
         <div>
           <label className={labelClass}>CPD Hours</label>

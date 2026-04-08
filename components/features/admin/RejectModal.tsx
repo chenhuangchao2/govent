@@ -44,7 +44,7 @@ export default function RejectModal({ open, participantName, loading, onClose, o
           <textarea
             value={reason}
             onChange={e => setReason(e.target.value)}
-            placeholder="e.g. Not eligible — wrong department"
+            placeholder="e.g. Not eligible — wrong organisation"
             rows={3}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500 resize-none"
           />

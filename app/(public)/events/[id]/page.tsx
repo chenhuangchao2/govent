@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import CapacityBar from '@/components/features/CapacityBar'
 import DeadlineCountdown from '@/components/features/DeadlineCountdown'
+import EventRegistrationStatus from '@/components/features/EventRegistrationStatus'
 
 export default async function EventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -84,11 +85,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           <span className="text-gray-400 mt-0.5">📍</span>
           <div>
             <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Venue</p>
-            {event.venueHidden ? (
-              <p className="text-sm italic text-gray-400">Venue will be revealed upon approval</p>
-            ) : (
-              <p className="text-sm text-gray-700">{event.venue}</p>
-            )}
+            <p className="text-sm text-gray-700">{event.venue || 'To Be Confirmed'}</p>
           </div>
         </div>
 
@@ -123,13 +120,13 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           </div>
         )}
 
-        {/* Eligibility — only if allowedDomains restricted */}
-        {event.allowedDomains.length > 0 && (
+        {/* Eligibility — only if organisation restricted */}
+        {event.allowedOrganisations.length > 0 && (
           <div className="px-5 py-4 flex gap-3">
             <span className="text-gray-400 mt-0.5">🔒</span>
             <div>
               <p className="text-xs font-medium text-gray-400 uppercase tracking-wide mb-0.5">Eligibility</p>
-              <p className="text-sm text-gray-700">Open to: {event.allowedDomains.join(', ')}</p>
+              <p className="text-sm text-gray-700">Open to: {event.allowedOrganisations.join(', ')}</p>
             </div>
           </div>
         )}
@@ -144,24 +141,12 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
         <p className="text-gray-700 whitespace-pre-wrap">{event.description}</p>
       </div>
 
-      {/* CTA */}
-      {!isPastDeadline && (
-        isFull ? (
-          <Link
-            href={`/register/${id}`}
-            className="inline-block bg-gray-700 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-gray-800"
-          >
-            Join Waitlist →
-          </Link>
-        ) : (
-          <Link
-            href={`/register/${id}`}
-            className="inline-block bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700"
-          >
-            Register Now →
-          </Link>
-        )
-      )}
+      {/* CTA — shows registration status if already registered, or register/waitlist button */}
+      <EventRegistrationStatus
+        eventId={id}
+        isFull={isFull}
+        isPastDeadline={isPastDeadline}
+      />
     </div>
   )
 }

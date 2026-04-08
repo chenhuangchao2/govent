@@ -94,3 +94,14 @@ export async function sendCancellationEmail(opts: {
     html: `<p>Hi ${opts.name},</p><p>We regret to inform you that <strong>${opts.eventTitle}</strong> has been cancelled. We apologise for any inconvenience caused.</p><p>GovEvent Team</p>`,
   })
 }
+
+export async function sendBroadcastEmail(opts: {
+  to: string; name: string; eventTitle: string; subject: string; message: string
+}) {
+  await resend.emails.send({
+    from: FROM,
+    to: opts.to,
+    subject: `${opts.subject} — ${opts.eventTitle}`,
+    html: `<p>Hi ${opts.name},</p><p>${opts.message.replace(/\n/g, '<br/>')}</p><p>GovEvent Team</p>`,
+  })
+}
