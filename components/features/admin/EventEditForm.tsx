@@ -54,9 +54,11 @@ export default function EventEditForm({ event }: { event: EventData }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      const data = await res.json()
+      const text = await res.text()
       if (!res.ok) {
-        toast.error(data.error ?? 'Failed to save changes')
+        let errorMsg = 'Failed to save changes'
+        try { errorMsg = JSON.parse(text).error ?? errorMsg } catch {}
+        toast.error(errorMsg)
       } else {
         toast.success('Event updated')
         router.refresh()

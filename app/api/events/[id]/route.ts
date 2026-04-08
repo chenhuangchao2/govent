@@ -50,23 +50,27 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   // General update
-  const event = await db.event.update({
-    where: { id },
-    data: {
-      title: body.title,
-      description: body.description,
-      startTime: body.startTime ? new Date(body.startTime) : undefined,
-      endTime: body.endTime ? new Date(body.endTime) : undefined,
-      venue: body.venue,
-      capacity: body.capacity ? Number(body.capacity) : undefined,
-      registrationDeadline: body.registrationDeadline ? new Date(body.registrationDeadline) : undefined,
-      allowedDomains: body.allowedDomains ?? undefined,
-      allowedDepartments: body.allowedDepartments ?? undefined,
-      cpdHours: body.cpdHours != null ? Number(body.cpdHours) : undefined,
-      isPaid: body.isPaid != null ? Boolean(body.isPaid) : undefined,
-      price: body.price != null ? Number(body.price) : undefined,
-    },
-  })
-  await logAction({ action: 'EDIT_EVENT', actorId: session.userId, eventId: id, req })
-  return NextResponse.json({ data: event, error: null })
+  try {
+    const event = await db.event.update({
+      where: { id },
+      data: {
+        title: body.title,
+        description: body.description,
+        startTime: body.startTime ? new Date(body.startTime) : undefined,
+        endTime: body.endTime ? new Date(body.endTime) : undefined,
+        venue: body.venue,
+        capacity: body.capacity ? Number(body.capacity) : undefined,
+        registrationDeadline: body.registrationDeadline ? new Date(body.registrationDeadline) : undefined,
+        allowedDomains: body.allowedDomains ?? undefined,
+        allowedDepartments: body.allowedDepartments ?? undefined,
+        cpdHours: body.cpdHours != null ? Number(body.cpdHours) : undefined,
+        isPaid: body.isPaid != null ? Boolean(body.isPaid) : undefined,
+        price: body.price != null ? Number(body.price) : undefined,
+      },
+    })
+    await logAction({ action: 'EDIT_EVENT', actorId: session.userId, eventId: id, req })
+    return NextResponse.json({ data: event, error: null })
+  } catch {
+    return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
+  }
 }

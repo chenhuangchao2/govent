@@ -2,18 +2,37 @@ import { db } from '@/lib/db'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import EventActionButtons from '@/components/features/admin/EventActionButtons'
-import EventEditForm from '@/components/features/admin/EventEditForm'
+import EventOverview from '@/components/features/admin/EventOverview'
+import EventDetailTabs from '@/components/features/admin/EventDetailTabs'
+import RegistrationsPanel from '@/components/features/admin/RegistrationsPanel'
+import CheckinScanner from '@/components/features/admin/CheckinScanner'
 
 export default async function AdminEventDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const event = await db.event.findUnique({
     where: { id },
-    include: { _count: { select: { registrations: true } } },
+    include: {
+      _count: {
+        select: {
+          registrations: true,
+        },
+      },
+    },
   })
   if (!event) notFound()
 
   const statusLabel = event.isCancelled ? 'Cancelled' : event.isPublished ? 'Published' : 'Draft'
-  const statusColor = event.isCancelled ? 'text-red-600' : event.isPublished ? 'text-green-600' : 'text-yellow-600'
+  const statusColor = event.isCancelled
+    ? 'bg-red-100 text-red-700'
+    : event.isPublished
+      ? 'bg-green-100 text-green-700'
+      : 'bg-yellow-100 text-yellow-700'
+
+  const tabs = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'registrations', label: 'Registrations', count: event._count.registrations },
+    { key: 'checkin', label: 'Check-in' },
+  ]
 
   return (
     <div>
@@ -21,13 +40,17 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
         ← All Events
       </Link>
 
-      <div className="flex items-start justify-between mb-2">
+      <div className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold text-gray-900">{event.title}</h1>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${statusColor}`}>
+              {statusLabel}
+            </span>
+          </div>
           <p className="text-sm text-gray-500 mt-1">
             {event.startTime.toLocaleDateString('en-SG', { dateStyle: 'full' })} · {event.venue}
           </p>
-          <span className={`text-xs font-semibold mt-1 inline-block ${statusColor}`}>{statusLabel}</span>
         </div>
         <EventActionButtons
           eventId={id}
@@ -36,40 +59,31 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
         />
       </div>
 
-      <div className="flex gap-3 my-6">
-        <Link href={`/admin/events/${id}/registrations`}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
-          Manage Registrations ({event._count.registrations})
-        </Link>
-        <Link href={`/admin/checkin/${id}`}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700">
-          Start Check-in
-        </Link>
-      </div>
+      <EventDetailTabs tabs={tabs}>
+        {/* Overview tab */}
+        <EventOverview event={{
+          id: event.id,
+          title: event.title,
+          description: event.description,
+          startTime: event.startTime.toISOString(),
+          endTime: event.endTime.toISOString(),
+          venue: event.venue,
+          capacity: event.capacity,
+          registrationDeadline: event.registrationDeadline.toISOString(),
+          allowedDomains: event.allowedDomains,
+          allowedDepartments: event.allowedDepartments,
+          cpdHours: event.cpdHours,
+          isPaid: event.isPaid,
+          price: event.price,
+          isCancelled: event.isCancelled,
+        }} />
 
-      <div className="grid grid-cols-2 gap-4 max-w-md text-sm text-gray-600">
-        <div><span className="font-medium">Capacity:</span> {event.capacity}</div>
-        <div><span className="font-medium">Total Registrations:</span> {event._count.registrations}</div>
-        <div><span className="font-medium">CPD Hours:</span> {event.cpdHours}</div>
-        {event.isPaid && <div><span className="font-medium">Price:</span> SGD {event.price}</div>}
-      </div>
+        {/* Registrations tab */}
+        <RegistrationsPanel eventId={id} />
 
-      <EventEditForm event={{
-        id: event.id,
-        title: event.title,
-        description: event.description,
-        startTime: event.startTime.toISOString(),
-        endTime: event.endTime.toISOString(),
-        venue: event.venue,
-        capacity: event.capacity,
-        registrationDeadline: event.registrationDeadline.toISOString(),
-        allowedDomains: event.allowedDomains,
-        allowedDepartments: event.allowedDepartments,
-        cpdHours: event.cpdHours,
-        isPaid: event.isPaid,
-        price: event.price,
-        isCancelled: event.isCancelled,
-      }} />
+        {/* Check-in tab */}
+        <CheckinScanner eventId={id} />
+      </EventDetailTabs>
     </div>
   )
 }

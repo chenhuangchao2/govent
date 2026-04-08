@@ -37,15 +37,18 @@ export default function BlacklistTable({ initial }: { initial: Entry[] }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: newEmail, reason: newReason }),
     })
-    const data = await res.json()
+    const text = await res.text()
     setShowAddConfirm(false)
     if (res.ok) {
+      const data = JSON.parse(text)
       setEntries(e => [data.data, ...e])
       setNewEmail('')
       setNewReason('')
       toast.success(`${newEmail} added to blacklist`)
     } else {
-      toast.error(data.error ?? 'Failed to add')
+      let errorMsg = 'Failed to add'
+      try { errorMsg = JSON.parse(text).error ?? errorMsg } catch {}
+      toast.error(errorMsg)
     }
   }
 

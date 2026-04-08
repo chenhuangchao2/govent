@@ -1,7 +1,7 @@
 import { db } from '@/lib/db'
 import { sendBlacklistNotification } from './email'
 
-const THRESHOLD = 2
+const THRESHOLD = 5
 
 export async function checkBlacklist(email: string): Promise<boolean> {
   const entry = await db.blacklist.findUnique({ where: { email } })

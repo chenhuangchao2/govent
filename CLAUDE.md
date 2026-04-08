@@ -83,12 +83,16 @@ app/
 
 **Phase 2.1 — Admin Core Completion ✅ (2026-04-08)**
 - shadcn Sonner + AlertDialog + Dialog installed; Toaster in root layout
-- Event edit form (`EventEditForm`) + publish/unpublish/cancel buttons (`EventActionButtons`) on event detail page
-- PATCH /api/events/[id] extended to save all fields (allowedDomains, allowedDepartments, cpdHours, isPaid, price)
+- Event detail: 3-tab layout (Overview / Registrations / Check-in) — all management in one page
+- Event overview: inline click-to-edit fields (Enter saves, Esc cancels)
+- Publish/unpublish/cancel action buttons with AlertDialog confirmation
+- PATCH /api/events/[id] extended to save all fields + error handling for missing records
 - RegistrationRow: toast feedback, RejectModal replaces inline reject form
 - Registrations table: fetch-all + client-side filter, status counts, name/email search
-- BlacklistTable: AlertDialog confirmation before add/remove
-- Audit log: filter by action/event (URL params), 50/page pagination, human timestamps
+- BlacklistTable: AlertDialog confirmation before add/remove; defensive JSON parsing
+- Audit log: card-based list grouped by date, color-coded action badges, time-period filter (Today/7d/30d/All), event title display, 50/page pagination
+- Logout: redirects to login page after session destroy
+- Blacklist auto-threshold: 5 no-shows (changed from 2)
 
 **What's working (v1.0)**
 - 15 API routes + 3 cron endpoints operational

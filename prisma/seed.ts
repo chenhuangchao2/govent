@@ -19,7 +19,7 @@ async function main() {
   const admin = await prisma.user.create({
     data: {
       email: 'admin@govtech.gov.sg',
-      name: 'Sarah Lim',
+      name: 'Phoenix Chen',
       passwordHash: hashPassword('admin123'),
     },
   })
@@ -131,9 +131,9 @@ async function main() {
   await prisma.blacklist.create({
     data: {
       email: 'noshow@govtech.gov.sg',
-      reason: 'Registered for 2 events without attending. Auto-flagged by system.',
+      reason: 'Registered for 5 events without attending. Auto-flagged by system.',
       source: 'AUTO_NO_SHOW',
-      noShowCount: 2,
+      noShowCount: 5,
     },
   })
 

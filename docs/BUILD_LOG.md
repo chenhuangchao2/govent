@@ -229,6 +229,42 @@ Conducted full gap analysis across all pages and user journeys. Ran brainstormin
 
 ---
 
+## v2.1 Polish — Audit log redesign, event detail tabs, inline editing, fixes
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+**What changed**
+
+| Area | Change |
+|------|--------|
+| Audit log redesign | Replaced timeline-axis layout with card-based list grouped by date (Today/Yesterday/date). Each entry shows color-coded action badge, event title, metadata summary, relative timestamp, and actor name. Added time-period filter (Today / Last 7 Days / Last 30 Days / All Time). |
+| Event detail — tab layout | Replaced single-scroll page with 3-tab layout: Overview / Registrations (with count badge) / Check-in. All event management in one page, no more jumping between routes. |
+| Event detail — inline editing | Replaced collapsible `<details>` edit form with inline-editable fields. Click any field to edit in-place; Enter saves, Esc cancels. Hover shows "Click to edit" hint. |
+| Logout | Fixed `/api/auth/logout` — was returning JSON, now redirects to `/admin/login` after destroying session. |
+| API error handling | Added try-catch on `PATCH /api/events/[id]` general update — Prisma `P2025` (record not found) now returns 404 JSON instead of empty 500. |
+| Defensive JSON parsing | `EventEditForm` and `BlacklistTable` now use `res.text()` + manual `JSON.parse` instead of `res.json()` — prevents crash on empty response body. |
+| Seed data | Admin name changed to Phoenix Chen. Blacklist threshold changed from 2 to 5 no-shows. |
+
+**Issues encountered and resolved**
+
+| Issue | Resolution |
+|-------|-----------|
+| `res.json()` crash on empty body after reseed | Session invalidated by reseed caused 500 with empty body. Fixed: read as `res.text()` first, parse manually with try-catch |
+| Stale `.next` cache causing "Cannot find module" errors | `npm run build` then `npm run dev` left incompatible turbopack chunks. Fixed: `rm -rf .next` |
+| Hydration mismatch warning on `<body>` | Caused by Grammarly browser extension injecting `data-gr-*` attributes — not a code bug |
+
+**Key decisions**
+
+| Decision | Reasoning |
+|----------|-----------|
+| Tab layout over separate pages | Admin managing an event needs overview, registrations, and check-in in context — switching between pages loses flow |
+| Inline edit over form | Click-to-edit is faster for single-field changes (the common case); a full form is overkill when you just want to change the title or capacity |
+| Card list over timeline for audit log | Timeline axis implies sequential dependency between events; audit log entries are independent items that should be scannable individually |
+| 5 no-shows threshold over 2 | 2 is too aggressive — a single bad week could blacklist someone; 5 is a clearer pattern of repeated no-shows |
+
+**Result**: `npx tsc --noEmit` — 0 errors. All pages returning 200.
+
+---
+
 ## Phase 6 — Deployment
 **Date**: _TBD_ | **Tool**: _TBD_
 
