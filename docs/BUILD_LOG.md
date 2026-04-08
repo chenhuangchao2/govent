@@ -144,10 +144,39 @@ Git tag `v1.0-mvp` created. Full gap analysis conducted across all pages, API ro
 
 ---
 
-## Phase 5 — v2.0 UX Pass
-**Date**: 2026-04-08 (in progress) | **Tool**: Claude Code
+## Phase 5 — v2.0 Design Spec
+**Date**: 2026-04-08 | **Tool**: Claude Code (brainstorming)
 
-Designing v2.0 improvements based on full gap analysis. Key areas: event management completeness, UX feedback layer, payment visibility, check-in resilience, admin polish. See `docs/superpowers/specs/` for spec.
+Conducted full gap analysis across all pages and user journeys. Ran brainstorming session to identify and confirm all v2.0 improvements. Spec written to `docs/superpowers/specs/2026-04-08-govent-v2-design.md`.
+
+**16 feature blocks confirmed:**
+
+| Block / Feature | Description |
+|----------------|-------------|
+| Block 1 | Event edit form + publish/unpublish/cancel buttons |
+| Block 2 | Payment visibility in My Registrations |
+| Block 3 | Global toast system + auto-refresh + table UX |
+| Block 4 | Confirmation dialogs on destructive actions |
+| Block 5 | Check-in camera error handling + name/email search + Enter key |
+| Block 6 | Audit log filtering + pagination + human timestamps |
+| Block 7 | Registration form UX (success CTA, real-time eligibility, deadline) |
+| Block 8 | CSV export, self-cancel, print QR, bulk approve |
+| Block 9 | Venue hiding — revealed only to APPROVED registrants |
+| Feature A | CPD hours accumulation dashboard (participant-facing) |
+| Feature B | Admin internal notes on registrations |
+| Feature C | Event broadcast notification (admin → attendees) |
+| Feature D | Registration deadline countdown |
+| Feature E | Capacity progress bar |
+| Feature F | QR code time-window validation (±2h from event) |
+| Feature H | Check-in real-time stats panel |
+| Feature I | Admin analytics dashboard with Recharts visualizations |
+| Feature J | Full UI overhaul — government design system, mobile-responsive public pages |
+
+**Key decisions made:**
+- Venue hiding adds `venueHidden` boolean to Event schema — government security use case
+- Admin notes adds `adminNotes` to Registration schema — operational need
+- Analytics uses Recharts (React-native, no server dependency) — consistent with client-component approach
+- UI overhaul scoped to shadcn/ui primitives only — no new UI library introduced
 
 ---
 

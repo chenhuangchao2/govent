@@ -74,11 +74,12 @@ app/
 
 ## Version History
 - **v1.0-mvp** (git tag) — 2026-04-08 — Bare-bones MVP. All core flows wired up but rough edges throughout. See `docs/V1_STATUS.md` for known gaps.
-- **v2.0** — _in progress_ — Full UX pass: event editing, publish/cancel controls, payment status visibility, confirmation dialogs, toast feedback, auto-refresh, check-in fallback. See `docs/superpowers/specs/` for design spec.
+- **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v1.0-mvp tagged → v2.0 in design/planning
+**Version**: v1.0-mvp tagged → v2.0 in design/planning (spec complete, implementation not started)
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
+**Next step**: Implement v2.0 per `docs/superpowers/specs/2026-04-08-govent-v2-design.md`, then deploy to NorthFlank (Phase 6)
 
 **What's working (v1.0)**
 - 15 API routes + 3 cron endpoints operational
@@ -87,14 +88,35 @@ app/
 - `npm run build` 0 TypeScript errors · 30 routes compiled
 
 **Known gaps in v1.0 — upgrading in v2.0**
-See `docs/V1_STATUS.md` for full gap list. Critical items:
-- No event edit form (admin can only create, not update)
-- No publish / unpublish / cancel buttons on event detail page
-- Payment status not shown in My Registrations
-- No confirmation dialogs on destructive actions (blacklist add/remove, event cancel)
-- No toast/feedback after approve/reject — table doesn't auto-refresh
-- Check-in has no camera-failure fallback beyond manual ID entry
-- Audit log not filterable, no pagination beyond 200 records
+See `docs/V1_STATUS.md` for full gap list and `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for the complete v2.0 plan.
+
+**v2.0 Feature Blocks (priority order):**
+1. **Block 1** — Event edit form + publish/unpublish/cancel buttons (critical: API exists, no UI)
+2. **Block 3** — Global toast system + registrations auto-refresh + status counts + search + reject modal
+3. **Feature J** — Full UI overhaul: better visual hierarchy, government color system, mobile-responsive public pages, admin tab layout
+4. **Block 2** — Payment status visible in My Registrations (PENDING_PAYMENT badge, Pay Now button)
+5. **Block 9** — Venue hiding: venue hidden from public, revealed only to APPROVED registrants (schema: `venueHidden`)
+6. **Feature I** — Admin analytics dashboard at `/admin/analytics` (Recharts: fill rate, status breakdown, check-in trend, dept breakdown)
+7. **Block 5** — Check-in: camera error handling + name/email search fallback + Enter key
+8. **Block 6** — Audit log: filter by action/event, pagination, human timestamps
+9. **Feature C** — Event broadcast notification (admin → all APPROVED/WAITLISTED via Resend)
+10. **Feature A** — CPD hours accumulation dashboard (participant-facing, My Registrations)
+11. **Block 4** — Confirmation dialogs on all destructive actions (shadcn AlertDialog)
+12. **Block 7** — Registration form: success CTA, real-time eligibility preview, Enter key
+13. **Feature B** — Admin internal notes on registrations (schema: `adminNotes`)
+14. **Features D/E/F** — Deadline countdown, capacity progress bar, QR time-window validation (±2h)
+15. **Block 8** — CSV export, participant self-cancel, print QR, bulk approve
+16. **Feature H** — Check-in real-time stats panel (checked in / total, last 5 scans)
+
+**Schema additions in v2.0:**
+- `Event.venueHidden Boolean @default(false)` — venue hiding
+- `Registration.adminNotes String?` — admin notes
+
+**New API endpoints in v2.0:**
+- `POST /api/events/[id]/broadcast` — send email to all attendees
+- `GET /api/analytics` — aggregated stats
+- `GET /api/events/[id]/checkin-stats` — live check-in progress
+- `GET /api/registrations/[eventId]/export` — CSV download
 
 ## Files to Maintain
 - **`docs/BUILD_LOG.md`** — update every phase (auto-updated by Claude)
