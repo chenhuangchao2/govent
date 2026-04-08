@@ -5,11 +5,9 @@
 
 ---
 
-## Phase 2.1 — Admin Core Completion ← START HERE
+## Phase 2.1 — Admin Core Completion ✅ COMPLETE (2026-04-08)
 
 **Goal**: Make the admin panel actually complete and usable.
-
-The v1.0 admin is broken in fundamental ways — you can create an event but never edit it, approve a registration with no feedback, and have no idea if an action worked. This phase fixes all of that.
 
 | Feature | Description |
 |---------|-------------|
@@ -31,7 +29,7 @@ The v1.0 admin is broken in fundamental ways — you can create an event but nev
 
 ---
 
-## Phase 2.2 — UI Overhaul + Public UX
+## Phase 2.2 — UI Overhaul + Public UX ← NEXT
 
 **Goal**: Make both the admin and public-facing pages polished, clear, and government-appropriate.
 
@@ -100,7 +98,7 @@ The v1.0 admin is broken in fundamental ways — you can create an event but nev
 
 | Phase | Focus | Schema | New APIs |
 |-------|-------|--------|----------|
-| **2.1** | Admin core completion | None | None |
+| **2.1** | Admin core completion ✅ | None | None |
 | **2.2** | UI overhaul + public UX | `venueHidden` | None |
 | **2.3** | New power features | `adminNotes` | 3 |
 | **2.4** | Utility + deployment | None | 1 |

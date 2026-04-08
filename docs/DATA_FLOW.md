@@ -65,7 +65,7 @@ API Route
 Response: { data: updatedRegistration }
   │
   ▼
-UI: Status badge updates inline, "Email sent" indicator appears on row
+UI: Status badge updates inline, toast notification confirms action, table auto-refreshes
 ```
 
 ---
@@ -187,7 +187,7 @@ NorthFlank Cron (every hour)
   2. For each event: find registrations where status=APPROVED (not ATTENDED)
   3. Update those registrations: status = NO_SHOW
   4. Increment no-show count on Blacklist record for each participant
-  5. Check: if noShowCount >= threshold → add to Blacklist, send notification email
+  5. Check: if noShowCount >= 5 → activate Blacklist entry, send notification email
   6. Update event: noShowProcessed = true
 ```
 
@@ -211,11 +211,71 @@ Failure handling: email errors are logged but do not roll back the main transact
 
 ---
 
+## Flow 8: Admin Login / Logout
+
+**Login**: Admin enters email + password on `/admin/login`
+
+```
+Browser
+  │  POST /api/auth/login
+  │  Body: { email, password }
+  ▼
+API Route
+  1. Hash password with SHA-256
+  2. Query User by email + passwordHash
+  3. if not found → return 401
+  4. Create iron-session: { userId, userEmail, userName, isLoggedIn: true }
+  │
+  ▼
+Response: { data: { name, email } }
+  → Redirect to /admin
+```
+
+**Logout**: Admin clicks "Sign out" in sidebar
+
+```
+Browser
+  │  POST /api/auth/logout (form submission)
+  ▼
+API Route
+  1. Get iron-session
+  2. session.destroy()
+  3. Redirect 307 → /admin/login
+```
+
+---
+
+## Flow 9: Admin Inline Edit (Event Overview)
+
+**User action**: Admin clicks a field on the event Overview tab
+
+```
+Browser (EventOverview client component)
+  │  Click field → inline input appears
+  │  Edit value → press Enter or click Save
+  │  PATCH /api/events/[id]
+  │  Body: { [fieldName]: newValue }
+  ▼
+API Route
+  1. Verify admin session
+  2. Update event record (single field)
+  3. Create AuditLog { action: "EDIT_EVENT" }
+  │
+  ▼
+Response: { data: updatedEvent }
+  │
+  ▼
+UI: Toast "Title updated", router.refresh() reloads server data
+```
+
+---
+
 ## API Route Summary
-_(Detailed request/response shapes filled in during Phase 2)_
 
 | Method | Path | Description |
 |--------|------|-------------|
+| POST | `/api/auth/login` | Admin login (iron-session) |
+| POST | `/api/auth/logout` | Admin logout (destroy session, redirect) |
 | GET | `/api/events` | List published events |
 | POST | `/api/events` | Create event (admin) |
 | PATCH | `/api/events/[id]` | Edit / cancel event (admin) |

@@ -13,10 +13,10 @@ Government agencies run internal workshops and training sessions using Google Fo
 │                         User's Browser                           │
 │                                                                  │
 │   Public Pages                      Admin Pages                  │
-│   /events          (Server)         /admin/dashboard  (Server)   │
-│   /events/[id]     (Server)         /admin/events     (Server)   │
-│   /register        (Client)         /admin/checkin    (Client)   │
-│   /my-registrations(Server)         /admin/audit-log  (Server)   │
+│   /events          (Server)         /admin/events     (Server)   │
+│   /events/[id]     (Server)         /admin/events/[id](S+Client) │
+│   /register        (Client)         /admin/audit-log  (S+Client) │
+│   /my-registrations(Server)         /admin/blacklist  (S+Client) │
 └──────────────┬───────────────────────────────┬───────────────────┘
                │ HTTP                           │ HTTP
                ▼                               ▼
@@ -76,10 +76,9 @@ Government agencies run internal workshops and training sessions using Google Fo
 | `/my-registrations` | Server | Participant's registration history + QR codes |
 | `/admin` | Server | Dashboard overview |
 | `/admin/events` | Server | Event management list |
-| `/admin/events/[id]` | Server | Registration approval list for one event |
-| `/admin/checkin/[id]` | Client | Full-screen QR scanner for check-in |
-| `/admin/audit-log` | Server | Audit log timeline |
-| `/admin/blacklist` | Server | Blacklist management |
+| `/admin/events/[id]` | Server+Client | Event detail with 3-tab layout (Overview / Registrations / Check-in). Overview fields are inline-editable (click to edit). |
+| `/admin/audit-log` | Server+Client | Audit log — card-based list grouped by date, color-coded action badges, filter by action/event/time-period, pagination |
+| `/admin/blacklist` | Server+Client | Blacklist management with AlertDialog confirmation |
 
 ### Backend (API Routes)
 - All routes return `{ data, error }` format
