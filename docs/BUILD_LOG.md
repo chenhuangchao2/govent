@@ -415,8 +415,6 @@ Rewrote `components/features/EventCard.tsx` as a polished Server Component:
 
 ---
 
----
-
 ## v2.2 — Registration Form: Eligibility Preview + Success CTA
 **Date**: 2026-04-08 | **Tool**: Claude Code
 

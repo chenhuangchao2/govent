@@ -77,9 +77,23 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v2.1 complete → v2.2 next
+**Version**: v2.2 complete → v2.3 next
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
-**Next step**: Phase 2.2 — UI overhaul + public UX (Feature J, Block 2, Block 7, Block 9, Features D/E)
+**Next step**: Phase 2.3 — Power features (analytics, broadcast, CPD, check-in reliability)
+
+**Phase 2.2 — UI Overhaul + Public UX ✅ (2026-04-08)**
+- Schema: added `venueHidden Boolean @default(false)` to Event
+- Admin sidebar: lucide-react icons, navy government color, active state highlights
+- Admin dashboard: 4 stat cards with icons + quick-action buttons
+- Admin events list: clickable titles, capacity colors, polished badges, empty state
+- EventOverview + EventForm: venueHidden toggle for venue hiding
+- Public event cards: redesigned with CapacityBar, venue hiding, clean layout
+- Public event detail: DeadlineCountdown, capacity bar, venue hiding, info card layout
+- Registration form: real-time eligibility preview, rich success screen with CTAs
+- My Registrations: proper types, Pay Now button, CPD hours summary, venue display
+- PublicNav: mobile hamburger menu, Landmark icon, government colors, footer
+- Loading skeletons on 4 pages (events, event detail, admin events, audit log)
+- Deleted legacy AuditTimeline.tsx, standalone registrations page; checkin redirects to tab
 
 **Phase 2.1 — Admin Core Completion ✅ (2026-04-08)**
 - shadcn Sonner + AlertDialog + Dialog installed; Toaster in root layout

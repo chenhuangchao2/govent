@@ -29,7 +29,7 @@
 
 ---
 
-## Phase 2.2 — UI Overhaul + Public UX ← NEXT
+## Phase 2.2 — UI Overhaul + Public UX ✅ COMPLETE (2026-04-08)
 
 **Goal**: Make both the admin and public-facing pages polished, clear, and government-appropriate.
 
@@ -53,7 +53,7 @@
 
 ---
 
-## Phase 2.3 — New Power Features
+## Phase 2.3 — New Power Features ← NEXT
 
 **Goal**: Add high-value features that go beyond the MVP scope — analytics, broadcast, CPD tracking, check-in resilience.
 
@@ -99,6 +99,6 @@
 | Phase | Focus | Schema | New APIs |
 |-------|-------|--------|----------|
 | **2.1** | Admin core completion ✅ | None | None |
-| **2.2** | UI overhaul + public UX | `venueHidden` | None |
+| **2.2** | UI overhaul + public UX ✅ | `venueHidden` | None |
 | **2.3** | New power features | `adminNotes` | 3 |
 | **2.4** | Utility + deployment | None | 1 |
