@@ -37,38 +37,43 @@ Dispatched 16 parallel agents to audit every layer: Prisma schema, all 26 API ro
 
 ---
 
-## Participant Authentication System (2026-04-08)
+## Phase 2.4 — Participant Auth + UX Polish
 **Date**: 2026-04-08 | **Tool**: Claude Code
 
-### What was added
+### Participant Authentication
 - **Participant model** in Prisma: email, passwordHash, name, isVerified, verificationCode, codeExpiresAt
 - **Sign Up flow**: name + email + password → OTP sent via Resend → verify code → account created
-- **Sign In flow**: email + password → session created (iron-session, separate cookie from admin)
+- **Sign In flow**: email + password → session created (iron-session, separate cookie `govent-participant`)
 - **5 new API routes**: `/api/auth/participant/{signup,verify,login,logout,me}`
 - **2 new pages**: `/signup` (two-step with OTP), `/login` (with redirect support)
-- **PublicNav upgrade**: shows Sign In/Sign Up for guests, user name + Sign Out for authenticated users
-- **My Registrations**: requires login, shows friendly prompt if not authenticated, auto-loads registrations from session
-- **Registration form**: pre-fills name + email from session if logged in, email field becomes read-only
-- **Event detail page**: uses session to check registration status, shows "Sign in for faster experience" hint
+- **PublicNav**: auth-aware — shows Sign In/Sign Up for guests, Hi {name} + Sign Out for logged-in users
+- **My Registrations**: requires login, shows friendly prompt if not authenticated
+- **Registration form**: pre-fills name + email from session if logged in, email field read-only
+
+### Data Model Cleanup
+- Renamed `department` → `organisation` across full stack (schema, 5 APIs, 9 components, seed data)
+- Renamed `allowedDepartments` → `allowedOrganisations` on Event model
+- Updated seed organisations to realistic Singapore agencies: GovTech, IMDA, CSA
+- Removed `venueHidden` — always show venue, display "To Be Confirmed" if empty
+
+### UX Improvements
+- **Event listing filters**: search by title + time (Upcoming/This Week/All) + cost (Free/Paid) + organisation tags
+- **Re-registration**: CANCELLED/REJECTED registrations can re-register (reuses existing record)
+- **EventOverview tags editor**: chip-based add/remove UI with Enter key, replaces plain text input
+- **Eligibility display**: shows Organisation name not email domain
+- **7 seed events** with varied configurations for demo
+
+### Bug Fixes
+- Stripe `expires_at` capped at 24h (Stripe limit)
+- Stripe Checkout URL stored directly (not double-prefixed)
+- API error handling: try/catch on registration PATCH, event PATCH returns real errors
+- Check-in defaults to Search tab (no auto camera permission prompt)
 
 ### Design decisions
-- Guests can freely browse events without login
-- Login only required for My Registrations and recommended for registration
-- Registration form still works without login (for quick one-off registrations)
+- Guests browse events freely, login only for My Registrations
+- Registration form works without login (for one-off registrations)
+- Separate session cookie from admin — no interference
 - OTP via Resend (already integrated), 6-digit code, 10-minute expiry
-- Separate session cookie (`govent-participant`) from admin (`govent-session`)
-
----
-
-## Rename: department → organisation (2026-04-08)
-**Scope**: Seed data + page files
-
-- Renamed `allowedDepartments` → `allowedOrganisations` in public events page, admin event detail page, and seed data
-- Renamed `department` → `organisation` in all seed participant records
-- Updated seed organisations to realistic agency names: GovTech, IMDA, CSA
-- Event 2 (Cloud Workshop) restricted to `['GovTech']` only
-- Event 3 participants now have mixed orgs (GovTech, IMDA, CSA) with matching email domains
-- Re-seeded database successfully
 
 ---
 
