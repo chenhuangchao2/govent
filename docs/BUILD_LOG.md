@@ -67,22 +67,65 @@ Full requirements in `docs/REQUIREMENTS.md`.
 ---
 
 ## Phase 1 — Data Modeling
-**Date**: _TBD_ | **Tool**: _TBD_
+**Date**: 2026-04-08 | **Tool**: Claude Code (executing-plans)
+
+**Approach**: Schema-first development. Defined the full Prisma schema with 5 models (User, Event, Registration, Blacklist, AuditLog) + 3 enums, then pushed to PostgreSQL (Docker) and generated the Prisma client. Seed data created with realistic Singapore government names, 3 events (free + paid + waitlist demo), 9 registrations, and 1 blacklist entry.
+
+**Key decisions**
+
+| Decision | Reasoning |
+|----------|-----------|
+| `@@unique([eventId, email])` on Registration | Prevents duplicate registrations at DB level, not just application level |
+| `allowedDomains: String[]` as array on Event | Supports multi-domain eligibility (e.g., govtech.gov.sg + tech.gov.sg) without a join table |
+| `noShowProcessed` flag on Event | Idempotent guard for cron job — prevents double NO_SHOW marking if job runs twice |
+| `reminderSent` flag on Registration | Prevents duplicate T-48h reminder emails when cron fires hourly |
 
 ---
 
 ## Phase 2 — Backend API
-**Date**: _TBD_ | **Tool**: _TBD_
+**Date**: 2026-04-08 | **Tool**: Claude Code (executing-plans)
+
+**Approach**: All 14 API routes built in one pass, grouped by domain. Services layer (email, Stripe, QR, waitlist, blacklist) extracted before routes to avoid circular dependencies. Session auth via `iron-session`.
+
+**Key decisions**
+
+| Decision | Reasoning |
+|----------|-----------|
+| `db.$transaction()` for registration submit | Prevents two users simultaneously claiming the last seat — capacity check and record creation are atomic |
+| Email errors don't roll back state | Email is best-effort; registration status is source of truth. Avoids broken UX if Resend has an outage |
+| `stripeSessionId` stores the Checkout URL | Not the session ID — makes it easy to show participants the payment link without a Stripe API round-trip |
+| Cron endpoints protected by `x-cron-secret` header | NorthFlank Cron jobs send this header; anyone who knows the URL without the secret gets 403 |
+| `promoteWaitlist()` called after any REJECTED/CANCELLED | Single function handles the state transition + renumbering + email — called from both the approve/reject route and the payment-timeout cron |
 
 ---
 
 ## Phase 3 — Frontend
-**Date**: _TBD_ | **Tool**: _TBD_
+**Date**: 2026-04-08 | **Tool**: Claude Code (executing-plans)
+
+**Approach**: Server Components for all read paths (event listing, event detail, admin dashboard, audit log). Client Components only for interactive islands (registration form, approval actions, QR scanner, blacklist management). This matches Next.js 15 best practice and avoids unnecessary hydration.
+
+**Key decisions**
+
+| Decision | Reasoning |
+|----------|-----------|
+| `'use client'` only for interactive islands | Server renders HTML with data already embedded — no client-side fetch waterfall for initial page loads |
+| `/my-registrations` as client with email lookup | No login required for participants; lookup by email matches government event context (anonymous access, self-service) |
+| QR code generated on client (`qrcode` lib) | Avoids a server round-trip for each QR display; the registration ID is already in the response |
+| `@zxing/browser` for camera scanning | Runs entirely in browser with no server dependency; works with any camera device |
+| Manual check-in fallback in scanner | If camera fails (permissions denied, bad lighting), organiser can type registration ID — critical for event-day reliability |
+| `BrowserQRCodeReader.releaseAllStreams()` in cleanup | Prevents camera resource leak on component unmount |
+
+**Build verification**: `npm run build` passes with 0 TypeScript errors. 28 routes compiled.
 
 ---
 
 ## Phase 4 — Integration
-**Date**: _TBD_ | **Tool**: _TBD_
+**Date**: _TBD (Resend + Stripe keys required)_ | **Tool**: _TBD_
+
+Integration code is written and ready. Pending:
+- Add Resend API key to `.env` (`RESEND_API_KEY`)
+- Add Stripe test keys to `.env` (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`)
+- Run `stripe listen --forward-to localhost:3000/api/webhook/stripe` to test webhook locally
 
 ---
 

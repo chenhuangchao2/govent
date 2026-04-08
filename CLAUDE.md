@@ -73,8 +73,19 @@ app/
 ```
 
 ## Current Status
-**Phase**: 0 complete — skeleton built, requirements locked
-**Next step**: Phase 1 — data modeling (`prisma/schema.prisma`)
+**Phase**: 1-3 complete — full app built and running locally
+**Next step**: Phase 4 — add real Resend + Stripe API keys, test email/payment flows end-to-end
+
+**What's working**
+- All 14 API routes + 3 cron endpoints operational
+- Public pages: event listing, event detail, registration form (with eligibility validation), my-registrations with QR display
+- Admin pages: dashboard, event list, create event, registration approval (approve/reject inline), QR check-in scanner, audit log timeline, blacklist management
+- `npm run build` passes — 28 routes, 0 TypeScript errors
+
+**Pending**
+- Real API keys needed: `RESEND_API_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+- NorthFlank deployment (Phase 5)
+- BUILD_LOG.md Phase 5 section to be filled after deployment
 
 ## Files to Maintain
 - **`docs/BUILD_LOG.md`** — update every phase (auto-updated by Claude)
