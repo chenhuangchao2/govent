@@ -74,6 +74,7 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
           venue: event.venue,
           capacity: event.capacity,
           registrationDeadline: event.registrationDeadline.toISOString(),
+          imageUrl: event.imageUrl,
           tags: event.tags,
           allowedDomains: event.allowedDomains,
           allowedOrganisations: event.allowedOrganisations,

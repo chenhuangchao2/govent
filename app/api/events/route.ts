@@ -56,6 +56,7 @@ export async function POST(req: NextRequest) {
       venue: body.venue,
       capacity: Number(body.capacity),
       registrationDeadline,
+      imageUrl: body.imageUrl || null,
       tags: body.tags ?? [],
       allowedDomains: body.allowedDomains ?? [],
       allowedOrganisations: body.allowedOrganisations ?? [],

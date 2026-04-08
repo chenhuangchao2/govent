@@ -14,6 +14,7 @@ interface EventData {
   venue: string
   capacity: number
   registrationDeadline: string
+  imageUrl: string | null
   tags: string[]
   allowedDomains: string[]
   allowedOrganisations: string[]
@@ -39,6 +40,7 @@ const FIELDS: FieldConfig[] = [
   { key: 'endTime', label: 'End Time', type: 'datetime' },
   { key: 'capacity', label: 'Capacity', type: 'number' },
   { key: 'registrationDeadline', label: 'Registration Deadline', type: 'datetime' },
+  { key: 'imageUrl', label: 'Cover Image URL', type: 'text' },
   { key: 'tags', label: 'Tags', type: 'tags', hint: 'e.g. AI, Cloud, Cybersecurity' },
   { key: 'allowedDomains', label: 'Allowed Domains', type: 'tags', hint: 'e.g. tech.gov.sg — leave empty for open access' },
   { key: 'allowedOrganisations', label: 'Allowed Organisations', type: 'tags', hint: 'e.g. GovTech, IMDA — leave empty for all' },

@@ -16,6 +16,7 @@ interface EventData {
   allowedDomains: string[]
   allowedOrganisations: string[]
   tags: string[]
+  imageUrl: string | null
 }
 
 const TIME_FILTERS = [
@@ -236,6 +237,7 @@ export default function EventFilters({ events }: { events: EventData[] }) {
                 allowedDomains={e.allowedDomains}
                 allowedOrganisations={e.allowedOrganisations}
                 tags={e.tags}
+                imageUrl={e.imageUrl}
               />
             ))}
           </>

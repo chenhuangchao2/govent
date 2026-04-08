@@ -77,7 +77,14 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v3.5 complete (organisation auto-fill on signup + registration)
+**Version**: v3.6 complete (event cover images + all v3.4-3.5 features)
+
+**v3.6 — Event Cover Images ✅ (2026-04-08)**
+- Schema: added `imageUrl String?` to Event
+- EventCard: displays cover image (Next.js Image, h-40, object-cover) when URL provided
+- Admin: imageUrl field in EventForm (create) + EventOverview (inline edit)
+- Seed: 7 Unsplash images matched to event topics
+- next.config: added images.unsplash.com to remotePatterns
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
 **Next step**: Deployment to NorthFlank
 

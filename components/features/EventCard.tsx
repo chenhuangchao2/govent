@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import CapacityBar from '@/components/features/CapacityBar'
 
 const TAG_COLORS: Record<string, string> = {
@@ -24,6 +25,7 @@ interface EventCardProps {
   allowedDomains: string[]
   allowedOrganisations: string[]
   tags: string[]
+  imageUrl?: string | null
 }
 
 function formatEventTime(startTime: string): string {
@@ -54,10 +56,19 @@ export default function EventCard({
   allowedDomains,
   allowedOrganisations,
   tags,
+  imageUrl,
 }: EventCardProps) {
   return (
     <Link href={`/events/${id}`} className="block">
-      <div className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow p-5">
+      <div className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-shadow overflow-hidden">
+        {/* Cover image */}
+        {imageUrl && (
+          <div className="relative h-40 w-full">
+            <Image src={imageUrl} alt={title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+          </div>
+        )}
+
+        <div className="p-5">
         {/* Top row: title + price badge */}
         <div className="flex justify-between items-start mb-2">
           <h3 className="text-lg font-semibold text-gray-900 leading-snug">{title}</h3>
@@ -104,6 +115,7 @@ export default function EventCard({
           </p>
         )}
 
+      </div>
       </div>
     </Link>
   )

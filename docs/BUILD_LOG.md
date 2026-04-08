@@ -665,6 +665,29 @@ Dispatched 5 specialist agents (UX/Demo reviewer, Backend architect, GovTech ass
 
 ---
 
+## v3.6 — Event Cover Images
+**Date**: 2026-04-08 | **Tool**: Claude Code (16 verification agents)
+
+### Changes
+
+| File | Change |
+|------|--------|
+| `prisma/schema.prisma` | Added `imageUrl String?` to Event model |
+| `next.config.ts` | Added `images.unsplash.com` to remotePatterns for Next.js Image |
+| `components/features/EventCard.tsx` | Renders cover image (Next.js Image, h-40, object-cover) when imageUrl present |
+| `components/features/EventFilters.tsx` | EventData interface + EventCard prop includes imageUrl |
+| `app/(public)/events/page.tsx` | Serializes imageUrl in event data |
+| `app/api/events/route.ts` | POST saves imageUrl |
+| `app/api/events/[id]/route.ts` | PATCH handles imageUrl updates |
+| `components/features/admin/EventForm.tsx` | "Cover Image URL" input field for event creation |
+| `components/features/admin/EventOverview.tsx` | imageUrl in interface + FIELDS for inline editing |
+| `app/admin/(protected)/events/[id]/page.tsx` | Passes imageUrl to EventOverview |
+| `prisma/seed.ts` | 7 Unsplash images matched to event topics (conference, server, whiteboard, security, AI, community, teamwork) |
+
+**Verification**: 16 agents confirmed all components pass. Build: 0 errors, 45 routes.
+
+---
+
 ## Phase 6 — Deployment
 **Date**: _TBD_ | **Target**: NorthFlank
 

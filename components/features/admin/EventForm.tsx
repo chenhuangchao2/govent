@@ -26,6 +26,7 @@ export default function EventForm() {
       venueHidden,
       capacity: fd.get('capacity'),
       registrationDeadline: fd.get('registrationDeadline'),
+      imageUrl: fd.get('imageUrl') || null,
       tags: selectedTags,
       allowedDomains: (fd.get('allowedDomains') as string).split(',').map(s => s.trim()).filter(Boolean),
       allowedOrganisations: (fd.get('allowedOrganisations') as string).split(',').map(s => s.trim()).filter(Boolean),
@@ -81,6 +82,7 @@ export default function EventForm() {
         </div>
         {selectedTags.length > 0 && <p className="text-xs text-gray-400">Selected: {selectedTags.join(', ')}</p>}
       </div>
+      <div><label className={labelClass}>Cover Image URL (optional)</label><input name="imageUrl" placeholder="https://images.unsplash.com/..." className={inputClass} /></div>
       <div><label className={labelClass}>Allowed Email Domains (comma-separated, empty = all)</label><input name="allowedDomains" placeholder="govtech.gov.sg, tech.gov.sg" className={inputClass} /></div>
       <div><label className={labelClass}>Allowed Organisations (comma-separated, empty = all)</label><input name="allowedOrganisations" placeholder="GovTech, IMDA" className={inputClass} /></div>
       <div><label className={labelClass}>CPD Hours</label><input type="number" name="cpdHours" defaultValue="0" step="0.5" className={inputClass} /></div>

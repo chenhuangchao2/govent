@@ -33,6 +33,9 @@ model Event {
   isCancelled          Boolean       @default(false)
   noShowProcessed      Boolean       @default(false)
 
+  // Image
+  imageUrl              String?       // Event cover image URL
+
   // Creator
   creatorId             String?
   creator               User?         @relation("EventCreator", fields: [creatorId], references: [id])

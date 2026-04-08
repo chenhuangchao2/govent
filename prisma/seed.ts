@@ -55,6 +55,7 @@ async function main() {
   const event1 = await prisma.event.create({
     data: {
       creatorId: admin.id,
+      imageUrl: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=400&fit=crop',
       title: 'Q2 All-Hands Townhall',
       description: 'Quarterly update from leadership on agency priorities, headcount plans, and Q3 roadmap. Lunch provided.',
       startTime: daysFromNow(2, 10),
@@ -75,6 +76,7 @@ async function main() {
   const event2 = await prisma.event.create({
     data: {
       creatorId: admin2.id,
+      imageUrl: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&h=400&fit=crop',
       title: 'Advanced Cloud Architecture Workshop',
       description: 'Hands-on workshop covering AWS Well-Architected Framework, multi-region deployment, and cost optimisation strategies. Includes certification voucher.',
       startTime: daysFromNow(5, 9),
@@ -97,6 +99,7 @@ async function main() {
   const event3 = await prisma.event.create({
     data: {
       creatorId: admin.id,
+      imageUrl: 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=800&h=400&fit=crop',
       title: 'Design Thinking for Public Services',
       description: 'Learn human-centred design methods applied to government digital services. Facilitated by GDS UX team.',
       startTime: daysFromNow(3, 14),
@@ -117,6 +120,7 @@ async function main() {
   const event4 = await prisma.event.create({
     data: {
       creatorId: admin3.id,
+      imageUrl: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=800&h=400&fit=crop',
       title: 'Government Cybersecurity Awareness Day',
       description: 'Interactive session on phishing prevention, zero-trust architecture, and incident response best practices. Mandatory for all IT staff.',
       startTime: daysFromNow(6, 9),
@@ -137,6 +141,7 @@ async function main() {
   const event5 = await prisma.event.create({
     data: {
       creatorId: admin.id,
+      imageUrl: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&h=400&fit=crop',
       title: 'Practical AI for All',
       description: 'Hands-on workshop: prompt engineering, RAG pipelines, and responsible AI deployment in public sector. Bring your own laptop.',
       startTime: daysFromNow(8, 9),
@@ -159,6 +164,7 @@ async function main() {
   const event6 = await prisma.event.create({
     data: {
       creatorId: admin2.id,
+      imageUrl: 'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&h=400&fit=crop',
       title: 'Digital Inclusion Roundtable',
       description: 'Discuss strategies for bridging the digital divide in Singapore — seniors, low-income families, and persons with disabilities.',
       startTime: daysFromNow(10, 14),
@@ -179,6 +185,7 @@ async function main() {
   const event7 = await prisma.event.create({
     data: {
       creatorId: admin3.id,
+      imageUrl: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=400&fit=crop',
       title: 'Agile & Scrum in Government Projects',
       description: 'Introduction to agile methodology tailored for government procurement timelines and compliance requirements.',
       startTime: daysFromNow(4, 10),

@@ -24,6 +24,7 @@ export default async function EventsPage() {
     allowedDomains: e.allowedDomains,
     allowedOrganisations: e.allowedOrganisations,
     tags: e.tags,
+    imageUrl: e.imageUrl,
   }))
 
   return (
