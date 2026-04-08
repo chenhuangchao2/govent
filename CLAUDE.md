@@ -81,7 +81,7 @@ app/
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
 **Next step**: Deployment to NorthFlank
 
-**Phase 3.2 — Data Integrity + UX Polish ✅ (2026-04-08)**
+**v3.2 — Data Integrity + UX Polish ✅ (2026-04-08)**
 - Stripe webhook: checks event.isCancelled before approving (prevents orphaned approvals)
 - Waitlist promotion: wrapped in db.$transaction (race condition fix)
 - Blacklist: auto-activation now logs to audit trail
@@ -91,7 +91,7 @@ app/
 - ARCHITECTURE.md: added Scalability + Failure Modes sections
 - Event PATCH: validates capacity > 0
 
-**Phase 3.1 — Critical Fixes ✅ (2026-04-08)**
+**v3.1 — Critical Fixes ✅ (2026-04-08)**
 - Password reset: forgot-password page + API with OTP verification + "Forgot password?" link on login
 - Event date validation: POST + PATCH reject invalid dates (end < start, deadline > start, capacity <= 0)
 - SelfCancelButton: replaced window.confirm with shadcn AlertDialog

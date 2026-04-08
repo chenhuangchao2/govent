@@ -548,7 +548,7 @@ Made all public-facing pages mobile-responsive.
 
 ---
 
-## Phase 3.2 — Data Integrity, UX Polish, Documentation (Tier 2+3)
+## v3.2 — Data Integrity, UX Polish, Documentation (Tier 2+3)
 **Date**: 2026-04-08 | **Tool**: Claude Code (16 verification agents)
 
 ### Changes
@@ -570,7 +570,7 @@ Made all public-facing pages mobile-responsive.
 
 ---
 
-## Phase 3.1 — Critical Fixes (Tier 1)
+## v3.1 — Critical Fixes (Tier 1)
 **Date**: 2026-04-08 | **Tool**: Claude Code (5 brainstorming agents + direct fixes)
 
 ### Process
