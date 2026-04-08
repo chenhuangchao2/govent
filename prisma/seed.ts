@@ -34,6 +34,7 @@ async function main() {
       startTime: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000),
       endTime: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000 + 2 * 60 * 60 * 1000),
       venue: 'Level 10 Auditorium, Sandcrawler Building',
+      venueHidden: true,
       capacity: 120,
       registrationDeadline: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000),
       isPublished: true,

@@ -24,6 +24,7 @@ model Event {
   startTime            DateTime
   endTime              DateTime
   venue                String
+  venueHidden          Boolean       @default(false)
   capacity             Int
   registrationDeadline DateTime
   isPublished          Boolean       @default(false)
