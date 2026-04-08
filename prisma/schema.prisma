@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  auditLogs    AuditLog[]
+}
+
+model Event {
+  id                   String        @id @default(cuid())
+  title                String
+  description          String
+  startTime            DateTime
+  endTime              DateTime
+  venue                String
+  capacity             Int
+  registrationDeadline DateTime
+  isPublished          Boolean       @default(false)
+  isCancelled          Boolean       @default(false)
+  noShowProcessed      Boolean       @default(false)
+
+  // Eligibility
+  allowedDomains      String[]      // e.g. ["govtech.gov.sg", "mci.gov.sg"]
+  allowedDepartments  String[]      // e.g. ["Engineering", "Policy"] — empty = all
+
+  // Payment
+  isPaid              Boolean       @default(false)
+  price               Float?        // SGD, null if free
+  paymentDeadlineHours Int          @default(48)
+
+  // CPD
+  cpdHours            Float         @default(0)
+
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  registrations       Registration[]
+  auditLogs           AuditLog[]
+}
+
+model Registration {
+  id              String             @id @default(cuid())
+  eventId         String
+  event           Event              @relation(fields: [eventId], references: [id])
+
+  // Participant info
+  name            String
+  email           String
+  department      String
+  remarks         String?
+
+  // Status
+  status          RegistrationStatus @default(PENDING)
+  waitlistPosition Int?
+
+  // Payment
+  paymentStatus   PaymentStatus      @default(NOT_REQUIRED)
+  stripeSessionId String?
+  paymentDeadline DateTime?
+  paidAt          DateTime?
+
+  // Check-in
+  checkedInAt     DateTime?
+
+  // Reminders
+  reminderSent    Boolean            @default(false)
+
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+
+  auditLogs       AuditLog[]
+
+  @@unique([eventId, email])
+}
+
+model Blacklist {
+  id          String          @id @default(cuid())
+  email       String          @unique
+  reason      String
+  source      BlacklistSource @default(MANUAL)
+  noShowCount Int             @default(0)
+  isActive    Boolean         @default(true)
+  addedAt     DateTime        @default(now())
+  removedAt   DateTime?
+}
+
+model AuditLog {
+  id             String        @id @default(cuid())
+  action         String        // e.g. "APPROVE", "REJECT", "CHECKIN", "CREATE_EVENT"
+  actorId        String?
+  actor          User?         @relation(fields: [actorId], references: [id])
+  eventId        String?
+  event          Event?        @relation(fields: [eventId], references: [id])
+  registrationId String?
+  registration   Registration? @relation(fields: [registrationId], references: [id])
+  metadata       Json?         // extra context
+  ipAddress      String?
+  createdAt      DateTime      @default(now())
+}
+
+enum RegistrationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  WAITLISTED
+  PENDING_PAYMENT
+  PAYMENT_FAILED
+  ATTENDED
+  NO_SHOW
+  CANCELLED
+}
+
+enum PaymentStatus {
+  NOT_REQUIRED
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+enum BlacklistSource {
+  MANUAL
+  AUTO_NO_SHOW
+  AUTO_PAYMENT
+}
