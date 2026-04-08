@@ -332,6 +332,7 @@ UI renders:
 | POST | `/api/auth/participant/login` | Participant login (email + password) |
 | POST | `/api/auth/participant/logout` | Participant logout (destroy session) |
 | GET | `/api/auth/participant/me` | Get current participant session info |
+| POST | `/api/auth/participant/reset-password` | Password reset (OTP-based, two-step) |
 | GET | `/api/events` | List published events |
 | GET | `/api/events/[id]` | Get single event detail |
 | POST | `/api/events` | Create event (admin) |

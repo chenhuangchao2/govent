@@ -37,7 +37,11 @@ export default function BulkApproveBar({ selectedIds, onComplete, onClear }: Bul
       if (json.error) {
         toast.error(json.error)
       } else {
-        toast.success(`Approved ${json.data.approved}, skipped ${json.data.skipped}`)
+        const { approved, skipped, pendingPayment } = json.data
+        const parts = [`Approved: ${approved - (pendingPayment || 0)}`]
+        if (pendingPayment) parts.push(`Awaiting payment: ${pendingPayment}`)
+        if (skipped) parts.push(`Skipped: ${skipped}`)
+        toast.success(parts.join(' · '))
         onComplete()
       }
     } catch {

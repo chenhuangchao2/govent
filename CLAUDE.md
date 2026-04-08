@@ -77,9 +77,19 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v3.1 complete (critical fixes + password reset + Zod validation)
+**Version**: v3.2 complete (data integrity + UX polish + docs)
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
-**Next step**: Phase 3.2 (Tier 2 improvements)
+**Next step**: Deployment to NorthFlank
+
+**Phase 3.2 — Data Integrity + UX Polish ✅ (2026-04-08)**
+- Stripe webhook: checks event.isCancelled before approving (prevents orphaned approvals)
+- Waitlist promotion: wrapped in db.$transaction (race condition fix)
+- Blacklist: auto-activation now logs to audit trail
+- Bulk approve: toast shows paid vs free breakdown
+- OTP countdown: mm:ss timer on signup verification step
+- Payment deadline: shown in My Registrations for PENDING_PAYMENT
+- ARCHITECTURE.md: added Scalability + Failure Modes sections
+- Event PATCH: validates capacity > 0
 
 **Phase 3.1 — Critical Fixes ✅ (2026-04-08)**
 - Password reset: forgot-password page + API with OTP verification + "Forgot password?" link on login

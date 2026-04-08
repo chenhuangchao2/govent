@@ -82,6 +82,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
   }
 
+  if (data.capacity !== undefined && (data.capacity as number) <= 0) {
+    return NextResponse.json({ data: null, error: 'Capacity must be greater than 0' }, { status: 400 })
+  }
+
   try {
     const event = await db.event.update({ where: { id }, data })
     await logAction({ action: 'EDIT_EVENT', actorId: session.userId, eventId: id, req })

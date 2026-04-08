@@ -1,5 +1,6 @@
 import { db } from '@/lib/db'
 import { sendBlacklistNotification } from './email'
+import { logAction } from '@/lib/audit'
 
 const THRESHOLD = 5
 
@@ -21,6 +22,7 @@ export async function incrementNoShow(email: string, name: string): Promise<void
         where: { email },
         data: { isActive: true, source: 'AUTO_NO_SHOW', removedAt: null },
       })
+      await logAction({ action: 'AUTO_BLACKLIST_ACTIVATED', metadata: { email, noShowCount: updated.noShowCount } })
       await sendBlacklistNotification({
         to: email,
         name,

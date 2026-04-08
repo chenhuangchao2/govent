@@ -548,6 +548,28 @@ Made all public-facing pages mobile-responsive.
 
 ---
 
+## Phase 3.2 — Data Integrity, UX Polish, Documentation (Tier 2+3)
+**Date**: 2026-04-08 | **Tool**: Claude Code (16 verification agents)
+
+### Changes
+
+| File | Change |
+|------|--------|
+| `app/api/webhook/stripe/route.ts` | Stripe webhook checks `event.isCancelled` before approving — prevents orphaned approvals on cancelled events |
+| `services/waitlist.ts` | Entire `promoteWaitlist` wrapped in `db.$transaction` — fixes race condition on concurrent rejections |
+| `services/blacklist.ts` | Auto-blacklist activation now logs `AUTO_BLACKLIST_ACTIVATED` to audit trail |
+| `app/api/registrations/bulk-approve/route.ts` | Returns `pendingPayment` count in response |
+| `components/features/admin/BulkApproveBar.tsx` | Toast now shows "Approved: X · Awaiting payment: Y" for paid events |
+| `app/(public)/signup/page.tsx` | Added OTP countdown timer (mm:ss format, "Code expired" state, resets on resend) |
+| `app/(public)/my-registrations/page.tsx` | Shows payment deadline date/time for PENDING_PAYMENT registrations |
+| `app/api/events/[id]/route.ts` | PATCH validates capacity > 0 when editing |
+| `docs/ARCHITECTURE.md` | Added "Scalability Considerations" table (7 dimensions) and "Failure Modes" table (6 scenarios) |
+| `docs/DATA_FLOW.md` | Added reset-password route to API summary table |
+
+**Build**: 0 TypeScript errors, 37 routes compiled.
+
+---
+
 ## Phase 3.1 — Critical Fixes (Tier 1)
 **Date**: 2026-04-08 | **Tool**: Claude Code (5 brainstorming agents + direct fixes)
 

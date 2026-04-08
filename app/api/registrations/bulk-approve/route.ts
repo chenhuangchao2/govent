@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
 
   let approved = 0
   let skipped = 0
+  let pendingPayment = 0
 
   const results = await Promise.allSettled(
     registrationIds.map(async (id: string) => {
@@ -40,6 +41,7 @@ export async function POST(req: NextRequest) {
           to: reg.email, name: reg.name, eventTitle: reg.event.title,
           paymentUrl, deadline: deadline.toLocaleDateString('en-SG'),
         }).catch(console.error)
+        pendingPayment++
       } else {
         const qrCode = await generateQRCodeDataUrl(id)
         await db.registration.update({ where: { id }, data: { status: 'APPROVED' } })
@@ -54,5 +56,5 @@ export async function POST(req: NextRequest) {
     })
   )
 
-  return NextResponse.json({ data: { approved, skipped }, error: null })
+  return NextResponse.json({ data: { approved, skipped, pendingPayment }, error: null })
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, useCallback, FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -8,6 +8,25 @@ import { toast } from 'sonner';
 export default function SignupPage() {
   const router = useRouter();
   const [step, setStep] = useState<1 | 2>(1);
+  const [codeExpiresAt, setCodeExpiresAt] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState('');
+
+  // Countdown timer for OTP
+  useEffect(() => {
+    if (!codeExpiresAt) return
+    const interval = setInterval(() => {
+      const remaining = Math.max(0, codeExpiresAt - Date.now())
+      if (remaining <= 0) {
+        setCountdown('Code expired')
+        clearInterval(interval)
+      } else {
+        const min = Math.floor(remaining / 60000)
+        const sec = Math.floor((remaining % 60000) / 1000)
+        setCountdown(`${min}:${sec.toString().padStart(2, '0')}`)
+      }
+    }, 1000)
+    return () => clearInterval(interval)
+  }, [codeExpiresAt]);
 
   // Step 1 fields
   const [name, setName] = useState('');
@@ -52,6 +71,7 @@ export default function SignupPage() {
       }
 
       setStep(2);
+      setCodeExpiresAt(Date.now() + 10 * 60 * 1000); // 10 minutes
     } catch {
       setError('Something went wrong. Please try again.');
     } finally {
@@ -106,6 +126,7 @@ export default function SignupPage() {
       }
 
       toast.success('Verification code resent!');
+      setCodeExpiresAt(Date.now() + 10 * 60 * 1000);
     } catch {
       setError('Something went wrong. Please try again.');
     } finally {
@@ -204,9 +225,14 @@ export default function SignupPage() {
         ) : (
           <>
             <h1 className="text-2xl font-bold text-center mb-2">Verify Your Email</h1>
-            <p className="text-sm text-gray-600 text-center mb-6">
+            <p className="text-sm text-gray-600 text-center mb-2">
               Enter the 6-digit code sent to <span className="font-medium">{email}</span>
             </p>
+            {countdown && (
+              <p className={`text-xs text-center mb-4 ${countdown === 'Code expired' ? 'text-red-500' : 'text-gray-400'}`}>
+                {countdown === 'Code expired' ? 'Code expired — click Resend below' : `Code expires in ${countdown}`}
+              </p>
+            )}
 
             <form onSubmit={handleVerify} className="space-y-4">
               <div>

@@ -22,6 +22,7 @@ interface Registration {
   status: string
   waitlistPosition: number | null
   stripeSessionId: string | null
+  paymentDeadline: string | null
   event: RegistrationEvent
 }
 
@@ -183,6 +184,11 @@ function RegistrationCard({ r, email, setRegistrations }: {
             className="inline-flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
             Pay Now →
           </a>
+          {r.paymentDeadline && (
+            <p className="text-xs text-gray-500 mt-1">
+              Payment due by {new Date(r.paymentDeadline).toLocaleString('en-SG', { dateStyle: 'medium', timeStyle: 'short' })}
+            </p>
+          )}
         </div>
       )}
 
