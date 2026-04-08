@@ -77,9 +77,18 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v1.0-mvp tagged → v2.0 in design/planning (spec complete, implementation not started)
+**Version**: v2.1 complete → v2.2 next
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
-**Next step**: Implement v2.0 per `docs/superpowers/specs/2026-04-08-govent-v2-design.md`, then deploy to NorthFlank (Phase 6)
+**Next step**: Phase 2.2 — UI overhaul + public UX (Feature J, Block 2, Block 7, Block 9, Features D/E)
+
+**Phase 2.1 — Admin Core Completion ✅ (2026-04-08)**
+- shadcn Sonner + AlertDialog + Dialog installed; Toaster in root layout
+- Event edit form (`EventEditForm`) + publish/unpublish/cancel buttons (`EventActionButtons`) on event detail page
+- PATCH /api/events/[id] extended to save all fields (allowedDomains, allowedDepartments, cpdHours, isPaid, price)
+- RegistrationRow: toast feedback, RejectModal replaces inline reject form
+- Registrations table: fetch-all + client-side filter, status counts, name/email search
+- BlacklistTable: AlertDialog confirmation before add/remove
+- Audit log: filter by action/event (URL params), 50/page pagination, human timestamps
 
 **What's working (v1.0)**
 - 15 API routes + 3 cron endpoints operational
