@@ -14,7 +14,7 @@ const links = [
 export default function AdminSidebar() {
   const path = usePathname()
   return (
-    <aside className="w-60 bg-slate-900 min-h-screen flex flex-col">
+    <aside className="w-60 bg-slate-900 h-screen sticky top-0 flex flex-col">
       {/* Logo area */}
       <div className="px-4 py-6 border-b border-white/10">
         <div className="flex items-center gap-3">

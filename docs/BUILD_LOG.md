@@ -629,6 +629,24 @@ Dispatched 5 specialist agents (UX/Demo reviewer, Backend architect, GovTech ass
 
 ---
 
+## v3.4 — QR Scanner, Sidebar, Filter & Capacity UX
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+### Changes
+
+| File | Change |
+|------|--------|
+| `components/features/admin/CheckinScanner.tsx` | QR Scanner no longer auto-requests camera on tab load. Shows "Start Camera" button; camera starts only on click. useEffect waits for video element mount before initialising. Camera released on tab switch. |
+| `components/layout/AdminSidebar.tsx` | Changed `min-h-screen` to `h-screen sticky top-0` — Sign out button always visible at bottom without scrolling |
+| `components/features/EventFilters.tsx` | Organisation filter label changed from "All Organisations" to "Open To: All" for clarity |
+| `components/features/CapacityBar.tsx` | Public mode shows "Seats Available" / "Waitlist Open" status text only (no numbers/progress bar). Admin mode unchanged. |
+| `components/features/EventCard.tsx` | Removed "View Details →" text — card hover effect is sufficient interaction hint |
+| `app/admin/login/page.tsx` | Removed hardcoded demo credentials, fixed login redirect flash |
+
+**Build**: 0 TypeScript errors, 45 routes compiled.
+
+---
+
 ## Phase 6 — Deployment
 **Date**: _TBD_ | **Target**: NorthFlank
 

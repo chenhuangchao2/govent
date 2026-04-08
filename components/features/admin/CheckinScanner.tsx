@@ -21,44 +21,53 @@ export default function CheckinScanner({ eventId }: Props) {
   const [manualId, setManualId] = useState('')
   const [tab, setTab] = useState<'qr' | 'search' | 'manual'>('search')
   const [cameraError, setCameraError] = useState(false)
+  const [cameraStarted, setCameraStarted] = useState(false)
 
   useEffect(() => {
     loadCount()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Clean up camera when leaving QR tab
   useEffect(() => {
-    if (tab !== 'qr') return
+    if (tab !== 'qr') {
+      setCameraStarted(false)
+      BrowserQRCodeReader.releaseAllStreams()
+    }
+  }, [tab])
 
-    const reader = new BrowserQRCodeReader()
-    readerRef.current = reader
+  // Start camera after video element is mounted
+  useEffect(() => {
+    if (!cameraStarted || tab !== 'qr') return
 
-    async function startCamera() {
-      if (!videoRef.current) return
+    // Small delay to let video element mount
+    const timeout = setTimeout(async () => {
+      const reader = new BrowserQRCodeReader()
+      readerRef.current = reader
+
+      if (!videoRef.current) { setCameraError(true); return }
       try {
-        await reader.decodeFromVideoDevice(undefined, videoRef.current!, async (res) => {
+        await reader.decodeFromVideoDevice(undefined, videoRef.current, async (res) => {
           if (!res) return
           const id = res.getText()
           if (id === lastScanned.current) return
           lastScanned.current = id
           await processCheckin(id)
-          setTimeout(() => {
-            lastScanned.current = null
-          }, 3000)
+          setTimeout(() => { lastScanned.current = null }, 3000)
         })
         setCameraError(false)
       } catch {
         setCameraError(true)
+        setCameraStarted(false)
       }
-    }
-
-    startCamera()
+    }, 100)
 
     return () => {
+      clearTimeout(timeout)
       BrowserQRCodeReader.releaseAllStreams()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tab])
+  }, [cameraStarted, tab])
 
   async function loadCount() {
     const res = await fetch(`/api/registrations?eventId=${eventId}&status=ATTENDED`)
@@ -133,11 +142,25 @@ export default function CheckinScanner({ eventId }: Props) {
                 <div>
                   <Camera className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm text-gray-600 font-medium">Camera not available</p>
-                  <p className="text-xs text-gray-500 mt-1">Use Search or Manual ID tab</p>
+                  <p className="text-xs text-gray-500 mt-1">Check browser permissions, or use Search / Manual ID tab</p>
+                </div>
+              </div>
+            ) : !cameraStarted ? (
+              <div className="flex items-center justify-center h-64 bg-gray-100 text-center p-6">
+                <div>
+                  <Camera className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                  <p className="text-sm text-gray-600 font-medium mb-3">Ready to scan QR codes</p>
+                  <button
+                    onClick={() => setCameraStarted(true)}
+                    className="bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                  >
+                    Start Camera
+                  </button>
+                  <p className="text-xs text-gray-400 mt-2">Browser will ask for camera permission</p>
                 </div>
               </div>
             ) : (
-              <video ref={videoRef} className="w-full" />
+              <video ref={videoRef} className="w-full" autoPlay playsInline />
             )}
             {result && (
               <div
