@@ -6,7 +6,8 @@ export async function logAction(opts: {
   actorId?: string
   eventId?: string
   registrationId?: string
-  metadata?: Record<string, unknown>
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  metadata?: any
   req?: NextRequest
 }) {
   await db.auditLog.create({
