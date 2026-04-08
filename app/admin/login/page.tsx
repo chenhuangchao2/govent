@@ -19,8 +19,7 @@ export default function LoginPage() {
     const data = await res.json()
     setLoading(false)
     if (!res.ok) { setError(data.error); return }
-    router.push('/admin')
-    router.refresh()
+    window.location.href = '/admin'
   }
 
   return (
@@ -44,7 +43,6 @@ export default function LoginPage() {
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
         </form>
-        <p className="text-xs text-gray-400 mt-4 text-center">admin@govtech.gov.sg / admin123</p>
       </div>
     </div>
   )

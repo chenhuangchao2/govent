@@ -21,13 +21,32 @@ async function main() {
   await prisma.registration.deleteMany()
   await prisma.blacklist.deleteMany()
   await prisma.event.deleteMany()
+  await prisma.participant.deleteMany()
   await prisma.user.deleteMany()
 
-  // Admin user
+  // Super Admin
   const admin = await prisma.user.create({
     data: {
       email: 'admin@tech.gov.sg',
       name: 'Phoenix Chen',
+      passwordHash: hashPassword('admin123'),
+      isSuperAdmin: true,
+    },
+  })
+
+  // Regular admins
+  const admin2 = await prisma.user.create({
+    data: {
+      email: 'sarah@tech.gov.sg',
+      name: 'Sarah Lim',
+      passwordHash: hashPassword('admin123'),
+    },
+  })
+
+  const admin3 = await prisma.user.create({
+    data: {
+      email: 'rajan@csa.gov.sg',
+      name: 'Rajan Suresh',
       passwordHash: hashPassword('admin123'),
     },
   })
@@ -35,6 +54,7 @@ async function main() {
   // ─── Event 1: Free, open to all, large capacity ───
   const event1 = await prisma.event.create({
     data: {
+      creatorId: admin.id,
       title: 'Q2 All-Hands Townhall',
       description: 'Quarterly update from leadership on agency priorities, headcount plans, and Q3 roadmap. Lunch provided.',
       startTime: daysFromNow(2, 10),
@@ -43,6 +63,7 @@ async function main() {
       capacity: 120,
       registrationDeadline: daysFromNow(1, 18),
       isPublished: true,
+      tags: ['Leadership'],
       allowedDomains: [],
       allowedOrganisations: [],
       isPaid: false,
@@ -53,6 +74,7 @@ async function main() {
   // ─── Event 2: Paid, GovTech only ───
   const event2 = await prisma.event.create({
     data: {
+      creatorId: admin2.id,
       title: 'Advanced Cloud Architecture Workshop',
       description: 'Hands-on workshop covering AWS Well-Architected Framework, multi-region deployment, and cost optimisation strategies. Includes certification voucher.',
       startTime: daysFromNow(5, 9),
@@ -61,6 +83,7 @@ async function main() {
       capacity: 25,
       registrationDeadline: daysFromNow(4, 18),
       isPublished: true,
+      tags: ['Cloud'],
       allowedDomains: ['tech.gov.sg'],
       allowedOrganisations: ['GovTech'],
       isPaid: true,
@@ -73,6 +96,7 @@ async function main() {
   // ─── Event 3: Free, open, small capacity → demo waitlist ───
   const event3 = await prisma.event.create({
     data: {
+      creatorId: admin.id,
       title: 'Design Thinking for Public Services',
       description: 'Learn human-centred design methods applied to government digital services. Facilitated by GDS UX team.',
       startTime: daysFromNow(3, 14),
@@ -81,6 +105,7 @@ async function main() {
       capacity: 3,
       registrationDeadline: daysFromNow(2, 18),
       isPublished: true,
+      tags: ['Design'],
       allowedDomains: [],
       allowedOrganisations: [],
       isPaid: false,
@@ -91,6 +116,7 @@ async function main() {
   // ─── Event 4: Cybersecurity, CSA + GovTech, free ───
   const event4 = await prisma.event.create({
     data: {
+      creatorId: admin3.id,
       title: 'Government Cybersecurity Awareness Day',
       description: 'Interactive session on phishing prevention, zero-trust architecture, and incident response best practices. Mandatory for all IT staff.',
       startTime: daysFromNow(6, 9),
@@ -99,6 +125,7 @@ async function main() {
       capacity: 80,
       registrationDeadline: daysFromNow(5, 18),
       isPublished: true,
+      tags: ['Cybersecurity'],
       allowedDomains: [],
       allowedOrganisations: ['CSA', 'GovTech'],
       isPaid: false,
@@ -109,7 +136,8 @@ async function main() {
   // ─── Event 5: AI workshop, open to all, paid ───
   const event5 = await prisma.event.create({
     data: {
-      title: 'Practical AI for Government Officers',
+      creatorId: admin.id,
+      title: 'Practical AI for All',
       description: 'Hands-on workshop: prompt engineering, RAG pipelines, and responsible AI deployment in public sector. Bring your own laptop.',
       startTime: daysFromNow(8, 9),
       endTime: daysFromNow(8, 17),
@@ -117,6 +145,7 @@ async function main() {
       capacity: 40,
       registrationDeadline: daysFromNow(7, 18),
       isPublished: true,
+      tags: ['AI', 'Data'],
       allowedDomains: [],
       allowedOrganisations: [],
       isPaid: true,
@@ -129,6 +158,7 @@ async function main() {
   // ─── Event 6: IMDA only, free ───
   const event6 = await prisma.event.create({
     data: {
+      creatorId: admin2.id,
       title: 'Digital Inclusion Roundtable',
       description: 'Discuss strategies for bridging the digital divide in Singapore — seniors, low-income families, and persons with disabilities.',
       startTime: daysFromNow(10, 14),
@@ -137,6 +167,7 @@ async function main() {
       capacity: 30,
       registrationDeadline: daysFromNow(9, 18),
       isPublished: true,
+      tags: ['Leadership'],
       allowedDomains: [],
       allowedOrganisations: ['IMDA'],
       isPaid: false,
@@ -147,6 +178,7 @@ async function main() {
   // ─── Event 7: Next week, free, open ───
   const event7 = await prisma.event.create({
     data: {
+      creatorId: admin3.id,
       title: 'Agile & Scrum in Government Projects',
       description: 'Introduction to agile methodology tailored for government procurement timelines and compliance requirements.',
       startTime: daysFromNow(4, 10),
@@ -155,6 +187,7 @@ async function main() {
       capacity: 50,
       registrationDeadline: daysFromNow(3, 18),
       isPublished: true,
+      tags: ['Agile'],
       allowedDomains: [],
       allowedOrganisations: [],
       isPaid: false,
@@ -227,11 +260,88 @@ async function main() {
     },
   })
 
-  // ─── Audit logs ───
+  // ─── Audit logs (diverse actions for demo) ───
   const allEvents = [event1, event2, event3, event4, event5, event6, event7]
   for (const ev of allEvents) {
     await prisma.auditLog.create({
       data: { action: 'CREATE_EVENT', actorId: admin.id, eventId: ev.id, metadata: { title: ev.title } },
+    })
+  }
+
+  // Publish events
+  for (const ev of [event1, event3, event4, event5]) {
+    await prisma.auditLog.create({
+      data: { action: 'PUBLISH_EVENT', actorId: admin.id, eventId: ev.id },
+    })
+  }
+
+  // Fetch registrations for audit references
+  const allRegs = await prisma.registration.findMany()
+  const approvedRegs = allRegs.filter(r => r.status === 'APPROVED')
+  const pendingRegs = allRegs.filter(r => r.status === 'PENDING')
+
+  // Registration submissions
+  for (const reg of allRegs.slice(0, 8)) {
+    await prisma.auditLog.create({
+      data: { action: 'REGISTER', eventId: reg.eventId, registrationId: reg.id, metadata: { email: reg.email, status: reg.status } },
+    })
+  }
+
+  // Approve actions
+  for (const reg of approvedRegs) {
+    await prisma.auditLog.create({
+      data: { action: 'APPROVE', actorId: admin.id, eventId: reg.eventId, registrationId: reg.id },
+    })
+  }
+
+  // Reject one registration
+  if (allRegs.length > 0) {
+    await prisma.auditLog.create({
+      data: { action: 'REJECT', actorId: admin.id, eventId: allRegs[0].eventId, registrationId: allRegs[0].id, metadata: { reason: 'Insufficient qualifications for this session' } },
+    })
+  }
+
+  // Edit event
+  await prisma.auditLog.create({
+    data: { action: 'EDIT_EVENT', actorId: admin.id, eventId: event5.id },
+  })
+
+  // Check-in
+  if (approvedRegs.length > 0) {
+    await prisma.auditLog.create({
+      data: { action: 'CHECKIN', actorId: admin.id, eventId: approvedRegs[0].eventId, registrationId: approvedRegs[0].id },
+    })
+  }
+
+  // Broadcast
+  await prisma.auditLog.create({
+    data: { action: 'BROADCAST', actorId: admin.id, eventId: event1.id, metadata: { subject: 'Reminder: Bring your laptop', recipientCount: 5 } },
+  })
+
+  // Blacklist add
+  await prisma.auditLog.create({
+    data: { action: 'BLACKLIST_ADD', actorId: admin.id, metadata: { email: 'noshow@tech.gov.sg', reason: 'Repeated no-shows' } },
+  })
+
+  // Add admin note
+  if (approvedRegs.length > 1) {
+    await prisma.auditLog.create({
+      data: { action: 'ADD_NOTE', actorId: admin.id, registrationId: approvedRegs[1].id, metadata: { notes: 'VIP guest — priority seating' } },
+    })
+  }
+
+  // Waitlist promotion
+  const waitlistedReg = allRegs.find(r => r.status === 'WAITLISTED')
+  if (waitlistedReg) {
+    await prisma.auditLog.create({
+      data: { action: 'WAITLIST_PROMOTED', eventId: waitlistedReg.eventId, registrationId: waitlistedReg.id, metadata: { promotedEmail: waitlistedReg.email } },
+    })
+  }
+
+  // Self-cancel
+  if (pendingRegs.length > 0) {
+    await prisma.auditLog.create({
+      data: { action: 'SELF_CANCEL', registrationId: pendingRegs[0].id, metadata: { email: pendingRegs[0].email } },
     })
   }
 

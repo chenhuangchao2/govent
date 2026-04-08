@@ -77,9 +77,21 @@ app/
 - **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 
 ## Current Status
-**Version**: v3.2 complete (data integrity + UX polish + docs)
+**Version**: v3.3 complete (tags, permissions, dashboard redesign, UX refinements)
 **Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
 **Next step**: Deployment to NorthFlank
+
+**v3.3 — Tags, Permissions, Dashboard & UX ✅ (2026-04-08)**
+- Event tags: schema `tags String[]`, coloured pills on cards, dropdown multi-select filter on public page
+- Admin event form: tag picker (8 presets), inline tag editing in event overview
+- Event permissions: `creatorId` on Event, `isSuperAdmin` on User, admin sees only own events, super admin sees all with "Created By" column
+- Seed: 3 admin accounts (Phoenix=super, Sarah, Rajan) with events split across creators
+- Dashboard redesign: removed Event Fill Rates (redundant), added Popular Topics (Top 5), Upcoming Schedule full-width grid
+- Stat cards: all pure display (removed misleading click-through links)
+- Filter UX: Topic + Open To as dropdown multi-select, "All Topics" / "Open To: All" default labels
+- CapacityBar: public shows "Seats Available" / "Waitlist Open" (no numbers), admin keeps full detail
+- Removed "View Details →" from event cards (hover effect is sufficient)
+- Admin login: removed hardcoded credentials display, fixed redirect flash
 
 **v3.2 — Data Integrity + UX Polish ✅ (2026-04-08)**
 - Stripe webhook: checks event.isCancelled before approving (prevents orphaned approvals)

@@ -1,9 +1,17 @@
 import { db } from '@/lib/db'
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
 
 export default async function AdminEventsPage() {
+  const session = await requireAdmin()
+  const isSuperAdmin = session?.isSuperAdmin ?? false
+
   const events = await db.event.findMany({
-    include: { _count: { select: { registrations: true } } },
+    where: isSuperAdmin ? {} : { creatorId: session?.userId },
+    include: {
+      _count: { select: { registrations: true } },
+      creator: { select: { name: true } },
+    },
     orderBy: { startTime: 'asc' },
   })
 
@@ -41,7 +49,7 @@ export default async function AdminEventsPage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                {['Title', 'Date & Time', 'Capacity', 'Status'].map(h => (
+                {['Title', 'Date & Time', 'Capacity', ...(isSuperAdmin ? ['Created By'] : []), 'Status'].map(h => (
                   <th
                     key={h}
                     className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide"
@@ -80,6 +88,13 @@ export default async function AdminEventsPage() {
                   <td className={`px-4 py-3 ${capacityColor(e._count.registrations, e.capacity)}`}>
                     {e._count.registrations} / {e.capacity}
                   </td>
+
+                  {/* Created By (super admin only) */}
+                  {isSuperAdmin && (
+                    <td className="px-4 py-3 text-gray-500">
+                      {e.creator?.name || '—'}
+                    </td>
+                  )}
 
                   {/* Status badge */}
                   <td className="px-4 py-3">

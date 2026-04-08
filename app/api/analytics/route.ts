@@ -49,6 +49,7 @@ export async function GET() {
         select: {
           title: true,
           capacity: true,
+          tags: true,
           _count: { select: { registrations: true } },
         },
       }),
@@ -107,6 +108,17 @@ export async function GET() {
       count: d._count.organisation,
     }))
 
+    // Topic breakdown — count events per tag
+    const tagCounts = new Map<string, number>()
+    for (const e of eventsForFillRate) {
+      for (const tag of e.tags) {
+        tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
+      }
+    }
+    const topicBreakdown = Array.from(tagCounts.entries())
+      .map(([topic, count]) => ({ topic, count }))
+      .sort((a, b) => b.count - a.count)
+
     // Sum CPD hours
     const totalCpdHours = cpdResult.reduce(
       (sum, r) => sum + (r.event.cpdHours ?? 0),
@@ -133,6 +145,7 @@ export async function GET() {
         registrationsByStatus: formattedRegistrationsByStatus,
         eventFillRates,
         organisationBreakdown: formattedOrganisationBreakdown,
+        topicBreakdown,
         totalCpdHours,
         upcomingEvents,
       },

@@ -593,6 +593,42 @@ Dispatched 5 specialist agents (UX/Demo reviewer, Backend architect, GovTech ass
 
 ---
 
+## v3.3 — Tags, Permissions, Dashboard & UX Refinements
+**Date**: 2026-04-08 | **Tool**: Claude Code
+
+### Event Tags
+| File | Change |
+|------|--------|
+| `prisma/schema.prisma` | Added `tags String[]` to Event, `creatorId String?` + `creator` relation, `isSuperAdmin Boolean` to User |
+| `app/api/events/route.ts` | POST saves `tags` and `creatorId` from session |
+| `app/api/events/[id]/route.ts` | PATCH supports `tags` field update |
+| `components/features/EventCard.tsx` | Displays coloured tag pills (AI=purple, Cloud=sky, Cybersecurity=red, etc.) |
+| `components/features/EventFilters.tsx` | Topic + Organisation changed from pill list to dropdown multi-select with checkboxes, "All Topics" / "Open To: All" defaults |
+| `components/features/admin/EventForm.tsx` | Tag picker with 8 presets (click to toggle), multi-select |
+| `components/features/admin/EventOverview.tsx` | Added Tags row to inline editor |
+
+### Event Permissions
+| File | Change |
+|------|--------|
+| `prisma/schema.prisma` | `Event.creatorId` → User relation, `User.isSuperAdmin` flag |
+| `lib/auth.ts` | Session includes `isSuperAdmin` |
+| `app/api/auth/login/route.ts` | Sets `isSuperAdmin` in session on login |
+| `app/admin/(protected)/events/page.tsx` | Super admin sees all events + "Created By" column; regular admin sees only own events |
+| `prisma/seed.ts` | 3 admin accounts (Phoenix=super, Sarah, Rajan), events split across creators, diverse audit logs |
+
+### Dashboard & UX
+| File | Change |
+|------|--------|
+| `components/features/admin/AnalyticsDashboard.tsx` | Removed Event Fill Rates (redundant with Upcoming Schedule), added Popular Topics (Top 5 ranked bars), Upcoming Schedule now full-width grid |
+| `app/admin/(protected)/page.tsx` | Stat cards changed to pure display (removed click-through links) |
+| `components/features/CapacityBar.tsx` | Public mode shows "Seats Available" / "Waitlist Open" (no numbers); admin mode unchanged |
+| `components/features/EventCard.tsx` | Removed "View Details →" text (hover effect sufficient) |
+| `app/admin/login/page.tsx` | Removed hardcoded credentials, fixed redirect flash (router.push → window.location.href) |
+
+**Build**: 0 TypeScript errors, 45 routes compiled.
+
+---
+
 ## Phase 6 — Deployment
 **Date**: _TBD_ | **Target**: NorthFlank
 

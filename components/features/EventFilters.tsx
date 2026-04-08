@@ -15,6 +15,7 @@ interface EventData {
   price: number | null
   allowedDomains: string[]
   allowedOrganisations: string[]
+  tags: string[]
 }
 
 const TIME_FILTERS = [
@@ -33,7 +34,17 @@ export default function EventFilters({ events }: { events: EventData[] }) {
   const [search, setSearch] = useState('')
   const [timeFilter, setTimeFilter] = useState<'this-week' | 'this-month' | 'all'>('this-week')
   const [costFilter, setCostFilter] = useState<'all' | 'free' | 'paid'>('all')
-  const [orgFilter, setOrgFilter] = useState<string>('all')
+  const [selectedOrgs, setSelectedOrgs] = useState<string[]>([])
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+
+  // Collect unique tags
+  const allTags = useMemo(() => {
+    const seen = new Set<string>()
+    for (const e of events) {
+      for (const t of e.tags) seen.add(t)
+    }
+    return Array.from(seen).sort()
+  }, [events])
 
   // Collect unique organisations (case-insensitive dedup, keep first casing seen)
   const allOrgs = useMemo(() => {
@@ -46,6 +57,13 @@ export default function EventFilters({ events }: { events: EventData[] }) {
     }
     return Array.from(seen.values()).sort()
   }, [events])
+
+  function toggleTag(tag: string) {
+    setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])
+  }
+  function toggleOrg(org: string) {
+    setSelectedOrgs(prev => prev.includes(org) ? prev.filter(o => o !== org) : [...prev, org])
+  }
 
   const filtered = useMemo(() => {
     const now = new Date()
@@ -73,18 +91,20 @@ export default function EventFilters({ events }: { events: EventData[] }) {
       if (costFilter === 'free' && e.isPaid) return false
       if (costFilter === 'paid' && !e.isPaid) return false
 
-      // Organisation
-      if (orgFilter !== 'all') {
-        if (orgFilter === 'open') {
-          if (e.allowedOrganisations.length > 0) return false
-        } else {
-          if (!e.allowedOrganisations.some(o => o.toLowerCase() === orgFilter.toLowerCase())) return false
-        }
+      // Tags (multi-select: event must have ALL selected tags)
+      if (selectedTags.length > 0) {
+        if (!selectedTags.some(t => e.tags.includes(t))) return false
+      }
+
+      // Organisation (multi-select)
+      if (selectedOrgs.length > 0) {
+        if (e.allowedOrganisations.length === 0) return true // open to all matches any org filter
+        if (!selectedOrgs.some(o => e.allowedOrganisations.some(ao => ao.toLowerCase() === o.toLowerCase()))) return false
       }
 
       return true
     })
-  }, [events, search, timeFilter, costFilter, orgFilter])
+  }, [events, search, timeFilter, costFilter, selectedOrgs, selectedTags])
 
   return (
     <div>
@@ -136,43 +156,53 @@ export default function EventFilters({ events }: { events: EventData[] }) {
           ))}
         </div>
 
-        {/* Organisation */}
+        {/* Topic dropdown multi-select */}
+        {allTags.length > 0 && (
+          <div className="relative">
+            <details className="group">
+              <summary className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 cursor-pointer hover:bg-gray-50 select-none list-none">
+                {selectedTags.length === 0 ? 'All Topics' : selectedTags.join(', ')} {selectedTags.length > 0 && <span className="bg-blue-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">{selectedTags.length}</span>}
+                <svg className="w-3 h-3 ml-1 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </summary>
+              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1 min-w-[160px]">
+                {allTags.map(tag => (
+                  <label key={tag} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 cursor-pointer text-xs">
+                    <input type="checkbox" checked={selectedTags.includes(tag)} onChange={() => toggleTag(tag)} className="rounded" />
+                    {tag}
+                  </label>
+                ))}
+                {selectedTags.length > 0 && (
+                  <button onClick={() => setSelectedTags([])} className="w-full text-left px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600 border-t border-gray-100 mt-1">
+                    Clear
+                  </button>
+                )}
+              </div>
+            </details>
+          </div>
+        )}
+
+        {/* Organisation dropdown multi-select */}
         {allOrgs.length > 0 && (
-          <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-xs text-gray-400">Open to:</span>
-            <button
-              onClick={() => setOrgFilter('all')}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                orgFilter === 'all'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setOrgFilter('open')}
-              className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                orgFilter === 'open'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              Open to Everyone
-            </button>
-            {allOrgs.map(org => (
-              <button
-                key={org}
-                onClick={() => setOrgFilter(org)}
-                className={`px-2.5 py-1 rounded-full text-xs font-medium transition-colors ${
-                  orgFilter === org
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                {org}
-              </button>
-            ))}
+          <div className="relative">
+            <details className="group">
+              <summary className="flex items-center gap-1.5 px-3 py-1.5 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 cursor-pointer hover:bg-gray-50 select-none list-none">
+                {selectedOrgs.length === 0 ? 'Open To: All' : selectedOrgs.join(', ')} {selectedOrgs.length > 0 && <span className="bg-blue-600 text-white px-1.5 py-0.5 rounded-full text-[10px]">{selectedOrgs.length}</span>}
+                <svg className="w-3 h-3 ml-1 transition-transform group-open:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              </summary>
+              <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 py-1 min-w-[160px]">
+                {allOrgs.map(org => (
+                  <label key={org} className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-50 cursor-pointer text-xs">
+                    <input type="checkbox" checked={selectedOrgs.includes(org)} onChange={() => toggleOrg(org)} className="rounded" />
+                    {org}
+                  </label>
+                ))}
+                {selectedOrgs.length > 0 && (
+                  <button onClick={() => setSelectedOrgs([])} className="w-full text-left px-3 py-1.5 text-xs text-gray-400 hover:text-gray-600 border-t border-gray-100 mt-1">
+                    Clear
+                  </button>
+                )}
+              </div>
+            </details>
           </div>
         )}
       </div>
@@ -183,7 +213,7 @@ export default function EventFilters({ events }: { events: EventData[] }) {
           <div className="text-center py-12">
             <p className="text-gray-400 text-sm">No events match your filters.</p>
             <button
-              onClick={() => { setSearch(''); setTimeFilter('this-week'); setCostFilter('all'); setOrgFilter('all') }}
+              onClick={() => { setSearch(''); setTimeFilter('this-week'); setCostFilter('all'); setSelectedOrgs([]); setSelectedTags([]) }}
               className="text-sm text-blue-600 hover:underline mt-2"
             >
               Clear all filters
@@ -205,6 +235,7 @@ export default function EventFilters({ events }: { events: EventData[] }) {
                 price={e.price}
                 allowedDomains={e.allowedDomains}
                 allowedOrganisations={e.allowedOrganisations}
+                tags={e.tags}
               />
             ))}
           </>

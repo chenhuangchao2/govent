@@ -12,9 +12,11 @@ model User {
   email        String   @unique
   name         String
   passwordHash String
+  isSuperAdmin Boolean  @default(false)
   createdAt    DateTime @default(now())
 
   auditLogs    AuditLog[]
+  events       Event[]    @relation("EventCreator")
 }
 
 model Event {
@@ -30,6 +32,13 @@ model Event {
   isPublished          Boolean       @default(false)
   isCancelled          Boolean       @default(false)
   noShowProcessed      Boolean       @default(false)
+
+  // Creator
+  creatorId             String?
+  creator               User?         @relation("EventCreator", fields: [creatorId], references: [id])
+
+  // Tags / categories
+  tags                  String[]      // e.g. ["AI", "Cloud"] — topic labels for filtering
 
   // Eligibility
   allowedDomains        String[]      // e.g. ["tech.gov.sg"] — empty = open to all

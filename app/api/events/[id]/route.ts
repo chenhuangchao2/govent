@@ -59,6 +59,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.venueHidden !== undefined) data.venueHidden = Boolean(body.venueHidden)
   if (body.capacity !== undefined) data.capacity = Number(body.capacity)
   if (body.registrationDeadline !== undefined) data.registrationDeadline = new Date(body.registrationDeadline)
+  if (body.tags !== undefined) data.tags = body.tags
   if (body.allowedDomains !== undefined) data.allowedDomains = body.allowedDomains
   if (body.allowedOrganisations !== undefined) data.allowedOrganisations = body.allowedOrganisations
   if (body.cpdHours !== undefined) data.cpdHours = Number(body.cpdHours)

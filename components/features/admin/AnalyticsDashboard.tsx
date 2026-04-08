@@ -15,11 +15,23 @@ interface AnalyticsData {
   registrationsByStatus: { status: string; count: number }[]
   eventFillRates: { eventTitle: string; registered: number; capacity: number; fillRate: number }[]
   organisationBreakdown: { organisation: string; count: number }[]
+  topicBreakdown: { topic: string; count: number }[]
   totalCpdHours: number
   upcomingEvents: {
     id: string; title: string; startTime: string; endTime: string
     venue: string; registered: number; capacity: number; isPaid: boolean
   }[]
+}
+
+const TOPIC_COLORS: Record<string, string> = {
+  AI: '#7c3aed',
+  Cloud: '#0284c7',
+  Cybersecurity: '#dc2626',
+  Data: '#0d9488',
+  Design: '#db2777',
+  Agile: '#ea580c',
+  Leadership: '#4f46e5',
+  Compliance: '#6b7280',
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -113,25 +125,27 @@ export default function AnalyticsDashboard() {
         )}
       </Panel>
 
-      {/* 2. Event Fill Rates */}
-      <Panel title="Event Fill Rates">
-        {data.eventFillRates.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-12">No data yet</p>
+      {/* 2. Popular Topics */}
+      <Panel title="Popular Topics">
+        {(!data.topicBreakdown || data.topicBreakdown.length === 0) ? (
+          <p className="text-gray-400 text-sm text-center py-12">No topics yet</p>
         ) : (
           <div className="space-y-4">
-            {data.eventFillRates.map((e) => {
-              const pct = Math.min(e.fillRate, 100)
-              const color = pct >= 80 ? 'bg-red-500' : pct >= 50 ? 'bg-amber-500' : 'bg-blue-500'
+            {data.topicBreakdown.slice(0, 5).map((t, i) => {
+              const maxCount = data.topicBreakdown[0].count
+              const pct = maxCount > 0 ? Math.max(Math.round((t.count / maxCount) * 100), 12) : 12
+              const color = TOPIC_COLORS[t.topic] || '#6b7280'
               return (
-                <div key={e.eventTitle}>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <p className="text-sm font-medium text-gray-900 truncate flex-1 mr-3">{e.eventTitle}</p>
-                    <span className="text-xs font-semibold text-gray-500 shrink-0">
-                      {e.registered}/{e.capacity} ({pct}%)
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-100 rounded-full h-2">
-                    <div className={`${color} h-2 rounded-full transition-all`} style={{ width: `${pct}%` }} />
+                <div key={t.topic} className="flex items-center gap-3">
+                  <span className="text-lg font-bold text-gray-300 w-5 text-right">{i + 1}</span>
+                  <div className="flex-1">
+                    <div className="flex justify-between mb-1.5">
+                      <span className="text-sm font-semibold text-gray-900">{t.topic}</span>
+                      <span className="text-xs font-medium text-gray-500">{t.count} event{t.count !== 1 ? 's' : ''}</span>
+                    </div>
+                    <div className="w-full bg-gray-100 rounded-full h-2.5">
+                      <div className="h-2.5 rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
+                    </div>
                   </div>
                 </div>
               )
@@ -140,29 +154,13 @@ export default function AnalyticsDashboard() {
         )}
       </Panel>
 
-      {/* 3. Registrations by Organisation */}
-      <Panel title="Registrations by Organisation">
-        {data.organisationBreakdown.length === 0 ? (
-          <p className="text-gray-400 text-sm text-center py-12">No data yet</p>
-        ) : (
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={data.organisationBreakdown} margin={{ left: 0, right: 10, top: 5, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="organisation" tick={{ fontSize: 12 }} />
-              <YAxis allowDecimals={false} />
-              <Tooltip />
-              <Bar dataKey="count" fill="#1e40af" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-      </Panel>
-
-      {/* 4. Upcoming Schedule */}
+      {/* 3. Upcoming Schedule — full width */}
+      <div className="lg:col-span-2">
       <Panel title="Upcoming Schedule">
         {data.upcomingEvents.length === 0 ? (
           <p className="text-gray-400 text-sm text-center py-12">No upcoming events</p>
         ) : (
-          <div className="space-y-3 max-h-[320px] overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
             {data.upcomingEvents.map((e) => {
               const start = new Date(e.startTime)
               const day = start.toLocaleDateString('en-SG', { weekday: 'short', day: 'numeric', month: 'short' })
@@ -170,31 +168,31 @@ export default function AnalyticsDashboard() {
               const pct = e.capacity > 0 ? Math.round((e.registered / e.capacity) * 100) : 0
               return (
                 <Link key={e.id} href={`/admin/events/${e.id}`} className="block">
-                  <div className="flex gap-3 p-3 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-colors">
-                    {/* Date badge */}
-                    <div className="flex flex-col items-center justify-center w-14 h-14 rounded-lg bg-blue-50 shrink-0">
-                      <span className="text-xs font-medium text-blue-600">{start.toLocaleDateString('en-SG', { weekday: 'short' })}</span>
-                      <span className="text-lg font-bold text-blue-700">{start.getDate()}</span>
-                    </div>
-                    {/* Details */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{e.title}</p>
-                        {e.isPaid && <span className="text-xs bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium shrink-0">Paid</span>}
+                  <div className="p-4 rounded-lg border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30 transition-colors h-full">
+                    <div className="flex items-start gap-3">
+                      {/* Date badge */}
+                      <div className="flex flex-col items-center justify-center w-12 h-12 rounded-lg bg-blue-50 shrink-0">
+                        <span className="text-[10px] font-medium text-blue-600">{start.toLocaleDateString('en-SG', { weekday: 'short' })}</span>
+                        <span className="text-base font-bold text-blue-700">{start.getDate()}</span>
                       </div>
-                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-500">
-                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{day} {time}</span>
-                        <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{e.venue || 'TBC'}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-1.5">
-                        <div className="flex-1 bg-gray-100 rounded-full h-1.5 max-w-[120px]">
-                          <div
-                            className={`h-1.5 rounded-full ${pct >= 80 ? 'bg-red-400' : pct >= 50 ? 'bg-amber-400' : 'bg-blue-400'}`}
-                            style={{ width: `${Math.min(pct, 100)}%` }}
-                          />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-semibold text-gray-900 truncate">{e.title}</p>
+                          {e.isPaid && <span className="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-medium shrink-0">Paid</span>}
                         </div>
-                        <span className="flex items-center gap-1 text-xs text-gray-400"><Users className="w-3 h-3" />{e.registered}/{e.capacity}</span>
+                        <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1"><Calendar className="w-3 h-3" />{day} {time}</p>
+                        <p className="text-xs text-gray-500 mt-0.5 flex items-center gap-1 truncate"><MapPin className="w-3 h-3" />{e.venue || 'TBC'}</p>
                       </div>
+                    </div>
+                    {/* Fill bar — horizontal, full width */}
+                    <div className="flex items-center gap-2 mt-3">
+                      <div className="flex-1 bg-gray-100 rounded-full h-2">
+                        <div
+                          className={`h-2 rounded-full ${pct >= 80 ? 'bg-red-400' : pct >= 50 ? 'bg-amber-400' : 'bg-blue-400'}`}
+                          style={{ width: `${Math.min(pct, 100)}%` }}
+                        />
+                      </div>
+                      <span className="flex items-center gap-1 text-xs text-gray-400 shrink-0"><Users className="w-3 h-3" />{e.registered}/{e.capacity}</span>
                     </div>
                   </div>
                 </Link>
@@ -203,6 +201,7 @@ export default function AnalyticsDashboard() {
           </div>
         )}
       </Panel>
+      </div>
     </div>
   )
 }

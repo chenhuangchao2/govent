@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
   session.userId = user.id
   session.userEmail = user.email
   session.userName = user.name
+  session.isSuperAdmin = user.isSuperAdmin
   await session.save()
 
   return NextResponse.json({ data: { name: user.name, email: user.email }, error: null })

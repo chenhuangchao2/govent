@@ -23,6 +23,7 @@ export default async function EventsPage() {
     price: e.price,
     allowedDomains: e.allowedDomains,
     allowedOrganisations: e.allowedOrganisations,
+    tags: e.tags,
   }))
 
   return (

@@ -9,6 +9,9 @@ export default function EventForm() {
   const [error, setError] = useState<string | null>(null)
   const [isPaid, setIsPaid] = useState(false)
   const [venueHidden, setVenueHidden] = useState(false)
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
+
+  const SUGGESTED_TAGS = ['AI', 'Cloud', 'Cybersecurity', 'Data', 'Design', 'Agile', 'Leadership', 'Compliance']
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -23,6 +26,7 @@ export default function EventForm() {
       venueHidden,
       capacity: fd.get('capacity'),
       registrationDeadline: fd.get('registrationDeadline'),
+      tags: selectedTags,
       allowedDomains: (fd.get('allowedDomains') as string).split(',').map(s => s.trim()).filter(Boolean),
       allowedOrganisations: (fd.get('allowedOrganisations') as string).split(',').map(s => s.trim()).filter(Boolean),
       isPaid,
@@ -60,6 +64,22 @@ export default function EventForm() {
       <div className="grid grid-cols-2 gap-4">
         <div><label className={labelClass}>Capacity</label><input type="number" name="capacity" className={inputClass} required /></div>
         <div><label className={labelClass}>Registration Deadline</label><input type="datetime-local" name="registrationDeadline" className={inputClass} required /></div>
+      </div>
+      <div>
+        <label className={labelClass}>Tags</label>
+        <div className="flex flex-wrap gap-2 mb-2">
+          {SUGGESTED_TAGS.map(tag => (
+            <button key={tag} type="button"
+              onClick={() => setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])}
+              className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                selectedTags.includes(tag)
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >{tag}</button>
+          ))}
+        </div>
+        {selectedTags.length > 0 && <p className="text-xs text-gray-400">Selected: {selectedTags.join(', ')}</p>}
       </div>
       <div><label className={labelClass}>Allowed Email Domains (comma-separated, empty = all)</label><input name="allowedDomains" placeholder="govtech.gov.sg, tech.gov.sg" className={inputClass} /></div>
       <div><label className={labelClass}>Allowed Organisations (comma-separated, empty = all)</label><input name="allowedOrganisations" placeholder="GovTech, IMDA" className={inputClass} /></div>

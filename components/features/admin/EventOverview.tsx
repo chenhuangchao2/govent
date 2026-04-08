@@ -14,6 +14,7 @@ interface EventData {
   venue: string
   capacity: number
   registrationDeadline: string
+  tags: string[]
   allowedDomains: string[]
   allowedOrganisations: string[]
   cpdHours: number
@@ -38,6 +39,7 @@ const FIELDS: FieldConfig[] = [
   { key: 'endTime', label: 'End Time', type: 'datetime' },
   { key: 'capacity', label: 'Capacity', type: 'number' },
   { key: 'registrationDeadline', label: 'Registration Deadline', type: 'datetime' },
+  { key: 'tags', label: 'Tags', type: 'tags', hint: 'e.g. AI, Cloud, Cybersecurity' },
   { key: 'allowedDomains', label: 'Allowed Domains', type: 'tags', hint: 'e.g. tech.gov.sg — leave empty for open access' },
   { key: 'allowedOrganisations', label: 'Allowed Organisations', type: 'tags', hint: 'e.g. GovTech, IMDA — leave empty for all' },
   { key: 'cpdHours', label: 'CPD Hours', type: 'number', step: '0.5' },

@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
 
   const event = await db.event.create({
     data: {
+      creatorId: session.userId,
       title: body.title,
       description: body.description,
       startTime,
@@ -55,6 +56,7 @@ export async function POST(req: NextRequest) {
       venue: body.venue,
       capacity: Number(body.capacity),
       registrationDeadline,
+      tags: body.tags ?? [],
       allowedDomains: body.allowedDomains ?? [],
       allowedOrganisations: body.allowedOrganisations ?? [],
       isPaid: body.isPaid ?? false,
