@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>GovEvent Admin Portal | The Sovereign Prism</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;500;600;700;800&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#191c1d",
+                    "inverse-primary": "#a9c7ff",
+                    "surface-dim": "#d9dadb",
+                    "surface-variant": "#e1e3e4",
+                    "outline": "#727783",
+                    "on-primary-container": "#c8daff",
+                    "surface-container-low": "#f3f4f5",
+                    "secondary": "#4858ab",
+                    "on-tertiary-fixed-variant": "#004e59",
+                    "on-secondary-fixed-variant": "#2f3f92",
+                    "surface-bright": "#f8f9fa",
+                    "inverse-on-surface": "#f0f1f2",
+                    "background": "#f8f9fa",
+                    "surface-container": "#edeeef",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#bac3ff",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#78e9ff",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "on-secondary-fixed": "#00105b",
+                    "tertiary-fixed-dim": "#44d8f1",
+                    "surface-tint": "#005db6",
+                    "secondary-fixed": "#dee0ff",
+                    "on-error-container": "#93000a",
+                    "on-background": "#191c1d",
+                    "secondary-container": "#96a5ff",
+                    "tertiary-fixed": "#a1efff",
+                    "inverse-surface": "#2e3132",
+                    "on-surface-variant": "#424752",
+                    "tertiary-container": "#006977",
+                    "on-tertiary-fixed": "#001f25",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#27378a",
+                    "surface-container-highest": "#e1e3e4",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001b3d",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#d6e3ff",
+                    "on-primary-fixed-variant": "#00468c",
+                    "tertiary": "#004f5a",
+                    "primary-fixed-dim": "#a9c7ff",
+                    "primary-container": "#005eb8",
+                    "primary": "#00478d",
+                    "surface-container-high": "#e7e8e9",
+                    "outline-variant": "#c2c6d4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "1.5rem",
+                    "xl": "2rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(194, 198, 212, 0.2);
+        }
+        .iridescent-glow {
+            background: radial-gradient(circle at center, rgba(161, 239, 255, 0.15) 0%, transparent 70%);
+        }
+        .noise-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+        }
+        body {
+            font-family: 'Manrope', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .active-glow {
+            box-shadow: 0 8px 32px 0 rgba(0, 71, 141, 0.08);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface antialiased overflow-hidden selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Background Accents -->
+<div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] iridescent-glow blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary-fixed/10 blur-[150px] rounded-full"></div>
+<div class="absolute inset-0 noise-overlay"></div>
+</div>
+<!-- Sidebar Navigation -->
+<aside class="h-full w-72 fixed left-0 glass-panel rounded-r-3xl border-r border-white/20 flex flex-col p-6 z-50 shadow-[0_60px_60px_-10px_rgba(0,0,0,0.05)]">
+<div class="mb-10 px-3">
+<h1 class="text-xl font-black text-blue-900 tracking-tighter uppercase font-headline">GovEvent Admin</h1>
+<p class="text-[10px] font-bold text-slate-500 tracking-widest uppercase font-label mt-1">Management Portal</p>
+</div>
+<nav class="flex-1 space-y-2">
+<!-- Active State -->
+<a class="flex items-center gap-3 px-4 py-3 text-primary bg-white rounded-2xl font-semibold tracking-tight transition-all active:scale-[0.98] active-glow border border-primary/5" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-white/40 rounded-2xl font-semibold tracking-tight transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label">Events</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-white/40 rounded-2xl font-semibold tracking-tight transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label">Users</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-white/40 rounded-2xl font-semibold tracking-tight transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+<span class="font-label">Reports</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-500 hover:bg-white/40 rounded-2xl font-semibold tracking-tight transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label">Settings</span>
+</a>
+</nav>
+<div class="mt-auto space-y-6">
+<button class="w-full py-4 px-4 bg-primary text-white rounded-2xl font-bold font-label uppercase tracking-widest text-[11px] flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:opacity-90 active:scale-95 transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="add">add</span>
+            Create New Event
+        </button>
+<div class="flex items-center gap-4 p-3 bg-white/40 rounded-2xl border border-white/20">
+<div class="w-10 h-10 rounded-full bg-slate-200 overflow-hidden ring-2 ring-white shadow-sm">
+<img alt="Admin User Profile" class="w-full h-full object-cover" data-alt="Admin User Profile Avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBs5MS2yDfjtRc9X89kATcz6CUQfOzLiKWw3-eImTWCaKVPDm1nGIqrSkrvcDggFSy_FHrsaHH10J6UaiLUur2d-dIOV6PgKxKJrTvCobvEuz_0wSZ8zFDt6KayGSC3B431dfyoWAqqTG9BBPpqnp2gEO8cmW3ulhAPOXw-mq4OPrqedLMMyqHs6OC1gK3mHSOtzTo94cV_a8cGvL-70cveXvoQdfPN5--zIdocXoK-ya2J1szUTnhLNQW8RxWIHP4wFfQYLasHReg"/>
+</div>
+<div>
+<p class="text-sm font-bold text-on-surface">Alex Rivera</p>
+<p class="text-[10px] text-slate-500 font-bold tracking-widest uppercase">Senior Admin</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-72 h-screen overflow-y-auto no-scrollbar p-10">
+<!-- Top Navigation -->
+<header class="flex justify-between items-center mb-12">
+<div>
+<h2 class="text-5xl font-extrabold text-on-surface tracking-tighter leading-none mb-2">Executive Dashboard.</h2>
+<p class="text-on-surface-variant font-medium">Welcome back, here's what's happening today.</p>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="pl-12 pr-6 py-3.5 bg-surface-container-high/40 backdrop-blur-xl border-none rounded-2xl focus:ring-2 focus:ring-primary-fixed outline-none font-label transition-all placeholder:text-outline shadow-sm w-80" placeholder="Filter protocols or users..." type="text"/>
+</div>
+<button class="w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-[0_8px_32px_0_rgba(0,71,141,0.08)] text-slate-600 hover:text-primary transition-colors border border-white/20">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<!-- Metrics Grid -->
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+<!-- Active Events -->
+<div class="bg-white p-8 rounded-xl shadow-[0_12px_32px_-12px_rgba(0,0,0,0.08)] border border-white/40 flex flex-col gap-6 group hover:scale-[1.02] transition-transform">
+<div class="flex justify-between items-start">
+<div class="p-3 bg-primary-fixed/30 rounded-2xl text-primary">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+</div>
+<span class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase tracking-widest">+12%</span>
+</div>
+<div>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Active Events</p>
+<h3 class="text-4xl font-extrabold tracking-tighter">142</h3>
+</div>
+</div>
+<!-- Pending Approvals -->
+<div class="bg-white p-8 rounded-xl shadow-[0_12px_32px_-12px_rgba(0,0,0,0.08)] border border-white/40 flex flex-col gap-6 group hover:scale-[1.02] transition-transform">
+<div class="flex justify-between items-start">
+<div class="p-3 bg-amber-50 rounded-2xl text-amber-600">
+<span class="material-symbols-outlined" data-icon="pending_actions">pending_actions</span>
+</div>
+<span class="text-[10px] font-black text-amber-600 bg-amber-50 px-3 py-1 rounded-full uppercase tracking-widest">Alert</span>
+</div>
+<div>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Pending Approvals</p>
+<h3 class="text-4xl font-extrabold tracking-tighter">28</h3>
+</div>
+</div>
+<!-- Today's Check-ins -->
+<div class="bg-white p-8 rounded-xl shadow-[0_12px_32px_-12px_rgba(0,0,0,0.08)] border border-white/40 flex flex-col gap-6 group hover:scale-[1.02] transition-transform">
+<div class="flex justify-between items-start">
+<div class="p-3 bg-tertiary-fixed/30 rounded-2xl text-tertiary">
+<span class="material-symbols-outlined" data-icon="person_pin_circle">person_pin_circle</span>
+</div>
+<span class="text-[10px] font-black text-tertiary bg-tertiary-fixed/20 px-3 py-1 rounded-full uppercase tracking-widest">Peak</span>
+</div>
+<div>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Today's Check-ins</p>
+<h3 class="text-4xl font-extrabold tracking-tighter">1,240</h3>
+</div>
+</div>
+<!-- Total Registrations -->
+<div class="bg-white p-8 rounded-xl shadow-[0_12px_32px_-12px_rgba(0,0,0,0.08)] border border-white/40 flex flex-col gap-6 group hover:scale-[1.02] transition-transform">
+<div class="flex justify-between items-start">
+<div class="p-3 bg-secondary-fixed/30 rounded-2xl text-secondary">
+<span class="material-symbols-outlined" data-icon="how_to_reg">how_to_reg</span>
+</div>
+<span class="text-[10px] font-black text-secondary bg-secondary-fixed/20 px-3 py-1 rounded-full uppercase tracking-widest">+2.4k</span>
+</div>
+<div>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-1">Total Registrations</p>
+<h3 class="text-4xl font-extrabold tracking-tighter">48.6k</h3>
+</div>
+</div>
+</section>
+<!-- Bento Layout -->
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column -->
+<div class="col-span-12 lg:col-span-8 flex flex-col gap-8">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Registration Status (Donut) -->
+<div class="bg-white p-10 rounded-xl shadow-sm flex flex-col border border-white/40">
+<div class="flex justify-between items-center mb-8">
+<h4 class="font-extrabold text-xl tracking-tight">Registration Status</h4>
+<span class="material-symbols-outlined text-outline-variant cursor-pointer" data-icon="more_horiz">more_horiz</span>
+</div>
+<div class="flex-1 flex items-center justify-center relative py-6">
+<svg class="w-48 h-48 transform -rotate-90">
+<circle class="text-slate-100" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-width="24"></circle>
+<circle class="text-primary" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502" stroke-dashoffset="120" stroke-linecap="round" stroke-width="24"></circle>
+<circle class="text-secondary-fixed" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502" stroke-dashoffset="380" stroke-linecap="round" stroke-width="24"></circle>
+<circle class="text-tertiary-fixed" cx="96" cy="96" fill="transparent" r="80" stroke="currentColor" stroke-dasharray="502" stroke-dashoffset="460" stroke-linecap="round" stroke-width="24"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-black text-on-surface tracking-tighter">84%</span>
+<span class="text-[9px] uppercase font-black text-slate-400 tracking-[0.2em]">Capacity</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-2 mt-10">
+<div class="text-center">
+<div class="w-1.5 h-1.5 rounded-full bg-primary mx-auto mb-1.5"></div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Confirmed</p>
+</div>
+<div class="text-center">
+<div class="w-1.5 h-1.5 rounded-full bg-secondary-fixed mx-auto mb-1.5"></div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Waitlist</p>
+</div>
+<div class="text-center">
+<div class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed mx-auto mb-1.5"></div>
+<p class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Pending</p>
+</div>
+</div>
+</div>
+<!-- Popular Topics (Bar) -->
+<div class="bg-white p-10 rounded-xl shadow-sm border border-white/40">
+<div class="flex justify-between items-center mb-10">
+<h4 class="font-extrabold text-xl tracking-tight">Popular Topics</h4>
+<div class="flex gap-1 bg-surface-container-low p-1 rounded-full">
+<button class="text-[9px] font-black uppercase tracking-widest text-primary px-4 py-1.5 bg-white rounded-full shadow-sm">Monthly</button>
+<button class="text-[9px] font-black uppercase tracking-widest text-slate-400 px-4 py-1.5 hover:text-slate-600 transition-colors">Weekly</button>
+</div>
+</div>
+<div class="flex items-end justify-between h-56 gap-5 px-2">
+<div class="flex flex-col items-center w-full group">
+<div class="w-full bg-surface-container-low rounded-t-lg h-full group-hover:bg-primary/5 transition-colors relative overflow-hidden flex flex-col justify-end">
+<div class="bg-primary h-4/5 rounded-t-lg"></div>
+</div>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">Tech</p>
+</div>
+<div class="flex flex-col items-center w-full group">
+<div class="w-full bg-surface-container-low rounded-t-lg h-full group-hover:bg-secondary/5 transition-colors relative overflow-hidden flex flex-col justify-end">
+<div class="bg-secondary-fixed h-2/5 rounded-t-lg"></div>
+</div>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">Policy</p>
+</div>
+<div class="flex flex-col items-center w-full group">
+<div class="w-full bg-surface-container-low rounded-t-lg h-full group-hover:bg-tertiary/5 transition-colors relative overflow-hidden flex flex-col justify-end">
+<div class="bg-tertiary-fixed-dim h-3/5 rounded-t-lg"></div>
+</div>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">Urban</p>
+</div>
+<div class="flex flex-col items-center w-full group">
+<div class="w-full bg-surface-container-low rounded-t-lg h-full group-hover:bg-primary/5 transition-colors relative overflow-hidden flex flex-col justify-end">
+<div class="bg-primary-fixed h-1/5 rounded-t-lg"></div>
+</div>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-4">Agri</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Featured Activity (Iridescent Gradient) -->
+<div class="bg-gradient-to-br from-primary to-secondary p-10 rounded-xl text-white relative overflow-hidden h-72 shadow-2xl shadow-primary/10">
+<div class="relative z-10 max-w-lg">
+<span class="bg-white/20 backdrop-blur-md px-4 py-1 rounded-full text-[9px] font-black uppercase tracking-[0.2em] mb-6 inline-block">Global Insight</span>
+<h3 class="text-5xl font-extrabold mb-6 tracking-tighter leading-none">Civic Engagement Summit 2026</h3>
+<p class="text-white/80 mb-8 font-medium leading-relaxed">Coordinate with 45 ministries for the upcoming annual policy review session and infrastructure audit.</p>
+<button class="bg-white text-primary font-bold px-8 py-3 rounded-xl text-xs uppercase tracking-widest font-label shadow-xl hover:scale-105 transition-transform active:scale-95">
+                        View Logistics Plan
+                    </button>
+</div>
+<div class="absolute right-0 top-0 h-full w-2/5 opacity-40">
+<img alt="Featured Event Header" class="w-full h-full object-cover" data-alt="Modern architecture conference hall with floor-to-ceiling glass windows and futuristic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA4hwl-jNr7ryg8sm1dbbJEZ1ebnR1faKFeH4aJTVJDeODPFxb38wwcPgb_PXnAQVyFHY8tsc6pv740v0EKQDJdSJ7pw6jGa4-2zKwRm2wivXfHRloSsJkHd_prwiYCvNq7A4LV-felucPMu6AZ1A6QYgv1-8_gpJyF3e3bvN85q9MWuxlH5M6WjvDSenvlOw6KhVU-kCgShbUgUdfyAwh7_O9R7pRpT8Uyn2xXrgV5IiyHgloAiFaxYcJYDNqu8b_3Mj65xU4psgM"/>
+</div>
+</div>
+</div>
+<!-- Right Column: Upcoming Schedule -->
+<div class="col-span-12 lg:col-span-4 flex flex-col">
+<div class="bg-white rounded-xl p-10 shadow-sm flex flex-col h-full border border-white/40">
+<div class="flex justify-between items-center mb-10">
+<h4 class="font-extrabold text-2xl tracking-tighter">Upcoming Schedule.</h4>
+<span class="material-symbols-outlined text-primary" data-icon="calendar_today">calendar_today</span>
+</div>
+<div class="space-y-8">
+<!-- Activity Card 1 -->
+<div class="flex gap-6 group cursor-pointer">
+<div class="flex flex-col items-center">
+<p class="text-lg font-black text-on-surface tracking-tighter">09</p>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Oct</p>
+<div class="w-[1px] flex-1 bg-slate-100 mt-4"></div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex-1 hover:bg-white hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 border border-transparent hover:border-slate-100">
+<p class="text-[9px] font-black text-primary uppercase tracking-widest mb-2">09:00 AM - 11:30 AM</p>
+<h5 class="font-bold text-base mb-4 tracking-tight">Sustainable Cities Forum</h5>
+<div class="flex -space-x-2">
+<div class="w-7 h-7 rounded-full border-2 border-white overflow-hidden bg-slate-300"><img alt="Team 1" data-alt="Portrait of a diverse man for team icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAOodvHqa2lBH1PuuJwtJeOxMY7k22Tyueeh1Abv9NDoac8ktYJiMz_dMXnuNpEYJRD2JVcgi0tSqW7gEexg4sdNYG7E4RCJl1hekYd_x5FwhZ6cFkwokA_sKwAyndzSRRt_PuvrVqtS953ho4CK-_-QABDQpdkxwU3FnwfZb9dn4Suy2zx5WQ9_0tJyPBIqz5pOnHRNs8TVNp1d2qQ3GwNKzktu1HrkKa-1Ez5RKf5k-WDWuW10zNkdTFSN4OPMztENgOM7nwogvU"/></div>
+<div class="w-7 h-7 rounded-full border-2 border-white overflow-hidden bg-slate-300"><img alt="Team 2" data-alt="Portrait of a smiling woman for team icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGkTVvdDGOGwTVab525oBkCDz7eBKFuhhCEk3a-5egJ460F5QA1Yof2gwOU_Xx8w26qYkAzorahLLkdAzoIF2Df9gjwLcPgQ14hqhkuJR6XIlWXeAsdw2FPh27SSAEdV9IYgPBHKa-FhlVWM8iVeC_fkiPCutEXfxjN1tkRV5lRqsOGxgR_XhrhiZ3OXjpUWAJuwB4IL5KRt9x1R6te-uQ5n7clXYARJOq8VWRT6p2m9Cnsmcz_o4zR2jiFm9NkXHha6H0EtuSeGM"/></div>
+<div class="w-7 h-7 rounded-full border-2 border-white bg-slate-50 flex items-center justify-center text-[8px] font-black text-slate-500 tracking-tighter">+12</div>
+</div>
+</div>
+</div>
+<!-- Activity Card 2 -->
+<div class="flex gap-6 group cursor-pointer">
+<div class="flex flex-col items-center">
+<p class="text-lg font-black text-on-surface tracking-tighter">11</p>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Oct</p>
+<div class="w-[1px] flex-1 bg-slate-100 mt-4"></div>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex-1 hover:bg-white hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 border border-transparent hover:border-slate-100">
+<p class="text-[9px] font-black text-secondary uppercase tracking-widest mb-2">02:00 PM - 04:00 PM</p>
+<h5 class="font-bold text-base mb-2 tracking-tight">Health &amp; Safety Webinar</h5>
+<p class="text-xs text-slate-500 font-medium line-clamp-1">Virtual coordination with medical staff.</p>
+</div>
+</div>
+<!-- Activity Card 3 -->
+<div class="flex gap-6 group cursor-pointer">
+<div class="flex flex-col items-center">
+<p class="text-lg font-black text-on-surface tracking-tighter">14</p>
+<p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Oct</p>
+</div>
+<div class="bg-surface-container-low p-6 rounded-xl flex-1 hover:bg-white hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 border border-transparent hover:border-slate-100">
+<p class="text-[9px] font-black text-tertiary-container uppercase tracking-widest mb-2">10:00 AM - 12:00 PM</p>
+<h5 class="font-bold text-base mb-3 tracking-tight">Regional Budgeting</h5>
+<div class="mt-4 w-full bg-slate-200 h-1 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[65%] rounded-full"></div>
+</div>
+</div>
+</div>
+</div>
+<button class="mt-10 w-full py-4 bg-white text-primary border border-primary/10 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+                    Expand All Schedules
+                </button>
+</div>
+</div>
+</div>
+<!-- System Status Bar -->
+<footer class="mt-12 flex justify-between items-center bg-white/40 backdrop-blur-xl px-8 py-5 rounded-2xl border border-white/20">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3">
+<div class="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.4)]"></div>
+<span class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Network Secure</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-1.5 h-1.5 rounded-full bg-primary shadow-[0_0_12px_rgba(45,85,207,0.4)]"></div>
+<span class="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Server Load 24%</span>
+</div>
+</div>
+<p class="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Last System Update: 14 mins ago</p>
+</footer>
+</main>
+</body></html>

@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#191c1d",
+                    "inverse-primary": "#a9c7ff",
+                    "surface-dim": "#d9dadb",
+                    "surface-variant": "#e1e3e4",
+                    "outline": "#727783",
+                    "on-primary-container": "#c8daff",
+                    "surface-container-low": "#f3f4f5",
+                    "secondary": "#4858ab",
+                    "on-tertiary-fixed-variant": "#004e59",
+                    "on-secondary-fixed-variant": "#2f3f92",
+                    "surface-bright": "#f8f9fa",
+                    "inverse-on-surface": "#f0f1f2",
+                    "background": "#f8f9fa",
+                    "surface-container": "#edeeef",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#bac3ff",
+                    "on-secondary": "#ffffff",
+                    "on-tertiary-container": "#78e9ff",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f8f9fa",
+                    "on-secondary-fixed": "#00105b",
+                    "tertiary-fixed-dim": "#44d8f1",
+                    "surface-tint": "#005db6",
+                    "secondary-fixed": "#dee0ff",
+                    "on-error-container": "#93000a",
+                    "on-background": "#191c1d",
+                    "secondary-container": "#96a5ff",
+                    "tertiary-fixed": "#a1efff",
+                    "inverse-surface": "#2e3132",
+                    "on-surface-variant": "#424752",
+                    "tertiary-container": "#006977",
+                    "on-tertiary-fixed": "#001f25",
+                    "on-error": "#ffffff",
+                    "on-secondary-container": "#27378a",
+                    "surface-container-highest": "#e1e3e4",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary-fixed": "#001b3d",
+                    "error": "#ba1a1a",
+                    "error-container": "#ffdad6",
+                    "primary-fixed": "#d6e3ff",
+                    "on-primary-fixed-variant": "#00468c",
+                    "tertiary": "#004f5a",
+                    "primary-fixed-dim": "#a9c7ff",
+                    "primary-container": "#005eb8",
+                    "primary": "#00478d",
+                    "surface-container-high": "#e7e8e9",
+                    "outline-variant": "#c2c6d4"
+            },
+            "borderRadius": {
+                    "DEFAULT": "1rem",
+                    "lg": "2rem",
+                    "xl": "3rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Manrope"],
+                    "body": ["Manrope"],
+                    "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(194, 198, 212, 0.2);
+        }
+        .iridescent-glow {
+            background: radial-gradient(circle at center, rgba(161, 239, 255, 0.15) 0%, transparent 70%);
+        }
+        .noise-overlay {
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+            opacity: 0.02;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-background font-body text-on-surface overflow-x-hidden selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- Background Accents -->
+<div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] iridescent-glow blur-[120px] rounded-full"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary-fixed/10 blur-[150px] rounded-full"></div>
+<div class="absolute inset-0 noise-overlay"></div>
+</div>
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-3 glass-panel rounded-full mt-4 mx-auto w-[95%] max-w-7xl shadow-[0_8px_32px_0_rgba(0,71,141,0.08)]">
+<div class="flex items-center gap-2">
+<span class="text-lg font-black text-blue-900 dark:text-blue-100 tracking-tighter uppercase font-headline">GovEvent</span>
+</div>
+<div class="hidden md:flex items-center gap-8">
+<a class="font-label uppercase tracking-widest text-[11px] font-bold text-blue-700 border-b-2 border-blue-600 pb-1" href="#">Discover</a>
+<a class="font-label uppercase tracking-widest text-[11px] font-bold text-slate-600 hover:text-blue-900 transition-opacity" href="#">Calendar</a>
+<a class="font-label uppercase tracking-widest text-[11px] font-bold text-slate-600 hover:text-blue-900 transition-opacity" href="#">Protocol</a>
+<a class="font-label uppercase tracking-widest text-[11px] font-bold text-slate-600 hover:text-blue-900 transition-opacity" href="#">Archives</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-600 hover:bg-surface-container rounded-full transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="bg-primary text-white font-label uppercase tracking-widest text-[11px] font-bold px-6 py-2.5 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20">
+                Access Portal
+            </button>
+</div>
+</nav>
+<!-- Main Content Canvas -->
+<main class="pt-32 pb-24 px-6 max-w-7xl mx-auto">
+<!-- Header & Floating Search -->
+<header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div class="max-w-2xl">
+<h1 class="text-6xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-[0.9]">
+                    Public <br/>Initiatives.
+                </h1>
+<p class="text-lg text-on-surface-variant font-medium max-w-md">
+                    Explore high-level gatherings defining the future of sovereign governance and digital infrastructure.
+                </p>
+</div>
+<div class="relative w-full md:w-96 group">
+<div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-outline">search</span>
+</div>
+<input class="w-full pl-12 pr-4 py-4 bg-surface-container-high/40 backdrop-blur-xl border-none rounded-2xl focus:ring-2 focus:ring-primary-fixed outline-none font-label transition-all placeholder:text-outline shadow-sm" placeholder="Filter by protocol or date..." type="text"/>
+</div>
+</header>
+<!-- Featured Section (Asymmetric Glass Cards) -->
+<section class="mb-16">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Main Featured Event -->
+<div class="lg:col-span-8 group relative overflow-hidden rounded-xl h-[500px] shadow-2xl shadow-primary/5 cursor-pointer">
+<img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="Sophisticated minimalist office space with floor to ceiling windows and soft daylight reflecting on glass surfaces" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQk57_0wLjuKJv9Zg_JBSExFU76N3BCqzP9Bn2UdqlbbqXzf0eIjMAOHwriY5Hy0MqgGp4hmqD7SooGKQ0TXMFAfW_cyD8rNq1pd0NaQ8eXmNCsDUk4Qio6deP42i76s_GCY6lTSct31T4Pykmuvl_lbaJPOmWr5K1uhaK0rr64dEpVwjlob6dKrfD5cu7gXiG4mME-2FnslLEaFMhsC0co1lqUeNlbNb2M_cCuh3hkRfAtuW400MNUW0zsYDOuHC-MtRFIdpjHDk"/>
+<div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
+<div class="absolute bottom-0 left-0 p-10 w-full">
+<div class="flex items-center gap-3 mb-4">
+<span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase font-label">Governance Summit</span>
+<span class="text-white/80 font-label text-[10px] font-bold tracking-widest uppercase">OCT 24, 2024</span>
+</div>
+<h2 class="text-4xl md:text-5xl font-extrabold text-white tracking-tighter mb-4 max-w-xl">
+                            Design Thinking for Public Services
+                        </h2>
+<div class="flex items-center justify-between">
+<p class="text-white/70 font-medium max-w-md">Reimagining citizen experiences through empathetic architecture and data-driven policy frameworks.</p>
+<button class="bg-white text-primary p-4 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+<span class="material-symbols-outlined">arrow_outward</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Secondary Featured Card -->
+<div class="lg:col-span-4 bg-surface-container-lowest glass-panel p-8 rounded-xl flex flex-col justify-between shadow-xl shadow-slate-200/50">
+<div>
+<div class="w-12 h-12 bg-primary-fixed rounded-2xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">security</span>
+</div>
+<h3 class="text-2xl font-bold tracking-tight text-on-surface mb-3">Security Protocol Briefing</h3>
+<p class="text-on-surface-variant font-medium leading-relaxed">Exclusive session on advanced encryption standards for multi-lateral state communications.</p>
+</div>
+<div class="mt-8 pt-6 border-t border-outline-variant/30">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-outline text-sm">schedule</span>
+<span class="text-xs font-bold font-label text-outline uppercase tracking-wider">Starting in 2 hours</span>
+</div>
+<button class="w-full py-4 bg-surface-container text-primary font-bold font-label uppercase tracking-widest text-[11px] rounded-xl hover:bg-primary hover:text-white transition-all">
+                            Join Briefing
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Bento Grid for Other Events -->
+<section class="mb-20">
+<div class="flex items-center justify-between mb-8">
+<h2 class="text-2xl font-extrabold tracking-tight">Active Registries</h2>
+<a class="text-primary font-bold font-label text-sm flex items-center gap-1 hover:gap-2 transition-all" href="#">
+                    View Archive <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Bento Item 1 -->
+<div class="bg-surface-container-low p-6 rounded-xl hover:bg-white transition-all duration-300 group">
+<div class="flex justify-between items-start mb-6">
+<div class="px-3 py-1 bg-secondary-fixed/30 text-on-secondary-fixed-variant text-[9px] font-black uppercase tracking-widest rounded-full font-label">Technology</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">analytics</span>
+</div>
+<h4 class="text-xl font-bold tracking-tight mb-2">Future of Digital Identity</h4>
+<p class="text-on-surface-variant text-sm font-medium mb-6">Standardizing sovereign identity layers for cross-border digital services.</p>
+<div class="flex items-center gap-3">
+<div class="flex -space-x-2">
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-low bg-slate-300 overflow-hidden">
+<img data-alt="Portrait of a professional man in a dark suit with neutral background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcpBqPR8SLQ0_K8gWSB6dtPtkZtDQCVk3hO8zlnrKlponOwDDMwLzMNc6qdJiGOjk0Rq895mRpxV7wEJB__EajNOmrQGv-jYlMUThwkZLcCrp3jCRna4--CgRzvvUIUzFh1IVSKCao1YMsOi_8zGhqn9rIQmIOyqhBThLeMp6kNsksyGcKcO1aozAkfmBAxbPPn9eiNJQYoYWUQGPkRumolcWsI56cbhkqONYWFZIMbV1PB1-uj4aU3jQEDA9kwxXT1EkSFyVM89w"/>
+</div>
+<div class="w-8 h-8 rounded-full border-2 border-surface-container-low bg-slate-300 overflow-hidden">
+<img data-alt="Close up portrait of a smiling woman with warm lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYXNjS1Qt_Bz6hSDvUqYmXb04yANsAY2pnpSnu2WFJRdDVqEG--zmD7FBdWR55FqdZ3cHKcUzyxY79q4WbqCAa0xGuoOEatWx0NuuSTZ6igjuC5E1cYdQhomsQWAirfmIYxOOj4f1eh8JIFUvz_EGkjrQKoq8CG0ENIKVriBsM3QF_hE2vicCCm8y5g3ihgdNZsYYhV01i7Mp6ivC_Wxn2DKXlrRmHmUqovUX2dT2g9GZmhrKIOae1b3aahrdGwEm-uL7e7UtmQCM"/>
+</div>
+</div>
+<span class="text-[10px] font-bold font-label text-outline uppercase">+ 124 Participants</span>
+</div>
+</div>
+<!-- Bento Item 2 -->
+<div class="bg-surface-container-low p-6 rounded-xl hover:bg-white transition-all duration-300 group">
+<div class="flex justify-between items-start mb-6">
+<div class="px-3 py-1 bg-tertiary-fixed/30 text-on-tertiary-fixed-variant text-[9px] font-black uppercase tracking-widest rounded-full font-label">Policy</div>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">shield_person</span>
+</div>
+<h4 class="text-xl font-bold tracking-tight mb-2">AI &amp; Policy Frameworks</h4>
+<p class="text-on-surface-variant text-sm font-medium mb-6">Drafting ethical constraints and innovation accelerators for neural governance.</p>
+<div class="flex items-center gap-3">
+<span class="text-[10px] font-bold font-label text-outline uppercase">Next Monday • 09:00 AM</span>
+</div>
+</div>
+<!-- Bento Item 3 (Spanning or unique) -->
+<div class="bg-primary p-6 rounded-xl text-white flex flex-col justify-between group overflow-hidden relative">
+<div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
+<div>
+<h4 class="text-xl font-bold tracking-tight mb-2 leading-tight">Annual Sovereign Strategy Day</h4>
+<p class="text-white/70 text-sm font-medium">The pinnacle event for administrative leadership.</p>
+</div>
+<div class="mt-8">
+<button class="flex items-center gap-2 font-label text-[10px] font-black uppercase tracking-widest bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg transition-all">
+                            Register Interest <span class="material-symbols-outlined text-sm">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- For Your Career Section -->
+<section class="mt-24 p-12 bg-surface-container/30 glass-panel rounded-xl border-none relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 iridescent-glow opacity-40 blur-3xl pointer-events-none"></div>
+<div class="relative z-10 flex flex-col md:flex-row gap-12 items-center">
+<div class="md:w-1/2">
+<span class="font-label text-[11px] font-black tracking-[0.2em] text-primary uppercase mb-4 block">Specialized Growth</span>
+<h2 class="text-5xl font-extrabold tracking-tighter mb-6">For Your Career.</h2>
+<p class="text-lg text-on-surface-variant font-medium mb-8 leading-relaxed">
+                        Earn sovereign certifications and professional accolades recognized across all union territories. Expand your influence in the administrative ecosystem.
+                    </p>
+<div class="flex flex-wrap gap-4">
+<div class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl shadow-sm border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="text-sm font-bold text-on-surface">Certified Analyst</span>
+</div>
+<div class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl shadow-sm border border-outline-variant/10">
+<span class="material-symbols-outlined text-secondary text-lg" style="font-variation-settings: 'FILL' 1;">workspace_premium</span>
+<span class="text-sm font-bold text-on-surface">Policy Lead</span>
+</div>
+</div>
+</div>
+<div class="md:w-1/2 grid grid-cols-2 gap-4">
+<div class="h-48 rounded-xl bg-surface-container overflow-hidden">
+<img class="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 transition-all duration-500" data-alt="High angle view of business people in a modern white office collaborating at a table" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxaqRpHTnacw0p1_PbLssdXw_kUv9GlDpMvNe31GLzzABRYISzks52sUev01yGpK4XpXDWL209I_mLnEArmy2coI2nWnj0EAdQRz6xzl-ssHHZQ2LmcTpb2QA-DYNXsMdt-0hTM3kc4oocYBZlIiibLEnyFm4QZCbpxVMVrkDfHKhIot5Pb6LyEAqrrZvq_KWBlheZOLU0cRtnBbBk7MtSJhCM9e2zpYq8IVNnrNbRGOqR4TURqRsowT0y7V2yJNJaAPlitm4waqY"/>
+</div>
+<div class="h-48 rounded-xl bg-surface-container overflow-hidden mt-8">
+<img class="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 transition-all duration-500" data-alt="Modern geometric architecture with blue tinted glass and clean lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB1VLoQBOS_gUtGukAKKB-cMJO8Bbg6DDv6t2TJtqbKEEorZR_0MWVg3NU9aX1UsGhR2MO-hZB-Zbk2pMrQ-BVcOETnLJhgeLq3WLheTSKilgcnVGhf3zOsOVwqzZNYY4xJBgjIUTbkmNc3zOb8KnF7kJxZ_73LBtDeex81jDN6RwPTXtngJB7bsHqs6OOlN0ANUeB2mgQUiA1ILQmh_sOsZ1w5LbABb3f3wZF3qqmFHQXErnXSRnjzYecz1Mc2eZOunxQbhPG3oxY"/>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Side Navigation Bar (Administrative Overlay) -->
+<aside class="fixed left-0 top-0 h-screen w-72 flex flex-col p-6 z-[60] glass-panel rounded-r-3xl translate-x-[-100%] hover:translate-x-0 transition-transform duration-500 group shadow-[0_60px_60px_-10px_rgba(0,0,0,0.08)]">
+<!-- Visual Handle -->
+<div class="absolute right-[-24px] top-1/2 -translate-y-1/2 w-6 h-24 bg-white/80 backdrop-blur-xl rounded-r-xl flex items-center justify-center cursor-pointer border-r border-y border-white/20">
+<span class="material-symbols-outlined text-primary">chevron_right</span>
+</div>
+<div class="mb-10 px-3">
+<h3 class="text-xl font-extrabold text-blue-900 tracking-tighter uppercase font-headline">The Sovereign Prism</h3>
+<p class="text-[10px] font-bold text-slate-500 tracking-widest uppercase font-label mt-1">Administrative Authority</p>
+</div>
+<div class="space-y-2 flex-1">
+<a class="flex items-center gap-3 text-slate-500 p-3 hover:bg-white/40 transition-all rounded-2xl group/nav" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-label font-semibold tracking-tight">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 bg-blue-600 text-white rounded-2xl p-3 shadow-lg shadow-blue-500/20" href="#">
+<span class="material-symbols-outlined">event_available</span>
+<span class="font-label font-semibold tracking-tight">Event Registry</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 p-3 hover:bg-white/40 transition-all rounded-2xl" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-label font-semibold tracking-tight">Citizen Analytics</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 p-3 hover:bg-white/40 transition-all rounded-2xl" href="#">
+<span class="material-symbols-outlined">shield_person</span>
+<span class="font-label font-semibold tracking-tight">Security Protocol</span>
+</a>
+<a class="flex items-center gap-3 text-slate-500 p-3 hover:bg-white/40 transition-all rounded-2xl" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-label font-semibold tracking-tight">Settings</span>
+</a>
+</div>
+<div class="border-t border-slate-200/50 pt-6 space-y-2">
+<a class="flex items-center gap-3 text-slate-500 p-3 hover:bg-white/40 transition-all rounded-2xl" href="#">
+<span class="material-symbols-outlined">help_center</span>
+<span class="font-label font-semibold tracking-tight">Support</span>
+</a>
+<a class="flex items-center gap-3 text-error p-3 hover:bg-error-container/30 transition-all rounded-2xl" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-label font-semibold tracking-tight">Sign Out</span>
+</a>
+</div>
+</aside>
+<!-- Floating Action Button -->
+<div class="fixed bottom-8 right-8 z-[100]">
+<button class="flex items-center gap-3 bg-primary text-white p-5 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all group">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">add_circle</span>
+<span class="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-500 ease-in-out whitespace-nowrap font-label uppercase tracking-widest text-[11px] font-bold">New Initiative</span>
+</button>
+</div>
+</body></html>
