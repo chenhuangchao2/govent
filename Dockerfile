@@ -17,7 +17,11 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
+# Dummy env vars for build (Prisma needs DATABASE_URL at build time for schema validation,
+# but no actual DB connection is made — force-dynamic pages skip static generation)
 ENV NEXT_TELEMETRY_DISABLED 1
+ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+ENV SESSION_SECRET="build-time-placeholder-not-used-at-runtime"
 RUN npx next build
 
 # Stage 3: Production runner
