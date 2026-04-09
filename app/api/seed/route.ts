@@ -9,10 +9,21 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // Check if already seeded
+  // Check if already seeded — pass ?reset=true to wipe and re-seed
+  const url = new URL(req.url)
+  const reset = url.searchParams.get('reset') === 'true'
   const existingUsers = await db.user.count()
-  if (existingUsers > 0) {
-    return NextResponse.json({ data: 'Already seeded', error: null })
+  if (existingUsers > 0 && !reset) {
+    return NextResponse.json({ data: 'Already seeded. Use ?reset=true to wipe and re-seed.', error: null })
+  }
+  if (reset) {
+    // Delete in correct order (foreign keys)
+    await db.auditLog.deleteMany()
+    await db.registration.deleteMany()
+    await db.blacklist.deleteMany()
+    await db.event.deleteMany()
+    await db.participant.deleteMany()
+    await db.user.deleteMany()
   }
 
   const hash = (pw: string) => createHash('sha256').update(pw).digest('hex')
@@ -159,11 +170,68 @@ export async function POST(req: NextRequest) {
     passwordHash: hash('demo123'), isVerified: true,
   }})
 
+  // Demo user also attended past events (for CPD demo)
+  for (const pe of pastEvents) {
+    const pastEvent = await db.event.findFirst({ where: { title: pe.title } })
+    if (pastEvent) {
+      await db.registration.create({ data: {
+        eventId: pastEvent.id, name: 'Demo User', email: 'demo@gov.sg',
+        organisation: 'GovTech', status: 'ATTENDED',
+        checkedInAt: pastEvent.startTime,
+      }}).catch(() => {})
+    }
+  }
+
+  // Demo user has one upcoming APPROVED registration
+  await db.registration.create({ data: {
+    eventId: events[0].id, name: 'Demo User', email: 'demo@gov.sg',
+    organisation: 'GovTech', status: 'APPROVED',
+  }}).catch(() => {})
+
+  // Blacklist entries
+  await db.blacklist.create({ data: {
+    email: 'alex.rivers@cloudmail.com', reason: 'Repeated no-show at premium tier events',
+    source: 'AUTO_NO_SHOW', noShowCount: 4,
+  }})
+  await db.blacklist.create({ data: {
+    email: 'm.zhang@techcorp.io', reason: 'Payment failure - High risk chargeback profile',
+    source: 'AUTO_PAYMENT', noShowCount: 1,
+  }})
+  await db.blacklist.create({ data: {
+    email: 'jordan.smith_test@mail.com', reason: 'Administrator flag: Violation of terms of service',
+    source: 'MANUAL', noShowCount: 0,
+  }})
+
+  // Audit log entries
+  const auditEntries = [
+    { action: 'CREATE_EVENT', actorId: phoenix.id, eventId: events[0].id, metadata: { title: events[0].title } },
+    { action: 'PUBLISH_EVENT', actorId: phoenix.id, eventId: events[0].id, metadata: { title: events[0].title } },
+    { action: 'CREATE_EVENT', actorId: sarah.id, eventId: events[2].id, metadata: { title: events[2].title } },
+    { action: 'PUBLISH_EVENT', actorId: sarah.id, eventId: events[2].id, metadata: { title: events[2].title } },
+    { action: 'APPROVE', actorId: phoenix.id, eventId: events[0].id, metadata: { registrantEmail: 'amanda.tan@tech.gov.sg' } },
+    { action: 'APPROVE', actorId: phoenix.id, eventId: events[0].id, metadata: { registrantEmail: 'bryan.lee@imda.gov.sg' } },
+    { action: 'REJECT', actorId: sarah.id, eventId: events[2].id, metadata: { registrantEmail: 'test@external.com', reason: 'Not eligible' } },
+    { action: 'BULK_APPROVE', actorId: phoenix.id, eventId: events[4].id, metadata: { count: 5 } },
+    { action: 'ADD_BLACKLIST', actorId: phoenix.id, metadata: { email: 'alex.rivers@cloudmail.com', reason: 'Repeated no-show' } },
+    { action: 'CHECKIN', actorId: rajan.id, eventId: events[3].id, metadata: { registrantEmail: 'grace.lim@tech.gov.sg' } },
+    { action: 'BROADCAST', actorId: phoenix.id, eventId: events[0].id, metadata: { subject: 'Event reminder', recipients: 15 } },
+    { action: 'EDIT_EVENT', actorId: sarah.id, eventId: events[2].id, metadata: { field: 'venue', oldValue: 'TBC', newValue: 'PIXEL, 10 Central Exchange Green' } },
+  ]
+  for (let i = 0; i < auditEntries.length; i++) {
+    await db.auditLog.create({ data: {
+      ...auditEntries[i],
+      metadata: auditEntries[i].metadata as any,
+      createdAt: new Date(Date.now() - (auditEntries.length - i) * 3600000), // stagger by 1h each
+    }})
+  }
+
   return NextResponse.json({
     data: {
       admins: 3,
       events: events.length + pastEvents.length,
       registrations: regCount + pastEvents.length,
+      blacklist: 3,
+      auditLogs: auditEntries.length,
       participant: 'demo@gov.sg / demo123',
     },
     error: null,
