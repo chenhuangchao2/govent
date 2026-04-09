@@ -26,24 +26,24 @@
 - **Logic**:
   - Split events into: `featured` (nearest future), `secondary` (2nd future), `gridEvents` (all)
   - Pass `gridEvents` to interactive filter component
-- **Sections**:
-  1. **Header**: Page title + search input
-  2. **Featured**: 8:4 asymmetric grid — large image card (featured event) + side card (secondary event)
-  3. **Event Grid**: Filter pills (Time/Topic/Org/Free) + 3-col card grid. Every 3rd card = highlight style
-  4. **CPD Section**: Static placeholder for future CPD hours tracking
-- **Links**: Each event card → `/events/{id}`
+- **Content**:
+  1. Page title + search input
+  2. Featured event (nearest future) + secondary event (2nd future)
+  3. Filterable event list — filters: Time, Topic, Organisation, Cost
+  4. CPD section: static placeholder for future CPD hours feature
+- **Links**: Each event → `/events/{id}`
 
 ### P3. Event Detail `/events/[id]`
 - **Type**: Server Component
 - **Data**: `db.event.findUnique({ id, isPublished: true, isCancelled: false })` with registration count
 - **Computed**: `registered`, `available`, `isFull`, `isPastDeadline`, formatted date/time
-- **Sections**:
+- **Content**:
   1. Back link → `/events`
-  2. Title + FREE/PAID badge
-  3. Info cards: Date/Time, Venue, Capacity (CapacityBar), CPD Hours (if >0), Price (if paid), Eligibility (if org-restricted)
+  2. Title + FREE/PAID indicator
+  3. Event info: Date/Time, Venue, Capacity status, CPD Hours (if >0), Price (if paid), Eligibility (if org-restricted)
   4. Deadline countdown (live, updates every 1s)
   5. Description
-  6. Registration CTA (EventRegistrationStatus — see below)
+  6. Registration CTA (conditional — see below)
 - **EventRegistrationStatus logic**:
   - Fetches `/api/auth/participant/me` + `/api/my-registrations`
   - If registered: show status badge + link to `/my-registrations`
@@ -60,7 +60,7 @@
   - Fields: name (required), email (required, read-only if logged in), organisation (required), remarks (optional)
   - Real-time eligibility hint: checks email domain against `allowedDomains`
   - Submit: POST `/api/registrations`
-  - Success screen: status badge, context-aware "what happens next" text, CTA to my-registrations or signup
+  - Success screen: registration status, context-aware "what happens next" text, links to my-registrations or signup
 - **Links**: `/login?redirect=/register/{id}`, `/my-registrations`, `/signup`, `/events`
 
 ### P5. My Registrations `/my-registrations`
@@ -70,8 +70,8 @@
 - **Display**:
   - CPD hours summary (total from ATTENDED events)
   - Split into Upcoming / Past sections
-  - Each registration card shows:
-    - Event title (link to `/events/{id}`), date/time, venue, status badge
+  - Each registration shows:
+    - Event title (link to `/events/{id}`), date/time, venue, status
     - APPROVED: QR code (with print), venue
     - PENDING_PAYMENT: "Pay Now" button (Stripe URL) + payment deadline
     - WAITLISTED: position number
@@ -105,8 +105,7 @@
 - **Links**: `/login`
 
 ### P9. Public Layout (wraps all public pages)
-- Background accent layers (decorative glows)
-- PublicNav: fixed floating nav bar
+- PublicNav: persistent navigation
   - Logo "GovEvent" → `/events`
   - "Events" link (always visible)
   - "My Registrations" link (logged in only)
@@ -129,8 +128,8 @@
 
 ### A2. Admin Layout (wraps all `/admin/*` except login)
 - **Auth**: Server-side `requireAdmin()`, redirect to `/admin/login` if not authenticated
-- **Sidebar**: Dashboard, Events, Accounts (Super Admin only), Blacklist, Audit Log
-  - Active link highlighting based on current path
+- **Navigation**: Dashboard, Events, Accounts (Super Admin only), Blacklist, Audit Log
+  - Active state on current route
   - Sign Out: form POST to `/api/auth/logout`
   - Receives `isSuperAdmin` prop from layout
 
@@ -141,17 +140,17 @@
   - Pending approvals count (status=PENDING)
   - Today's check-ins count (status=ATTENDED, checkedInAt >= today)
   - Total registrations count
-- **Sections**:
-  1. 4 stat cards (icons + numbers)
+- **Content**:
+  1. 4 stat metrics: active events, pending approvals, today's check-ins, total registrations
   2. AnalyticsDashboard (client component, fetches `/api/analytics`):
-     - Registration status pie chart
-     - Popular topics bar chart (top 5)
-     - Upcoming events grid with fill rate
+     - Registration status breakdown by status
+     - Popular topics (top 5)
+     - Upcoming events with fill rate
 
 ### A4. Events List `/admin/events`
 - **Type**: Server Component
 - **Data**: `db.event.findMany()` — Super Admin sees all, regular admin sees own events only
-- **Display**: Table with title (link), date, capacity (color-coded), status badge (Published/Draft/Cancelled), creator (Super Admin only)
+- **Display**: Event list showing title (link), date, capacity usage, status (Published/Draft/Cancelled), creator (Super Admin only)
 - **Actions**: "+ New Event" button → `/admin/events/new`
 - **Empty state**: "Create your first event" link
 
@@ -165,7 +164,7 @@
 ### A6. Event Detail `/admin/events/[id]`
 - **Type**: Server Component (page) + Client Components (tabs)
 - **Auth**: `requireAdmin()` + ownership check (creatorId or isSuperAdmin)
-- **Header**: Title, status badge, date/venue, BroadcastModal button, EventActionButtons (Publish/Unpublish/Cancel)
+- **Header**: Title, status, date/venue, Broadcast action, Publish/Unpublish/Cancel actions
 - **3 Tabs**:
 
 **Tab 1 — Overview (EventOverview)**:
@@ -178,7 +177,7 @@
 **Tab 2 — Registrations (RegistrationsPanel)**:
 - Fetches: GET `/api/registrations?eventId={id}`
 - Search by name/email, filter by status (with counts)
-- Table: name/email, organisation, status badge, date, action buttons
+- List: name/email, organisation, status, date, action buttons
 - Actions per status:
   - PENDING: Approve / Reject (with reason modal)
   - APPROVED: Resend email / Cancel
@@ -188,10 +187,10 @@
 - Export: CsvExportButton (GET `/api/registrations/export?eventId={id}`)
 
 **Tab 3 — Check-in (CheckinScanner)**:
-- Two sub-tabs: QR Scanner / Search
+- Two modes: QR Scanner / Search
 - QR: camera starts on explicit click, scans registration ID, POST `/api/registrations/{id}/checkin`
-- Search: loads APPROVED registrations, search by name/email, "Check In" button per row
-- Right sidebar: CheckInStatsPanel (polls `/api/events/{id}/checkin-stats` every 10s)
+- Search: loads APPROVED registrations, search by name/email, check-in action per row
+- Live stats: polls `/api/events/{id}/checkin-stats` every 10s (attended/total/recent check-ins)
 - Time window: ±2h from event start/end enforced by API
 
 ### A7. Blacklist `/admin/blacklist`
@@ -205,14 +204,14 @@
 - **Type**: Server Component with URL-based filters
 - **Data**: `db.auditLog.findMany()` with optional filters (action, eventId, period), 50/page
 - **Filters**: Period (Today/7d/30d/All), Action type, Event — each updates URL params
-- **Display**: Card-based list grouped by date, color-coded action badges, actor name, metadata, relative time
+- **Display**: Log entries grouped by date, action type, actor name, metadata, relative time
 - **Pagination**: Previous/Next links
 
 ### A9. Accounts `/admin/accounts` (Super Admin only)
 - **Type**: Server Component (page) + Client Component (AccountsPanel)
 - **Auth**: Redirects non-Super-Admin to `/admin`
 - **Data**: `db.user.findMany()` with event counts
-- **Display**: Table with name (+ "You" badge), email, role badge, event count, joined date
+- **Display**: Account list showing name (mark current user), email, role (Super Admin/Admin), event count, joined date
 - **Add Admin**: Dialog with name/email/password → POST `/api/admin/accounts`
 - **Reset Password**: Per-row button (except self) → PATCH `/api/admin/accounts`
 
