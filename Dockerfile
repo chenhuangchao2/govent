@@ -17,11 +17,14 @@ COPY . .
 # Generate Prisma client
 RUN npx prisma generate
 
-# Dummy env vars for build (Prisma needs DATABASE_URL at build time for schema validation,
-# but no actual DB connection is made — force-dynamic pages skip static generation)
-ENV NEXT_TELEMETRY_DISABLED 1
+# Dummy env vars for build — Next.js webpack mode instantiates modules at build time
+# even for force-dynamic pages. Real values are injected at runtime.
+ENV NEXT_TELEMETRY_DISABLED=1
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-ENV SESSION_SECRET="build-time-placeholder-not-used-at-runtime"
+ENV SESSION_SECRET="build-time-placeholder-min-32-chars-long!!"
+ENV RESEND_API_KEY="re_build_placeholder"
+ENV STRIPE_SECRET_KEY="sk_test_build_placeholder"
+ENV NEXT_PUBLIC_APP_URL="http://localhost:3000"
 RUN npx next build
 
 # Stage 3: Production runner
