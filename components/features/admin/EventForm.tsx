@@ -10,8 +10,20 @@ export default function EventForm() {
   const [isPaid, setIsPaid] = useState(false)
   const [venueHidden, setVenueHidden] = useState(false)
   const [selectedTags, setSelectedTags] = useState<string[]>([])
+  const [startTime, setStartTime] = useState('')
+  const [endTime, setEndTime] = useState('')
+  const [deadline, setDeadline] = useState('')
 
   const SUGGESTED_TAGS = ['AI', 'Cloud', 'Cybersecurity', 'Data', 'Design', 'Agile', 'Leadership', 'Compliance']
+
+  // Date validation warnings
+  const dateWarnings: string[] = []
+  if (startTime && endTime && endTime <= startTime) {
+    dateWarnings.push('End time must be after start time')
+  }
+  if (startTime && deadline && deadline >= startTime) {
+    dateWarnings.push('Registration deadline must be before start time')
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -54,17 +66,22 @@ export default function EventForm() {
       <div><label className={labelClass}>Title</label><input name="title" className={inputClass} required /></div>
       <div><label className={labelClass}>Description</label><textarea name="description" className={inputClass} rows={3} required /></div>
       <div className="grid grid-cols-2 gap-4">
-        <div><label className={labelClass}>Start Time</label><input type="datetime-local" name="startTime" className={inputClass} required /></div>
-        <div><label className={labelClass}>End Time</label><input type="datetime-local" name="endTime" className={inputClass} required /></div>
+        <div><label className={labelClass}>Start Time</label><input type="datetime-local" name="startTime" value={startTime} onChange={e => setStartTime(e.target.value)} className={inputClass} required /></div>
+        <div><label className={labelClass}>End Time</label><input type="datetime-local" name="endTime" value={endTime} onChange={e => setEndTime(e.target.value)} className={`${inputClass} ${startTime && endTime && endTime <= startTime ? 'border-red-400 ring-1 ring-red-400' : ''}`} required /></div>
       </div>
+      {dateWarnings.length > 0 && (
+        <div className="space-y-1">
+          {dateWarnings.map((w, i) => <p key={i} className="text-xs text-red-600">{w}</p>)}
+        </div>
+      )}
       <div><label className={labelClass}>Venue</label><input name="venue" className={inputClass} required /></div>
       <div className="flex items-center gap-2">
         <input type="checkbox" id="venueHidden" checked={venueHidden} onChange={e => setVenueHidden(e.target.checked)} />
         <label htmlFor="venueHidden" className="text-sm text-gray-700">Hide venue from public (revealed only to approved registrants)</label>
       </div>
       <div className="grid grid-cols-2 gap-4">
-        <div><label className={labelClass}>Capacity</label><input type="number" name="capacity" className={inputClass} required /></div>
-        <div><label className={labelClass}>Registration Deadline</label><input type="datetime-local" name="registrationDeadline" className={inputClass} required /></div>
+        <div><label className={labelClass}>Capacity</label><input type="number" name="capacity" min="1" className={inputClass} required /></div>
+        <div><label className={labelClass}>Registration Deadline</label><input type="datetime-local" name="registrationDeadline" value={deadline} onChange={e => setDeadline(e.target.value)} className={`${inputClass} ${startTime && deadline && deadline >= startTime ? 'border-red-400 ring-1 ring-red-400' : ''}`} required /></div>
       </div>
       <div>
         <label className={labelClass}>Tags</label>
@@ -90,9 +107,9 @@ export default function EventForm() {
         <input type="checkbox" id="isPaid" checked={isPaid} onChange={e => setIsPaid(e.target.checked)} />
         <label htmlFor="isPaid" className="text-sm text-gray-700">Paid event</label>
       </div>
-      {isPaid && <div><label className={labelClass}>Price (SGD)</label><input type="number" name="price" step="0.01" className={inputClass} /></div>}
+      {isPaid && <div><label className={labelClass}>Price (SGD)</label><input type="number" name="price" step="0.01" min="0.01" required className={inputClass} /></div>}
       {error && <p className="text-sm text-red-600">{error}</p>}
-      <button type="submit" disabled={loading} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50">
+      <button type="submit" disabled={loading || dateWarnings.length > 0} className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50">
         {loading ? 'Creating...' : 'Create Event'}
       </button>
     </form>

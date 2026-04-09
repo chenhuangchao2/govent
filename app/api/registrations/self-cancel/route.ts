@@ -10,9 +10,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ data: null, error: 'registrationId and email required' }, { status: 400 })
   }
 
-  // Verify authenticated user matches the email
+  // Require login before allowing cancel
   const session = await getParticipantSession()
-  if (session.isLoggedIn && session.email && session.email.toLowerCase() !== email.toLowerCase()) {
+  if (!session.isLoggedIn || !session.email) {
+    return NextResponse.json({ data: null, error: 'You must be logged in to cancel' }, { status: 401 })
+  }
+  if (session.email.toLowerCase() !== email.toLowerCase()) {
     return NextResponse.json({ data: null, error: 'Email does not match your session' }, { status: 403 })
   }
 

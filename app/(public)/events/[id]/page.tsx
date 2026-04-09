@@ -63,9 +63,6 @@ export default async function EventDetailPage({ params }: { params: Promise<{ id
           >
             {event.isPaid ? 'PAID' : 'FREE'}
           </span>
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-            Published
-          </span>
         </div>
       </div>
 

@@ -26,6 +26,10 @@ export async function POST(req: NextRequest) {
     const reg = await db.registration.findUnique({ where: { id: registrationId }, include: { event: true } })
     if (!reg) return NextResponse.json({ received: true })
 
+    if (reg.status !== 'PENDING_PAYMENT') {
+      return NextResponse.json({ received: true })
+    }
+
     // Don't approve if event was cancelled while user was paying
     if (reg.event.isCancelled) {
       await db.registration.update({

@@ -34,6 +34,7 @@ export default function RegistrationRow({ id, name, email, organisation, status,
         const messages: Record<string, string> = {
           approve: `${name} approved`,
           reject: `${name} rejected`,
+          cancel: `${name} registration cancelled`,
           'mark-paid': 'Marked as paid',
           'resend-email': `Email resent to ${email}`,
         }
@@ -72,15 +73,33 @@ export default function RegistrationRow({ id, name, email, organisation, status,
             </div>
           )}
           {status === 'APPROVED' && (
-            <button onClick={() => act('resend-email')} disabled={loading}
-              className="text-xs text-blue-600 hover:underline disabled:opacity-50">
-              Resend email
-            </button>
+            <div className="flex gap-2 items-center">
+              <button onClick={() => act('resend-email')} disabled={loading}
+                className="text-xs text-blue-600 hover:underline disabled:opacity-50">
+                Resend email
+              </button>
+              <button onClick={() => act('cancel')} disabled={loading}
+                className="text-xs text-red-500 hover:underline disabled:opacity-50">
+                Cancel
+              </button>
+            </div>
           )}
           {status === 'PENDING_PAYMENT' && (
-            <button onClick={() => act('mark-paid')} disabled={loading}
-              className="text-xs bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 disabled:opacity-50">
-              Mark paid
+            <div className="flex gap-2 items-center">
+              <button onClick={() => act('mark-paid')} disabled={loading}
+                className="text-xs bg-purple-600 text-white px-3 py-1 rounded hover:bg-purple-700 disabled:opacity-50">
+                Mark paid
+              </button>
+              <button onClick={() => act('cancel')} disabled={loading}
+                className="text-xs text-red-500 hover:underline disabled:opacity-50">
+                Cancel
+              </button>
+            </div>
+          )}
+          {status === 'WAITLISTED' && (
+            <button onClick={() => act('cancel')} disabled={loading}
+              className="text-xs text-red-500 hover:underline disabled:opacity-50">
+              Cancel
             </button>
           )}
         </td>

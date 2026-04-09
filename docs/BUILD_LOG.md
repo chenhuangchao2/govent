@@ -712,3 +712,66 @@ Dispatched 5 specialist agents (UX/Demo reviewer, Backend architect, GovTech ass
 | Error monitoring | Add Sentry or equivalent | Currently logging to console; production needs alerting |
 | Approval workflow | Multi-level approval (registrant → manager → coordinator) | Some government events require hierarchical sign-off |
 | Accessibility | WCAG 2.1 AA audit | Government services must be accessible; current UI hasn't been audited |
+
+---
+
+## v4.0 — Security Audit, Admin Accounts & UX Fixes
+**Date**: 2026-04-09 | **Tool**: Claude Code (8 parallel audit agents + 6 parallel fix agents)
+
+**Approach**
+Dispatched 8 specialised agents to audit the entire codebase in parallel: public pages, registration flow, admin management, payment/check-in/cron, accounts/blacklist/audit, my-registrations/email, API security, and layout/routing. Identified 17 bugs across security, state machine, and UX. Then dispatched 6 fix agents in parallel to resolve all issues.
+
+### New Features
+
+| Feature | Files | Description |
+|---------|-------|-------------|
+| Admin Accounts page | `app/admin/(protected)/accounts/page.tsx`, `components/features/admin/AccountsPanel.tsx`, `app/api/admin/accounts/route.ts` | Super Admin can view all admin accounts, create new admins, reset passwords. Sidebar link visible only to Super Admin. |
+| Admin cancel registration | `components/features/admin/RegistrationRow.tsx`, `app/api/registrations/[id]/route.ts` | Admin can cancel APPROVED, WAITLISTED, and PENDING_PAYMENT registrations. Waitlist auto-promotes on cancel. |
+| Participant re-registration | `app/api/auth/participant/signup/route.ts` | Same email can re-register (updates credentials, re-sends OTP). Supports repeated demo of full signup flow. |
+
+### Security Fixes (17 bugs)
+
+| Bug | File | Fix |
+|-----|------|-----|
+| Event API missing ownership check | `app/api/events/[id]/route.ts` | PATCH verifies `creatorId === session.userId` or `isSuperAdmin` before edit/publish/cancel |
+| Broadcast API missing ownership check | `app/api/events/[id]/broadcast/route.ts` | Added ownership check after fetching event |
+| Registration export missing ownership | `app/api/registrations/export/route.ts` | Added ownership check before returning CSV data |
+| Admin event detail page open to all admins | `app/admin/(protected)/events/[id]/page.tsx` | Added `requireAdmin()` + ownership check, non-owner gets 404 |
+| Self-cancel auth bypass | `app/api/registrations/self-cancel/route.ts` | Requires login (401) + email match (403) |
+| Open redirect on login | `app/(public)/login/page.tsx` | Validates redirect starts with `/`, rejects `//` |
+| Stripe webhook not idempotent | `app/api/webhook/stripe/route.ts` | Skips processing if registration status is not `PENDING_PAYMENT` |
+| Email case sensitivity | 5 auth API routes | All email inputs normalised with `toLowerCase().trim()` |
+| Domain check case sensitivity | `app/api/registrations/route.ts` | Domain extracted with `.toLowerCase()` |
+| Reject allows non-PENDING | `app/api/registrations/[id]/route.ts` | Added status check + cancelled event guard |
+| Mark-paid allows non-PENDING_PAYMENT | `app/api/registrations/[id]/route.ts` | Added `PENDING_PAYMENT` status guard |
+| Payment timeout increments no-show | `app/api/cron/payment-timeout/route.ts` | Removed `incrementNoShow()` — payment failure ≠ no-show |
+| Email service crashes on Resend outage | `services/email.ts` | All 9 send functions wrapped in try-catch (best-effort) |
+
+### UX Fixes
+
+| Issue | File | Fix |
+|-------|------|-----|
+| Publish → Unpublish double dialog | `EventActionButtons.tsx` | Controlled `open` state; single AlertDialog with dynamic text |
+| Published badge shown to participants | `events/[id]/page.tsx` | Removed — participants only see published events |
+| Broadcast toast shows "0 recipients" | `BroadcastModal.tsx` | Changed `data.count` → `data.sent` |
+| Password fields show plaintext | `AccountsPanel.tsx` | Changed `type="text"` → `type="password"` |
+| CapacityBar division by zero | `CapacityBar.tsx` | Added `capacity === 0` guard |
+| EventForm allows invalid dates | `EventForm.tsx` | Real-time validation: red border + warning text + submit disabled |
+| EventForm missing min on capacity/price | `EventForm.tsx` | Added `min="1"` / `min="0.01"` + `required` |
+| Organisation filter shows empty options | `EventFilters.tsx` | Tag/org dropdowns now derived from time-filtered events |
+| Organisation filter includes "open to all" | `EventFilters.tsx` | Excluded `allowedOrganisations: []` events when filtering by specific org |
+| Manual ID check-in tab useless | `CheckinScanner.tsx` | Removed — QR Scanner + Search is sufficient |
+| Admin login no password recovery hint | `admin/login/page.tsx` | Added "Forgot password? Contact your system administrator." |
+
+### Key Decisions
+
+| Decision | Rationale |
+|----------|-----------|
+| 8 parallel audit agents | Covers all layers (public, admin, API, security) simultaneously; each agent has focused scope for thorough analysis |
+| Ownership check pattern: `creatorId === userId \|\| isSuperAdmin` | Consistent permission model: creators own their events, super admin overrides all |
+| Email normalisation at API boundary | Single point of normalisation prevents case mismatch bugs across all downstream logic |
+| Remove Manual ID tab | Registration IDs are cuid strings — no user would type these manually. QR + name search covers all real check-in scenarios |
+| Real-time date validation over API-only | Prevents confusion where dates silently "correct" themselves; user sees the problem immediately |
+| `try-catch` on email, not `throw` | Email is best-effort; registration is source of truth. Resend outage should not block user actions |
+
+**Build**: 0 TypeScript errors, 46 routes compiled.

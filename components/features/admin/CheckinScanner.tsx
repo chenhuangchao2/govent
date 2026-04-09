@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { BrowserQRCodeReader } from '@zxing/browser'
-import { Camera, Search, Hash } from 'lucide-react'
+import { Camera, Search } from 'lucide-react'
 import CheckInSearch from './CheckInSearch'
 import CheckInStatsPanel from './CheckInStatsPanel'
 
@@ -18,8 +18,7 @@ export default function CheckinScanner({ eventId }: Props) {
   const [attendedCount, setAttendedCount] = useState(0)
   const readerRef = useRef<BrowserQRCodeReader | null>(null)
   const lastScanned = useRef<string | null>(null)
-  const [manualId, setManualId] = useState('')
-  const [tab, setTab] = useState<'qr' | 'search' | 'manual'>('search')
+  const [tab, setTab] = useState<'qr' | 'search'>('search')
   const [cameraError, setCameraError] = useState(false)
   const [cameraStarted, setCameraStarted] = useState(false)
 
@@ -95,17 +94,9 @@ export default function CheckinScanner({ eventId }: Props) {
     setTimeout(() => setResult(null), 3000)
   }
 
-  function handleManualSubmit() {
-    if (manualId.trim()) {
-      processCheckin(manualId.trim())
-      setManualId('')
-    }
-  }
-
   const tabs = [
     { key: 'qr' as const, label: 'QR Scanner', icon: Camera },
     { key: 'search' as const, label: 'Search', icon: Search },
-    { key: 'manual' as const, label: 'Manual ID', icon: Hash },
   ]
 
   return (
@@ -142,7 +133,7 @@ export default function CheckinScanner({ eventId }: Props) {
                 <div>
                   <Camera className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm text-gray-600 font-medium">Camera not available</p>
-                  <p className="text-xs text-gray-500 mt-1">Check browser permissions, or use Search / Manual ID tab</p>
+                  <p className="text-xs text-gray-500 mt-1">Check browser permissions, or use Search tab</p>
                 </div>
               </div>
             ) : !cameraStarted ? (
@@ -179,38 +170,6 @@ export default function CheckinScanner({ eventId }: Props) {
         )}
 
         {tab === 'search' && <CheckInSearch eventId={eventId} />}
-
-        {tab === 'manual' && (
-          <div>
-            <p className="text-sm text-gray-500 mb-2">Enter registration ID:</p>
-            <div className="flex gap-2">
-              <input
-                value={manualId}
-                onChange={(e) => setManualId(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') handleManualSubmit()
-                }}
-                placeholder="Registration ID"
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm flex-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-              />
-              <button
-                onClick={handleManualSubmit}
-                className="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
-              >
-                Check in
-              </button>
-            </div>
-            {result && (
-              <div
-                className={`mt-3 px-3 py-2 rounded-lg text-sm font-medium text-white ${
-                  result.success ? 'bg-green-500' : 'bg-red-500'
-                }`}
-              >
-                {result.success ? `${result.name} checked in at ${result.time}` : result.error}
-              </div>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Right: Stats sidebar */}

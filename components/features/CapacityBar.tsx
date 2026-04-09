@@ -13,7 +13,7 @@ export default function CapacityBar({
   const isFull = registered >= capacity
 
   if (admin) {
-    const pct = isFull ? 100 : Math.round((registered / capacity) * 100)
+    const pct = capacity === 0 ? 0 : isFull ? 100 : Math.round((registered / capacity) * 100)
     const fillColour =
       pct > 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-green-500'
 

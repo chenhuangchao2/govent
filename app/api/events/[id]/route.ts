@@ -24,6 +24,11 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const body = await req.json()
 
   if (body.action === 'cancel') {
+    const existing = await db.event.findUnique({ where: { id } })
+    if (!existing) return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
+    if (!session.isSuperAdmin && existing.creatorId !== session.userId) {
+      return NextResponse.json({ data: null, error: 'Forbidden' }, { status: 403 })
+    }
     const event = await db.event.update({ where: { id }, data: { isCancelled: true } })
     const registrations = await db.registration.findMany({
       where: { eventId: id, status: { in: ['PENDING', 'APPROVED', 'WAITLISTED'] } },
@@ -38,12 +43,22 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (body.action === 'publish') {
+    const existing = await db.event.findUnique({ where: { id } })
+    if (!existing) return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
+    if (!session.isSuperAdmin && existing.creatorId !== session.userId) {
+      return NextResponse.json({ data: null, error: 'Forbidden' }, { status: 403 })
+    }
     const event = await db.event.update({ where: { id }, data: { isPublished: true } })
     await logAction({ action: 'PUBLISH_EVENT', actorId: session.userId, eventId: id, req })
     return NextResponse.json({ data: event, error: null })
   }
 
   if (body.action === 'unpublish') {
+    const existing = await db.event.findUnique({ where: { id } })
+    if (!existing) return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
+    if (!session.isSuperAdmin && existing.creatorId !== session.userId) {
+      return NextResponse.json({ data: null, error: 'Forbidden' }, { status: 403 })
+    }
     const event = await db.event.update({ where: { id }, data: { isPublished: false } })
     await logAction({ action: 'UNPUBLISH_EVENT', actorId: session.userId, eventId: id, req })
     return NextResponse.json({ data: event, error: null })
@@ -67,10 +82,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.isPaid !== undefined) data.isPaid = Boolean(body.isPaid)
   if (body.price !== undefined) data.price = body.price != null ? Number(body.price) : null
 
+  // Ownership check for general update
+  const existing = await db.event.findUnique({ where: { id } })
+  if (!existing) return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
+  if (!session.isSuperAdmin && existing.creatorId !== session.userId) {
+    return NextResponse.json({ data: null, error: 'Forbidden' }, { status: 403 })
+  }
+
   // Validate date logic if time fields are being updated
   if (data.startTime || data.endTime || data.registrationDeadline) {
-    const existing = await db.event.findUnique({ where: { id } })
-    if (!existing) return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
 
     const start = (data.startTime as Date) || existing.startTime
     const end = (data.endTime as Date) || existing.endTime

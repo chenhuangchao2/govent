@@ -74,10 +74,23 @@ app/
 
 ## Version History
 - **v1.0-mvp** (git tag) — 2026-04-08 — Bare-bones MVP. All core flows wired up but rough edges throughout. See `docs/V1_STATUS.md` for known gaps.
-- **v2.0** — _in progress_ — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
+- **v2.0** — 2026-04-08 — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
+- **v4.0** — 2026-04-09 — Security audit (17 bugs fixed), admin accounts, UX polish. See BUILD_LOG.md for full details.
 
 ## Current Status
-**Version**: v3.6 complete (event cover images + all v3.4-3.5 features)
+**Version**: v4.0 complete (security audit + admin accounts + UX fixes)
+
+**v4.0 — Security Audit, Admin Accounts & UX Fixes ✅ (2026-04-09)**
+- Security: 17 bugs fixed via 8 parallel audit agents + 6 parallel fix agents
+- Permissions: event ownership checks on all API endpoints (creatorId || isSuperAdmin)
+- New: Admin Accounts page (Super Admin only) — view, create, reset password
+- New: Admin cancel registration (APPROVED/WAITLISTED/PENDING_PAYMENT)
+- Auth: email normalisation (toLowerCase/trim), self-cancel requires login, open redirect blocked
+- State machine: reject/mark-paid validate status, Stripe webhook idempotent, payment timeout no longer increments no-show
+- UX: publish dialog fix, date validation, filter improvements, Manual ID tab removed
+- Email: all send functions wrapped in try-catch (best-effort)
+**Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
+**Next step**: Deployment to NorthFlank
 
 **v3.6 — Event Cover Images ✅ (2026-04-08)**
 - Schema: added `imageUrl String?` to Event
@@ -85,8 +98,6 @@ app/
 - Admin: imageUrl field in EventForm (create) + EventOverview (inline edit)
 - Seed: 7 Unsplash images matched to event topics
 - next.config: added images.unsplash.com to remotePatterns
-**Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
-**Next step**: Deployment to NorthFlank
 
 **v3.5 — Organisation Auto-fill ✅ (2026-04-08)**
 - Participant schema: added `organisation String?`
@@ -236,6 +247,14 @@ See `docs/V1_STATUS.md` for full gap list and `docs/superpowers/specs/2026-04-08
 - **`docs/BUILD_LOG.md`** — update every phase (auto-updated by Claude)
 - **`CLAUDE.md`** — update `Current Status` after each phase
 - **`prisma/schema.prisma`** — update when data model changes
+
+## After Batch File Changes
+When multiple files are modified in a short time (e.g. parallel agent fixes), Turbopack hot-reload can break and show "Internal Server Error". **Fix:**
+```bash
+# Kill existing dev server and restart
+lsof -i :3000 -t | xargs kill -9 2>/dev/null; sleep 1; npx next dev --turbopack -p 3000
+```
+Always restart the dev server after batch modifications before testing.
 
 ## Do NOT
 - Do not add test files — out of scope

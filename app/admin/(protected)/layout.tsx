@@ -8,7 +8,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div className="flex">
-      <AdminSidebar />
+      <AdminSidebar isSuperAdmin={session.isSuperAdmin ?? false} />
       <main className="flex-1 p-8 bg-gray-50 min-h-screen">{children}</main>
     </div>
   )

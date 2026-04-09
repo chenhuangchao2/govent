@@ -7,7 +7,8 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, name, organisation } = await req.json()
+    const { email: rawEmail, password, name, organisation } = await req.json()
+    const email = rawEmail?.toLowerCase().trim()
 
     // Validate required fields
     if (!email || !password || !name) {
@@ -36,23 +37,16 @@ export async function POST(req: NextRequest) {
 
     const existing = await db.participant.findUnique({ where: { email } })
 
-    if (existing && existing.isVerified) {
-      return NextResponse.json(
-        { data: null, error: 'Account already exists' },
-        { status: 409 }
-      )
-    }
-
     // Generate 6-digit verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString()
     const codeExpiresAt = new Date(Date.now() + 10 * 60 * 1000) // 10 minutes
     const passwordHash = createHash('sha256').update(password).digest('hex')
 
-    if (existing && !existing.isVerified) {
-      // Update existing unverified account
+    if (existing) {
+      // Re-registration: update credentials and re-verify
       await db.participant.update({
         where: { email },
-        data: { passwordHash, name, organisation: organisation || undefined, verificationCode, codeExpiresAt },
+        data: { passwordHash, name, organisation: organisation || undefined, verificationCode, codeExpiresAt, isVerified: false },
       })
     } else {
       // Create new participant

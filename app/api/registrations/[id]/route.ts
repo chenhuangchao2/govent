@@ -72,6 +72,12 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (action === 'reject') {
+    if (reg.event.isCancelled) {
+      return NextResponse.json({ data: null, error: 'Cannot reject registrations for a cancelled event' }, { status: 400 })
+    }
+    if (reg.status !== 'PENDING') {
+      return NextResponse.json({ data: null, error: 'Can only reject PENDING registrations' }, { status: 400 })
+    }
     if (!reason) return NextResponse.json({ data: null, error: 'Rejection reason required' }, { status: 400 })
     const updated = await db.registration.update({
       where: { id },
@@ -84,6 +90,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (action === 'cancel') {
+    const cancellable = ['PENDING', 'APPROVED', 'WAITLISTED', 'PENDING_PAYMENT']
+    if (!cancellable.includes(reg.status)) {
+      return NextResponse.json({ data: null, error: `Cannot cancel registration with status ${reg.status}` }, { status: 400 })
+    }
     const updated = await db.registration.update({ where: { id }, data: { status: 'CANCELLED' } })
     if (['APPROVED', 'PENDING'].includes(reg.status)) await promoteWaitlist(reg.eventId)
     await logAction({ action: 'CANCEL_REGISTRATION', actorId: session.userId, registrationId: id, req })
@@ -91,6 +101,9 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   }
 
   if (action === 'mark-paid') {
+    if (reg.status !== 'PENDING_PAYMENT') {
+      return NextResponse.json({ data: null, error: 'Can only mark PENDING_PAYMENT registrations as paid' }, { status: 400 })
+    }
     const qrCode = await generateQRCodeDataUrl(id)
     const updated = await db.registration.update({
       where: { id },

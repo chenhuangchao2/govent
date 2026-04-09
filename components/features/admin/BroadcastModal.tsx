@@ -41,7 +41,7 @@ export default function BroadcastModal({ eventId, eventTitle }: BroadcastModalPr
         throw new Error(data.error || 'Failed to send broadcast')
       }
 
-      toast.success(`Broadcast sent to ${data.data?.count ?? 0} recipients`)
+      toast.success(`Broadcast sent to ${data.data?.sent ?? 0} recipients`)
       resetAndClose()
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to send broadcast'

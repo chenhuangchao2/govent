@@ -42,6 +42,7 @@ export default function LoginPage() {
             className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50">
             {loading ? 'Signing in...' : 'Sign in'}
           </button>
+          <p className="text-xs text-gray-400 text-center">Forgot password? Contact your system administrator.</p>
         </form>
       </div>
     </div>

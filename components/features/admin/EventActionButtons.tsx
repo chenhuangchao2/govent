@@ -24,6 +24,8 @@ interface Props {
 export default function EventActionButtons({ eventId, isPublished, isCancelled }: Props) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [publishOpen, setPublishOpen] = useState(false)
+  const [cancelOpen, setCancelOpen] = useState(false)
 
   async function doAction(action: string) {
     setLoading(true)
@@ -43,6 +45,9 @@ export default function EventActionButtons({ eventId, isPublished, isCancelled }
           cancel: 'Event cancelled — all attendees notified',
         }
         toast.success(messages[action] ?? 'Done')
+        // Close dialogs before refresh to prevent stale dialog state
+        setPublishOpen(false)
+        setCancelOpen(false)
         router.refresh()
       }
     } finally {
@@ -56,47 +61,30 @@ export default function EventActionButtons({ eventId, isPublished, isCancelled }
 
   return (
     <div className="flex gap-2 flex-wrap">
-      {!isPublished ? (
-        <AlertDialog>
-          <AlertDialogTrigger disabled={loading}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 disabled:opacity-50">
-            Publish
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Publish this event?</AlertDialogTitle>
-              <AlertDialogDescription>
-                The event will be visible to all eligible participants immediately.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => doAction('publish')}>Publish</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      ) : (
-        <AlertDialog>
-          <AlertDialogTrigger disabled={loading}
-            className="bg-yellow-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-yellow-600 disabled:opacity-50">
-            Unpublish
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Unpublish this event?</AlertDialogTitle>
-              <AlertDialogDescription>
-                The event will be hidden from the public listing. Existing registrations are not affected.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={() => doAction('unpublish')}>Unpublish</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
+      <AlertDialog open={publishOpen} onOpenChange={setPublishOpen}>
+        <AlertDialogTrigger disabled={loading}
+          className={`${isPublished ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-green-600 hover:bg-green-700'} text-white px-4 py-2 rounded-lg text-sm font-medium disabled:opacity-50`}>
+          {isPublished ? 'Unpublish' : 'Publish'}
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{isPublished ? 'Unpublish this event?' : 'Publish this event?'}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {isPublished
+                ? 'The event will be hidden from the public listing. Existing registrations are not affected.'
+                : 'The event will be visible to all eligible participants immediately.'}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={() => doAction(isPublished ? 'unpublish' : 'publish')}>
+              {isPublished ? 'Unpublish' : 'Publish'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      <AlertDialog>
+      <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
         <AlertDialogTrigger disabled={loading}
           className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50">
           Cancel Event

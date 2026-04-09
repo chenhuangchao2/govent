@@ -4,7 +4,8 @@ import { getParticipantSession } from '@/lib/participant-auth'
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, code } = await req.json()
+    const { email: rawEmail, code } = await req.json()
+    const email = rawEmail?.toLowerCase().trim()
 
     if (!email || !code) {
       return NextResponse.json(

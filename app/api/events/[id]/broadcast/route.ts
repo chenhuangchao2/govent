@@ -41,6 +41,12 @@ export async function POST(
       { status: 404 }
     )
   }
+  if (!session.isSuperAdmin && event.creatorId !== session.userId) {
+    return NextResponse.json(
+      { data: null, error: 'Forbidden' },
+      { status: 403 }
+    )
+  }
 
   const registrations = await db.registration.findMany({
     where: {

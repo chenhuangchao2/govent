@@ -2,17 +2,19 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { LayoutDashboard, Calendar, Shield, FileText, LogOut } from 'lucide-react'
+import { LayoutDashboard, Calendar, Shield, FileText, LogOut, Users } from 'lucide-react'
 
 const links = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard, exact: true },
   { href: '/admin/events', label: 'Events', icon: Calendar },
+  { href: '/admin/accounts', label: 'Accounts', icon: Users, superAdminOnly: true },
   { href: '/admin/blacklist', label: 'Blacklist', icon: Shield },
   { href: '/admin/audit-log', label: 'Audit Log', icon: FileText },
 ]
 
-export default function AdminSidebar() {
+export default function AdminSidebar({ isSuperAdmin = false }: { isSuperAdmin?: boolean }) {
   const path = usePathname()
+  const visibleLinks = links.filter(l => !l.superAdminOnly || isSuperAdmin)
   return (
     <aside className="w-60 bg-slate-900 h-screen sticky top-0 flex flex-col">
       {/* Logo area */}
@@ -26,7 +28,7 @@ export default function AdminSidebar() {
 
       {/* Nav links */}
       <nav className="flex-1 px-3 py-4 space-y-1">
-        {links.map(({ href, label, icon: Icon, exact }) => {
+        {visibleLinks.map(({ href, label, icon: Icon, exact }) => {
           const active = exact ? path === href : path.startsWith(href)
           return (
             <Link

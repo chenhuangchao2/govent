@@ -7,7 +7,8 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, code, newPassword, action } = await req.json()
+    const { email: rawEmail, code, newPassword, action } = await req.json()
+    const email = rawEmail?.toLowerCase().trim()
 
     if (action === 'send-code') {
       // Step 1: Send reset code

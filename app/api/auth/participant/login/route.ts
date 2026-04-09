@@ -5,7 +5,8 @@ import { createHash } from 'crypto'
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json()
+    const { email: rawEmail, password } = await req.json()
+    const email = rawEmail?.toLowerCase().trim()
 
     if (!email || !password) {
       return NextResponse.json(

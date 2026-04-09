@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ data: null, error: firstError }, { status: 400 })
   }
 
-  const { eventId, name, email, organisation, remarks } = parsed.data
+  const { eventId, name, email: rawEmail, organisation, remarks } = parsed.data
+  const email = rawEmail.toLowerCase().trim()
 
   // Check 1: Blacklist
   const isBlacklisted = await checkBlacklist(email)
@@ -61,7 +62,7 @@ export async function POST(req: NextRequest) {
 
   // Check 2: Eligibility (email domain)
   if (event.allowedDomains.length > 0) {
-    const domain = email.split('@')[1]
+    const domain = email.split('@')[1]?.toLowerCase()
     if (!event.allowedDomains.includes(domain)) {
       return NextResponse.json({
         data: null,

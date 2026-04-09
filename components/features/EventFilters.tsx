@@ -38,26 +38,47 @@ export default function EventFilters({ events }: { events: EventData[] }) {
   const [selectedOrgs, setSelectedOrgs] = useState<string[]>([])
   const [selectedTags, setSelectedTags] = useState<string[]>([])
 
-  // Collect unique tags
+  // Pre-filter by time and cost (used to build dynamic tag/org options)
+  const timeAndCostFiltered = useMemo(() => {
+    const now = new Date()
+    const weekEnd = new Date(now)
+    weekEnd.setDate(weekEnd.getDate() + 7)
+    weekEnd.setHours(23, 59, 59, 999)
+    const monthEnd = new Date(now)
+    monthEnd.setDate(monthEnd.getDate() + 30)
+    monthEnd.setHours(23, 59, 59, 999)
+
+    return events.filter(e => {
+      const start = new Date(e.startTime)
+      if (start < now) return false
+      if (timeFilter === 'this-week' && start > weekEnd) return false
+      if (timeFilter === 'this-month' && start > monthEnd) return false
+      if (costFilter === 'free' && e.isPaid) return false
+      if (costFilter === 'paid' && !e.isPaid) return false
+      return true
+    })
+  }, [events, timeFilter, costFilter])
+
+  // Collect unique tags from visible events
   const allTags = useMemo(() => {
     const seen = new Set<string>()
-    for (const e of events) {
+    for (const e of timeAndCostFiltered) {
       for (const t of e.tags) seen.add(t)
     }
     return Array.from(seen).sort()
-  }, [events])
+  }, [timeAndCostFiltered])
 
-  // Collect unique organisations (case-insensitive dedup, keep first casing seen)
+  // Collect unique organisations from visible events
   const allOrgs = useMemo(() => {
     const seen = new Map<string, string>()
-    for (const e of events) {
+    for (const e of timeAndCostFiltered) {
       for (const o of e.allowedOrganisations) {
         const key = o.toLowerCase()
         if (!seen.has(key)) seen.set(key, o)
       }
     }
     return Array.from(seen.values()).sort()
-  }, [events])
+  }, [timeAndCostFiltered])
 
   function toggleTag(tag: string) {
     setSelectedTags(prev => prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag])
@@ -97,9 +118,9 @@ export default function EventFilters({ events }: { events: EventData[] }) {
         if (!selectedTags.some(t => e.tags.includes(t))) return false
       }
 
-      // Organisation (multi-select)
+      // Organisation (multi-select): only show events restricted to the selected org(s)
       if (selectedOrgs.length > 0) {
-        if (e.allowedOrganisations.length === 0) return true // open to all matches any org filter
+        if (e.allowedOrganisations.length === 0) return false // "open to all" events excluded when filtering by specific org
         if (!selectedOrgs.some(o => e.allowedOrganisations.some(ao => ao.toLowerCase() === o.toLowerCase()))) return false
       }
 

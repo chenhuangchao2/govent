@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
+import { requireAdmin } from '@/lib/auth'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import EventActionButtons from '@/components/features/admin/EventActionButtons'
 import EventOverview from '@/components/features/admin/EventOverview'
 import EventDetailTabs from '@/components/features/admin/EventDetailTabs'
@@ -9,6 +10,9 @@ import CheckinScanner from '@/components/features/admin/CheckinScanner'
 import BroadcastModal from '@/components/features/admin/BroadcastModal'
 
 export default async function AdminEventDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await requireAdmin()
+  if (!session) redirect('/admin/login')
+
   const { id } = await params
   const event = await db.event.findUnique({
     where: { id },
@@ -21,6 +25,7 @@ export default async function AdminEventDetailPage({ params }: { params: Promise
     },
   })
   if (!event) notFound()
+  if (!session.isSuperAdmin && event.creatorId !== session.userId) notFound()
 
   const statusLabel = event.isCancelled ? 'Cancelled' : event.isPublished ? 'Published' : 'Draft'
   const statusColor = event.isCancelled

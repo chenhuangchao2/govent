@@ -11,6 +11,9 @@ export async function GET(req: NextRequest) {
 
   const event = await db.event.findUnique({ where: { id: eventId } })
   if (!event) return NextResponse.json({ data: null, error: 'Event not found' }, { status: 404 })
+  if (!session.isSuperAdmin && event.creatorId !== session.userId) {
+    return NextResponse.json({ data: null, error: 'Forbidden' }, { status: 403 })
+  }
 
   const registrations = await db.registration.findMany({
     where: { eventId },
