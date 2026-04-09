@@ -100,11 +100,11 @@ export default async function AdminDashboardPage() {
             className="bg-white p-6 rounded-lg border border-outline-variant/10 flex flex-col gap-5 group hover:shadow-md transition-shadow"
           >
             <div className="flex justify-between items-start">
-              <div className={`p-3 ${stat.iconBg} rounded-2xl ${stat.iconColor}`}>
+              <div className={`p-3 ${stat.iconBg} rounded-lg ${stat.iconColor}`}>
                 {stat.icon}
               </div>
               <span
-                className={`text-[10px] font-black ${stat.badgeClass} px-3 py-1 rounded-full uppercase tracking-widest`}
+                className={`text-xs font-bold ${stat.badgeClass} px-3 py-1 rounded-full uppercase tracking-wide whitespace-nowrap`}
               >
                 {stat.badge}
               </span>
