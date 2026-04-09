@@ -55,5 +55,5 @@ EXPOSE 3000
 ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
-# Run migrations then start
-CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node server.js"]
+# Start the server (run prisma migrate deploy manually via NorthFlank shell after first deploy)
+CMD ["node", "server.js"]
