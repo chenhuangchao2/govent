@@ -356,3 +356,4 @@ UI renders:
 | GET | `/api/cron/reminders` | T-48h reminder job (CRON_SECRET) |
 | GET | `/api/cron/payment-timeout` | Payment expiry cleanup (CRON_SECRET) |
 | GET | `/api/cron/no-shows` | Post-event NO_SHOW marking (CRON_SECRET) |
+| POST | `/api/seed` | One-time DB seed with demo data (CRON_SECRET, ?reset=true to wipe) |

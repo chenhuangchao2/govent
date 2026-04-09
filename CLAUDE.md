@@ -78,9 +78,21 @@ app/
 - **v4.0** — 2026-04-09 — Security audit (17 bugs fixed), admin accounts, UX polish. See BUILD_LOG.md for full details.
 - **v5.0** — 2026-04-09 — Complete UI rebuild with "The Ethereal State" design system. 16 pages, 3 phases. See BUILD_LOG.md v5.0 section.
 - **v5.1** — 2026-04-09 — Polish pass: 10 bug fixes, UX cleanup, demo data, dev workflow stabilisation. See BUILD_LOG.md v5.1 section.
+- **v5.2** — 2026-04-10 — NorthFlank deployment: Dockerfile fixes, Prisma migration, seed API, production live.
 
 ## Current Status
-**Version**: v5.1 (polished, demo-ready)
+**Version**: v5.2 (deployed to NorthFlank)
+
+**Production URL**: https://p01--govent--c2c7vkvx9sv9.code.run
+**GitHub**: https://github.com/chenhuangchao2/govent
+
+**v5.2 — NorthFlank Deployment ✅ (2026-04-10)**
+- Deployed to NorthFlank with PostgreSQL addon
+- Dockerfile: multi-stage build, dummy env vars for webpack, standalone output
+- Prisma migration: version-controlled SQL, auto-runs on container start
+- Seed API: `/api/seed` with reset support, creates full demo dataset
+- 3 admins, 11 events, 130+ registrations, 3 blacklist, 12 audit logs
+- Demo accounts: admin@tech.gov.sg/admin123, demo@gov.sg/demo123
 
 **v5.1 — Polish, Bug Fixes & Demo Data ✅ (2026-04-09)**
 - 10 bug fixes: Stripe env key override, featured API whitelist, bulk approve error handling, static page caching, audit log titles

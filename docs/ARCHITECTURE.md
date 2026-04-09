@@ -184,6 +184,34 @@ docker-compose.yml               Single Docker service (multi-stage build)
 | **Concurrent last-seat registrations** | Two users see "1 seat left" simultaneously | `db.$transaction` with count-then-create ensures only one gets the seat | Adequate for government event scale (~100 concurrent users max) |
 | **Cron fires twice** | Duplicate reminders, double no-show marking | Idempotent flags: `reminderSent`, `noShowProcessed` prevent duplicates | Sufficient — flags make cron jobs safely re-runnable |
 
+## Deployment Architecture (NorthFlank)
+
+```
+GitHub (main branch) ──auto-push──→ NorthFlank Build (Dockerfile)
+                                          │
+                                    Multi-stage Docker:
+                                    1. deps: npm ci
+                                    2. builder: prisma generate + next build
+                                    3. runner: standalone + prisma engine
+                                          │
+                                          ▼
+                                    NorthFlank Service
+                                    CMD: prisma migrate deploy → node server.js
+                                          │
+                                          ▼
+                                    NorthFlank PostgreSQL Addon
+                                    (managed, auto-provisioned)
+```
+
+**Key deployment decisions:**
+- `output: "standalone"` for minimal Docker image (~150MB vs ~1GB with full node_modules)
+- Dummy env vars at build stage (Webpack instantiates Resend/Stripe constructors during static analysis)
+- Prisma migration via `node node_modules/prisma/build/index.js` (npx unavailable in standalone)
+- Seed data via protected HTTP endpoint `/api/seed` (NorthFlank shell doesn't inherit runtime env vars)
+- `force-dynamic` on all DB pages (prevents stale pre-rendered content)
+
+**Production URL:** https://p01--govent--c2c7vkvx9sv9.code.run
+
 ## What I Would Improve for Production
 
 - Replace email+password with Singpass/Corppass for verified government identity
@@ -194,3 +222,4 @@ docker-compose.yml               Single Docker service (multi-stage build)
 - Multi-level approval workflow (registrant → manager → coordinator)
 - WCAG 2.1 AA accessibility audit
 - Database connection pooling (PgBouncer) for high-concurrency scenarios
+- Region: migrate from US-Central to Asia-Southeast (GCP Singapore) for lower latency

@@ -950,3 +950,91 @@ Added 4 past ATTENDED events for Phoenix Chen (chenhuangchao2@gmail.com):
 | `output: "standalone"` always on | Commented out for dev | Standalone mode doesn't auto-load `.env.local` at runtime |
 
 **Build**: 0 TypeScript errors. All features verified via curl + browser testing.
+
+---
+
+## v5.2 — NorthFlank Deployment (2026-04-10)
+
+### Deployment Architecture
+
+```
+GitHub (chenhuangchao2/govent, main branch)
+    │ auto-trigger on push
+    ▼
+NorthFlank Build (Dockerfile → Docker image)
+    │ multi-stage: deps → builder → runner
+    ▼
+NorthFlank Service (govent)
+    │ PORT 3000, standalone mode
+    │ CMD: prisma migrate deploy → node server.js
+    ▼
+NorthFlank PostgreSQL Addon (govent-db)
+    │ PostgreSQL 16, US-Central
+    ▼
+Live URL: https://p01--govent--c2c7vkvx9sv9.code.run
+```
+
+### Deployment Issues & Resolutions
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| Build fails: `Missing API key Resend` | Webpack build instantiates Resend/Stripe at build time | Added dummy env vars in Dockerfile build stage |
+| Build fails: `DATABASE_URL not found` | Prisma needs DATABASE_URL at webpack build time | Added dummy DATABASE_URL in build stage |
+| Runtime: `sh: prisma: not found` | Standalone mode has no node_modules, `npx` unavailable | Changed CMD to `node node_modules/prisma/build/index.js migrate deploy` |
+| Runtime env vars overwritten | NorthFlank POST `/runtime-environment` replaces all vars | Re-set all 8 env vars in single API call |
+| Shell: `DATABASE_URL not found` | NorthFlank shell doesn't inherit runtime env vars | Created `/api/seed` endpoint (HTTP-based seeding) |
+| Need to re-seed | Seed endpoint checks `if existingUsers > 0` | Added `?reset=true` query param to wipe and re-seed |
+
+### Prisma Migration Strategy
+
+Chose `prisma migrate deploy` over `prisma db push` for production:
+- **Why**: Migration files are version-controlled SQL, reproducible across environments, auditable
+- **How**: `prisma/migrations/20260409000000_init/migration.sql` — full schema as initial migration
+- **Deploy**: Dockerfile CMD runs `prisma migrate deploy` before `node server.js`
+- **Dev**: `prisma migrate resolve --applied` marks existing dev DB as up-to-date
+
+### Seed Data (Production)
+
+Created `/api/seed` endpoint (protected by `CRON_SECRET` header):
+
+| Data | Count | Details |
+|------|-------|---------|
+| Admin users | 3 | Phoenix Chen (Super Admin), Sarah Lim, Rajan Kumar |
+| Upcoming events | 7 | Various topics, 2 featured, 1 paid, org-restricted |
+| Past events | 4 | All ATTENDED by demo users, CPD hours |
+| Registrations | 130+ | Realistic distribution: PENDING, APPROVED, WAITLISTED (only on full events), REJECTED, CANCELLED |
+| Blacklist | 3 | AUTO_NO_SHOW, AUTO_PAYMENT, MANUAL sources |
+| Audit log | 12 | CREATE, PUBLISH, APPROVE, REJECT, BULK_APPROVE, CHECKIN, BROADCAST, EDIT |
+| Participant | 1 | demo@gov.sg / demo123 (verified, with CPD history) |
+
+### Environment Variables (NorthFlank)
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | NorthFlank PostgreSQL addon connection string |
+| `SESSION_SECRET` | iron-session encryption key (32+ chars) |
+| `CRON_SECRET` | Protects cron + seed endpoints |
+| `STRIPE_SECRET_KEY` | Stripe test mode key |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signature verification |
+| `RESEND_API_KEY` | Resend email API key |
+| `RESEND_FROM` | Email sender address |
+| `NEXT_PUBLIC_APP_URL` | Public URL for Stripe redirects |
+
+### Production URLs
+
+| Page | URL |
+|------|-----|
+| Public events | https://p01--govent--c2c7vkvx9sv9.code.run/events |
+| Participant login | https://p01--govent--c2c7vkvx9sv9.code.run/login |
+| Admin login | https://p01--govent--c2c7vkvx9sv9.code.run/admin/login |
+
+### Demo Accounts
+
+| Role | Email | Password |
+|------|-------|----------|
+| Super Admin | admin@tech.gov.sg | admin123 |
+| Admin | sarah@tech.gov.sg | admin123 |
+| Admin | rajan@tech.gov.sg | admin123 |
+| Participant | demo@gov.sg | demo123 |
+
+**Build**: 0 TypeScript errors. Production deployed and verified.
