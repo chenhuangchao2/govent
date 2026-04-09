@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;400;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        "on-surface": "#191c1d",
+        "surface": "#f8f9fa",
+        "surface-container-low": "#f3f4f5",
+        "surface-container-high": "#e7e8e9",
+        "surface-container-highest": "#e1e3e4",
+        "surface-container-lowest": "#ffffff",
+        "surface-container": "#edeeef",
+        "outline": "#727783",
+        "outline-variant": "#c2c6d4",
+        "on-surface-variant": "#424752",
+        "primary": "#00478d",
+        "primary-container": "#005eb8",
+        "primary-fixed": "#d6e3ff",
+        "primary-fixed-dim": "#a9c7ff",
+        "secondary-fixed": "#dee0ff",
+        "tertiary-fixed": "#a1efff",
+        "on-tertiary-fixed": "#001f25",
+        "on-tertiary-fixed-variant": "#004e59",
+        "on-secondary-fixed-variant": "#2f3f92",
+        "error": "#ba1a1a",
+      },
+      fontFamily: {
+        headline: ["Manrope"],
+        body: ["Manrope"],
+        label: ["Inter"],
+      },
+      borderRadius: {
+        DEFAULT: "1rem",
+        lg: "2rem",
+        xl: "3rem",
+        full: "9999px",
+      },
+    },
+  },
+}
+</script>
+<style>
+.glass-panel {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(194, 198, 212, 0.2);
+}
+.iridescent-glow {
+  background: radial-gradient(circle at center, rgba(161, 239, 255, 0.15) 0%, transparent 70%);
+}
+.noise-overlay {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  opacity: 0.02;
+  pointer-events: none;
+}
+</style>
+</head>
+<body class="bg-surface font-body text-on-surface overflow-x-hidden selection:bg-primary-fixed">
+
+<!-- Background Accents -->
+<div class="fixed inset-0 z-[-1] overflow-hidden pointer-events-none">
+  <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] iridescent-glow blur-[120px] rounded-full"></div>
+  <div class="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-secondary-fixed/10 blur-[150px] rounded-full"></div>
+  <div class="absolute inset-0 noise-overlay"></div>
+</div>
+
+<!-- Section 1: Floating Glass Nav -->
+<nav class="fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-8 py-3 glass-panel rounded-full mt-4 mx-auto w-[95%] max-w-7xl shadow-[0_8px_32px_0_rgba(0,71,141,0.08)]">
+  <div class="flex items-center gap-2">
+    <span class="text-lg font-black text-blue-900 tracking-tighter uppercase font-headline">GovEvent</span>
+  </div>
+  <div class="hidden md:flex items-center gap-8">
+    <a class="font-label uppercase tracking-widest text-[11px] font-bold text-blue-700 border-b-2 border-blue-600 pb-1" href="#">Events</a>
+    <a class="font-label uppercase tracking-widest text-[11px] font-bold text-slate-600 hover:text-blue-900 transition-opacity" href="#">My Registrations</a>
+  </div>
+  <div class="flex items-center gap-4">
+    <button class="bg-primary text-white font-label uppercase tracking-widest text-[11px] font-bold px-6 py-2.5 rounded-full hover:opacity-90 active:scale-95 transition-all shadow-lg shadow-primary/20">
+      Sign In
+    </button>
+  </div>
+</nav>
+
+<!-- Section 2: Hero -->
+<main class="pt-32 pb-24 px-6 max-w-7xl mx-auto">
+  <header class="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-8">
+    <div class="max-w-2xl">
+      <h1 class="text-6xl md:text-7xl font-extrabold tracking-tighter text-on-surface mb-4 leading-[0.9]">
+        Public<br/>Initiatives.
+      </h1>
+      <p class="text-lg text-on-surface-variant font-medium max-w-md">
+        Explore upcoming government events, workshops and training sessions. Register and manage your professional development.
+      </p>
+    </div>
+    <div class="relative w-full md:w-96 group">
+      <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+        <svg class="w-5 h-5 text-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </div>
+      <input class="w-full pl-12 pr-4 py-4 bg-surface-container-high/40 backdrop-blur-xl border-none rounded-2xl focus:ring-2 focus:ring-primary-fixed outline-none font-label transition-all placeholder:text-outline shadow-sm" placeholder="Search events..." type="text"/>
+    </div>
+  </header>
+
+  <!-- Featured Section (8:4 Asymmetric) -->
+  <section class="mb-16">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Main Featured Event -->
+      <div class="lg:col-span-8 group relative overflow-hidden rounded-xl h-[500px] shadow-2xl shadow-primary/5 cursor-pointer">
+        <img class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop" />
+        <div class="absolute inset-0 bg-gradient-to-t from-primary/80 via-transparent to-transparent"></div>
+        <div class="absolute bottom-0 left-0 p-10 w-full">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="bg-tertiary-fixed text-on-tertiary-fixed px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase font-label">Leadership</span>
+            <span class="text-white/80 font-label text-[10px] font-bold tracking-widest uppercase">APR 10, 2026</span>
+          </div>
+          <h2 class="text-4xl md:text-5xl font-extrabold text-white tracking-tighter mb-4 max-w-xl">
+            Q2 All-Hands Townhall
+          </h2>
+          <div class="flex items-center justify-between">
+            <p class="text-white/70 font-medium max-w-md">Quarterly alignment meeting for all government technology staff across agencies.</p>
+            <button class="bg-white text-primary p-4 rounded-full flex items-center justify-center hover:scale-110 transition-transform">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 17L17 7M17 7H7M17 7v10"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Secondary Featured Card -->
+      <div class="lg:col-span-4 bg-surface-container-lowest glass-panel p-8 rounded-xl flex flex-col justify-between shadow-xl shadow-slate-200/50">
+        <div>
+          <div class="w-12 h-12 bg-primary-fixed rounded-2xl flex items-center justify-center mb-6">
+            <svg class="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          </div>
+          <h3 class="text-2xl font-bold tracking-tight text-on-surface mb-3">Design Thinking for Public Services</h3>
+          <p class="text-on-surface-variant font-medium leading-relaxed">Reimagining citizen experiences through empathetic design and data-driven service improvement.</p>
+        </div>
+        <div class="mt-8 pt-6 border-t border-outline-variant/30">
+          <div class="flex items-center gap-2 mb-4">
+            <svg class="w-4 h-4 text-outline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="text-xs font-bold font-label text-outline uppercase tracking-wider">Apr 11 &middot; 2:00 PM</span>
+          </div>
+          <button class="w-full py-4 bg-surface-container text-primary font-bold font-label uppercase tracking-widest text-[11px] rounded-xl hover:bg-primary hover:text-white transition-all">
+            View Details
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 3: Event Grid with Filters -->
+  <section class="mb-20">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl font-extrabold tracking-tight">Active Registries</h2>
+    </div>
+
+    <!-- Glass Pill Filters -->
+    <div class="flex flex-wrap gap-3 mb-8">
+      <button class="glass-panel px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer hover:bg-white/80 shadow-sm border border-white/60">
+        Time: <span class="font-bold">This Week</span>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <button class="glass-panel px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer hover:bg-white/80 shadow-sm border border-white/60">
+        Topic: <span class="font-bold">All</span>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <button class="glass-panel px-5 py-2.5 rounded-full flex items-center gap-2 text-sm font-medium text-slate-700 cursor-pointer hover:bg-white/80 shadow-sm border border-white/60">
+        Org: <span class="font-bold">All</span>
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+      <button class="glass-panel px-5 py-2.5 rounded-full text-sm font-medium text-slate-700 cursor-pointer hover:bg-white/80 shadow-sm border border-white/60">
+        Free Only
+      </button>
+    </div>
+
+    <!-- Bento Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Card 1: Normal -->
+      <div class="bg-surface-container-low p-6 rounded-xl hover:bg-white transition-all duration-300 group cursor-pointer">
+        <div class="flex justify-between items-start mb-6">
+          <div class="px-3 py-1 bg-secondary-fixed/30 text-on-secondary-fixed-variant text-[9px] font-black uppercase tracking-widest rounded-full font-label">Agile</div>
+          <svg class="w-5 h-5 text-outline-variant group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        </div>
+        <h4 class="text-xl font-bold tracking-tight mb-2">Agile &amp; Scrum in Government Projects</h4>
+        <p class="text-on-surface-variant text-sm font-medium mb-6">Applying agile methodologies to improve government project delivery and team collaboration.</p>
+        <div class="flex items-center gap-3">
+          <span class="text-[10px] font-bold font-label text-outline uppercase">Apr 12 &middot; 10:00 AM</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Normal -->
+      <div class="bg-surface-container-low p-6 rounded-xl hover:bg-white transition-all duration-300 group cursor-pointer">
+        <div class="flex justify-between items-start mb-6">
+          <div class="px-3 py-1 bg-tertiary-fixed/30 text-on-tertiary-fixed-variant text-[9px] font-black uppercase tracking-widest rounded-full font-label">Cloud</div>
+          <span class="px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-bold rounded-full font-label uppercase">GovTech Only</span>
+        </div>
+        <h4 class="text-xl font-bold tracking-tight mb-2">Advanced Cloud Architecture Workshop</h4>
+        <p class="text-on-surface-variant text-sm font-medium mb-6">Deep dive into cloud-native architectures for government infrastructure modernization.</p>
+        <div class="flex items-center gap-3">
+          <span class="text-[10px] font-bold font-label text-outline uppercase">Apr 13 &middot; 9:00 AM</span>
+          <span class="text-[10px] font-bold font-label text-amber-700 uppercase">SGD 50.00</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Highlight (primary bg) -->
+      <div class="bg-primary p-6 rounded-xl text-white flex flex-col justify-between group overflow-hidden relative cursor-pointer">
+        <div class="absolute -right-4 -top-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:scale-150 transition-transform"></div>
+        <div>
+          <div class="flex justify-between items-start mb-6">
+            <div class="px-3 py-1 bg-white/20 text-[9px] font-black uppercase tracking-widest rounded-full font-label">AI &middot; Data</div>
+          </div>
+          <h4 class="text-xl font-bold tracking-tight mb-2 leading-tight">Practical AI for All</h4>
+          <p class="text-white/70 text-sm font-medium">Hands-on workshop covering AI tools and frameworks for public sector applications.</p>
+        </div>
+        <div class="mt-8">
+          <span class="text-[10px] font-bold font-label text-white/60 uppercase">Apr 16 &middot; 9:00 AM &middot; FREE</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: CPD Placeholder -->
+  <section class="mt-24 p-12 bg-surface-container/30 glass-panel rounded-xl border-none relative overflow-hidden">
+    <div class="absolute top-0 right-0 w-64 h-64 iridescent-glow opacity-40 blur-3xl pointer-events-none"></div>
+    <div class="relative z-10 flex flex-col md:flex-row gap-12 items-center">
+      <div class="md:w-1/2">
+        <span class="font-label text-[11px] font-black tracking-[0.2em] text-primary uppercase mb-4 block">Professional Development</span>
+        <h2 class="text-5xl font-extrabold tracking-tighter mb-6">For Your Career.</h2>
+        <p class="text-lg text-on-surface-variant font-medium mb-8 leading-relaxed">
+          Track your CPD hours across all registered events. Build your professional development portfolio within the government ecosystem.
+        </p>
+        <div class="flex flex-wrap gap-4">
+          <div class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl shadow-sm border border-outline-variant/10">
+            <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            <span class="text-sm font-bold text-on-surface">CPD Hours Tracker</span>
+          </div>
+          <div class="flex items-center gap-2 bg-white px-4 py-3 rounded-2xl shadow-sm border border-outline-variant/10">
+            <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="text-sm font-bold text-on-surface">Event Certificates</span>
+          </div>
+        </div>
+      </div>
+      <div class="md:w-1/2 grid grid-cols-2 gap-4">
+        <div class="h-48 rounded-xl bg-surface-container overflow-hidden">
+          <img class="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 transition-all duration-500" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=500&auto=format&fit=crop" />
+        </div>
+        <div class="h-48 rounded-xl bg-surface-container overflow-hidden mt-8">
+          <img class="w-full h-full object-cover grayscale opacity-80 hover:grayscale-0 transition-all duration-500" src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=500&auto=format&fit=crop" />
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+</body>
+</html>
