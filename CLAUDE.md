@@ -77,9 +77,18 @@ app/
 - **v2.0** — 2026-04-08 — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 - **v4.0** — 2026-04-09 — Security audit (17 bugs fixed), admin accounts, UX polish. See BUILD_LOG.md for full details.
 - **v5.0** — 2026-04-09 — Complete UI rebuild with "The Ethereal State" design system. 16 pages, 3 phases. See BUILD_LOG.md v5.0 section.
+- **v5.1** — 2026-04-09 — Polish pass: 10 bug fixes, UX cleanup, demo data, dev workflow stabilisation. See BUILD_LOG.md v5.1 section.
 
 ## Current Status
-**Version**: v5.0 complete (UI rebuild + new features)
+**Version**: v5.1 (polished, demo-ready)
+
+**v5.1 — Polish, Bug Fixes & Demo Data ✅ (2026-04-09)**
+- 10 bug fixes: Stripe env key override, featured API whitelist, bulk approve error handling, static page caching, audit log titles
+- UX: removed unused icons/manual check-in, Free Only button visibility, consistent rounded corners
+- Pricing locked (read-only after creation) to prevent payment integrity issues
+- Demo data: 4 past ATTENDED events for Phoenix Chen (15.5 CPD hours total)
+- Dev workflow: switched from Turbopack dev mode to build+start (stable)
+- Audit log filters: custom dropdown components replacing native select
 
 **v5.0 — Complete UI Rebuild: "The Ethereal State" ✅ (2026-04-09)**
 - Full frontend rebuilt from scratch with premium design system (glassmorphism, Manrope/Inter typography, Material Design 3 colors)
@@ -89,8 +98,8 @@ app/
 - Design: Tailwind v4 CSS-based config, custom `glass-panel`/`glass-card`/`state-glow` utilities
 - Admin: SVG donut chart, horizontal bar chart, scrollable schedule, inline field editing
 - UX: 15+ iterations on spacing, corners, fonts, capacity display, search/filter layout
-**Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
-**Next step**: Final polish + deployment
+**Integrations**: Resend ✅ · Stripe ✅ · NorthFlank deployment pending
+**Next step**: Deployment to NorthFlank
 
 **v4.0 — Security Audit, Admin Accounts & UX Fixes ✅ (2026-04-09)**
 - Security: 17 bugs fixed via 8 parallel audit agents + 6 parallel fix agents

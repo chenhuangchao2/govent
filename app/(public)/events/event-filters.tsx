@@ -211,7 +211,7 @@ export default function EventFilters({ events }: { events: SerializedEvent[] }) 
         />
         <button
           onClick={() => setFreeOnly(!freeOnly)}
-          className={`glass-panel px-5 py-2.5 rounded-full text-sm font-medium cursor-pointer hover:bg-white/80 shadow-sm border border-white/60 ${freeOnly ? 'bg-primary text-white' : 'text-slate-700'}`}
+          className={`px-5 py-2.5 rounded-full text-sm font-medium cursor-pointer shadow-sm transition-colors ${freeOnly ? 'bg-primary text-white border border-primary' : 'bg-white/70 text-slate-700 border border-outline-variant/15 hover:bg-white/80'}`}
         >
           Free Only
         </button>
@@ -276,24 +276,10 @@ export default function EventFilters({ events }: { events: SerializedEvent[] }) 
                   <div className={`px-3 py-1 ${tagColorClass} text-[9px] font-black uppercase tracking-widest rounded-full font-label`}>
                     {tagLabel}
                   </div>
-                  {hasRestriction ? (
+                  {hasRestriction && (
                     <span className="px-2 py-0.5 bg-amber-100 text-amber-800 text-[9px] font-bold rounded-full font-label uppercase">
                       {restrictionLabel}
                     </span>
-                  ) : (
-                    <svg
-                      className="w-5 h-5 text-outline-variant group-hover:text-primary transition-colors"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
-                      />
-                    </svg>
                   )}
                 </div>
                 <h4 className="text-xl font-bold tracking-tight mb-2">

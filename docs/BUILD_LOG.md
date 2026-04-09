@@ -903,3 +903,50 @@ app/
 ```
 
 **Build**: 0 TypeScript errors, 16 frontend pages + 28 API routes compiled.
+
+---
+
+## v5.1 — Polish, Bug Fixes & Demo Data (2026-04-09)
+
+### Bug Fixes
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| Free Only button turns white (invisible text) | `glass-panel` bg overrode active state | Separate active/inactive class: `bg-primary text-white` vs `bg-white/70 text-slate-700` |
+| Paid event bulk approve fails silently | Stripe key in `.env` placeholder overwrote `.env.local` real key | Commented out placeholder keys in `.env`, let `.env.local` take precedence |
+| Set Featured "failed to update" | `isFeatured` not in API PATCH whitelist | Added `if (body.isFeatured !== undefined) data.isFeatured = Boolean(body.isFeatured)` |
+| Featured max 2 not enforced | No server-side limit | API checks `count({ isFeatured: true })` before allowing new featured |
+| Pricing editable (dangerous) | Could toggle paid→free with existing payments | Made pricing read-only in event edit with "cannot be changed" note |
+| Audit log event dropdown shows raw IDs | API didn't include event title | Added `event: { select: { title: true } }` to audit query include |
+| Audit log filter dropdowns unstyled | Used native `<select>` with `appearance-none` | Replaced with custom `FilterDropdown` component (click-to-open, pill style) |
+| Bulk approve: Stripe error swallowed | `Promise.allSettled` caught exception but didn't count it | Added per-registration try-catch with `failed` counter |
+| Static pages don't update after admin changes | Server Components pre-rendered at build time | Added `export const dynamic = "force-dynamic"` to all 9 DB-querying pages |
+| Turbopack dev mode `[turbopack]_runtime.js` crash | Next.js 15.5.14 Turbopack SSR bug | Switched to `next build --turbopack && next start` for dev |
+
+### UX Improvements
+
+| Change | Rationale |
+|--------|-----------|
+| Removed clipboard icon from event grid cards | Non-functional, confusing |
+| Removed Manual Check-in input from QR scanner tab | Registration IDs are cuid strings — no one types these manually |
+| Register page containers `rounded-xl` → `rounded-lg` | Consistent with admin panel rounded-corner rules |
+| Event filters dropdown `rounded-xl` → `rounded-lg` | Consistent border styling |
+
+### Demo Data
+
+Added 4 past ATTENDED events for Phoenix Chen (chenhuangchao2@gmail.com):
+- Digital Economy Symposium (4.5 CPD hours)
+- Data Governance Workshop (6.0 CPD hours)
+- Leadership in Public Service (3.0 CPD hours)
+- Cybersecurity Awareness Training (2.0 CPD hours)
+- **Total CPD: 15.5 hours** — visible on My Registrations page and "For Your Career" section
+
+### Dev Workflow
+
+| Before | After | Why |
+|--------|-------|-----|
+| `next dev --turbopack` | `next build --turbopack && next start` | Turbopack dev mode has SSR runtime bug in Next.js 15.5.14 |
+| `.env` had placeholder Stripe/Resend keys | `.env` keys commented out | Placeholders overwrote `.env.local` real keys at runtime |
+| `output: "standalone"` always on | Commented out for dev | Standalone mode doesn't auto-load `.env.local` at runtime |
+
+**Build**: 0 TypeScript errors. All features verified via curl + browser testing.

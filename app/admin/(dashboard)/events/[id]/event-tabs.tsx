@@ -1847,31 +1847,7 @@ function QrCheckin({
         </div>
       )}
 
-      {/* Manual ID input */}
-      <div className="glass-card rounded-md p-4">
-        <h4 className="text-xs font-bold font-label text-on-surface-variant uppercase tracking-wider mb-3">
-          Manual Check-in
-        </h4>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={manualId}
-            onChange={(e) => setManualId(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleManualCheckin();
-            }}
-            placeholder="Enter registration ID..."
-            className="flex-1 px-3 py-2 rounded bg-surface-container text-on-surface text-sm border border-outline-variant/30 focus:border-primary focus:ring-1 focus:ring-primary"
-          />
-          <button
-            onClick={handleManualCheckin}
-            disabled={processing || !manualId.trim()}
-            className="rounded-full px-4 py-2 text-sm font-bold bg-primary text-on-primary hover:bg-primary-container transition-colors disabled:opacity-50"
-          >
-            Check In
-          </button>
-        </div>
-      </div>
+      {/* Manual ID input removed — QR Scanner + Search covers all check-in scenarios */}
     </div>
   );
 }
