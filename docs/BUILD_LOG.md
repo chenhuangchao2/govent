@@ -775,3 +775,131 @@ Dispatched 8 specialised agents to audit the entire codebase in parallel: public
 | `try-catch` on email, not `throw` | Email is best-effort; registration is source of truth. Resend outage should not block user actions |
 
 **Build**: 0 TypeScript errors, 46 routes compiled.
+
+---
+
+## v5.0 — Complete UI Rebuild: "The Ethereal State" Design System (2026-04-09)
+
+### Overview
+Deleted the entire v4.0 frontend (63 files) and rebuilt from scratch using a new design system called **"The Ethereal State" (Sovereign Prism)**. The rebuild was driven by visual reference mockups in `design_reference/` and guided by `docs/FRONTEND_SPEC.md` (logic spec) + `docs/DESIGN.md` (visual spec).
+
+**Approach**: Template-first — extract Tailwind classes and structure from design reference HTML files, inject real data/logic. Parallel agent execution (5-7 agents per phase) for independent pages.
+
+### Design System: The Ethereal State
+
+| Element | Specification |
+|---------|--------------|
+| **Philosophy** | "The Sovereign Prism" — authority through clarity, depth, and light. Departure from bureaucratic aesthetic. |
+| **Colors** | Material Design 3 token system: deep institutional blues (`primary` #00478d), ethereal accents (`tertiary-fixed` #a1efff, `secondary-fixed` #dee0ff) |
+| **Typography** | Manrope (headlines, Extra Bold, tight tracking) + Inter (labels, small caps) via `next/font/google` |
+| **Surfaces** | Tonal layering (frosted glass metaphor): `glass-panel` (82% white, 40px blur, saturate 1.6), `glass-card` (with box-shadow) |
+| **Borders** | "No-Line Rule" — boundaries via tonal shifts and spacing, not opaque borders. Ghost borders at 20% opacity when needed |
+| **Corners** | Public pages: `rounded-xl` for hero cards, `rounded-full` for nav/buttons. Admin pages: `rounded-md` (8px) for containers, `rounded` (6px) for inputs — professional, minimal |
+| **Backgrounds** | Iridescent radial gradients + noise-overlay texture at 2% opacity |
+| **Tailwind** | v4 with CSS-based `@theme` config (not `tailwind.config.js`), custom colors in `globals.css`, form reset in `@layer base` |
+
+### Phase 1 — Public Core (5 parallel agents)
+
+| Page | Route | Key Features |
+|------|-------|-------------|
+| **Events Listing** | `/events` | Server Component + ISR, hero featured event (admin-selected via `isFeatured`), secondary card, client-side filters (Time/Topic/Open To/Free Only as glass pills), search bar inline with filters |
+| **Event Detail** | `/events/[id]` | 8:4 grid (hero + bento info cards + description / sticky sidebar), live countdown timer, registration status logic (registered/sign-in/register/waitlist/closed) |
+| **Registration** | `/register/[id]` | Glass-panel form, real-time email eligibility check, pre-fill from session, success screen with status-aware messaging |
+| **My Registrations** | `/my-registrations` | CPD hours summary, upcoming/past split, QR code (local `qrcode` lib), self-cancel with confirmation, status-specific card variants |
+
+**Design decisions:**
+- Hero layout: "极简平行" (Minimal Parallel) — title left, description right, bottom-aligned. Search + filter pills in single inline row.
+- Capacity display: Public shows "Seats Available" / "Waitlist Open" (no exact numbers) — prevents gaming.
+- QR generation: Switched from external `api.qrserver.com` to local `qrcode` npm package via dynamic import — no network dependency.
+
+### Phase 2 — Authentication (4 parallel agents)
+
+| Page | Route | Key Features |
+|------|-------|-------------|
+| **Participant Login** | `/login` | Left-right split glass-panel, form + decorative image with testimonial quote |
+| **Signup** | `/signup` | Two-step flow (form → OTP), compact layout matching login proportions |
+| **Forgot Password** | `/forgot-password` | Two-step flow (email → code + new password), same split layout |
+| **Admin Login** | `/admin/login` | "Admin Console" variant with shield icon, "Authenticate Node" CTA, "System Integrity: Optimal" quote |
+
+**Design decisions:**
+- Auth pages in `(auth)` route group — no PublicNav (standalone full-screen layout)
+- Signup compacted: title `text-3xl`, inputs `py-3 text-sm`, `space-y-3` — fits one screen
+- Shared visual: iridescent-bg gradient + accent-spot glow effects + glass-panel container
+
+### Phase 3 — Admin Dashboard (7 parallel agents + layout)
+
+| Page | Route | Key Features |
+|------|-------|-------------|
+| **Layout + Sidebar** | `admin/(dashboard)/layout.tsx` | Server-side auth check, fixed sidebar w-64, active state via `usePathname()`, user avatar + role badge, Super Admin conditional nav items |
+| **Dashboard** | `/admin` | 4 stat cards (parallel Prisma queries), analytics section: SVG donut chart (registration status), horizontal bar chart (popular topics), horizontally-scrollable upcoming schedule cards |
+| **Events List** | `/admin/events` | Status tabs (All/Published/Draft/Cancelled), capacity bars, pagination, Super Admin sees all + creator column |
+| **Create Event** | `/admin/events/new` | 4-section form (Basic/Schedule/Eligibility/Payment), tag pill toggles, real-time validation, **Save as Draft** + Create & Publish dual actions |
+| **Event Detail** | `/admin/events/[id]` | 3-tab layout — Overview (inline edit, all fields in single card with border separators), Registrations (search/filter/bulk approve/CSV export/reject modal), Check-in (QR scanner via @zxing + search fallback + live stats polling) |
+| **Blacklist** | `/admin/blacklist` | Search + source filter, incident bars, add/remove with confirmation dialogs |
+| **Audit Log** | `/admin/audit-log` | Period/Action/Event filters, date-grouped entries, color-coded action badges, pagination |
+| **Accounts** | `/admin/accounts` | Super Admin only, add admin dialog, reset password per-row |
+
+**Design decisions:**
+- Admin圆角分层: containers `rounded-md` (8px), inputs `rounded` (6px), modals `rounded-lg`, pills `rounded-full`
+- Page titles unified: all `text-3xl font-extrabold` across admin pages
+- Event edit: single white card container with `border-b` field separators (not individual cards per field)
+- Tag colors: unified neutral gray `bg-surface-container-high` (no per-tag rainbow colors)
+- Dashboard layout: Registration Status + Popular Topics side-by-side (row 1), Upcoming Schedule full-width horizontal scroll (row 2) — no forced equal-height stretching
+- Analytics charts: hand-written SVG (donut) + div-based bars — no Recharts dependency
+
+### Additional Features (3 parallel agents)
+
+| Feature | Implementation |
+|---------|---------------|
+| **Featured Event** | `isFeatured Boolean` on Event schema. Admin toggle (★/☆) in event detail. Public `/events` prioritizes `isFeatured` over auto-nearest. |
+| **CPD Hours Tracker** | Dynamic "For Your Career" section: static for guests, shows real CPD hours + events attended count for logged-in users |
+| **Event Certificates** | `/certificate/[id]` — formal government-style certificate (double border, navy/gold), A4 landscape print-optimized, `@media print` hides buttons |
+
+### UX Polish & Iterations
+
+| Issue | Fix |
+|-------|-----|
+| Nav bar translucent vs frosted | Increased glass-panel opacity 0.70→0.82, added `saturate(1.6)` |
+| Search box invisible against background | Form reset moved to `@layer base` so Tailwind utilities can override; added `bg-white/70 border border-outline-variant/30` |
+| Hero too left-heavy and empty | "极简平行" layout: title left + description right, bottom-aligned |
+| Search + filters on separate rows | Combined into single inline row with `flex-1` search + filter pills |
+| Nav active state not switching | Added `usePathname()` + conditional `border-b-2 border-blue-600` |
+| Signup page too long | Compacted: smaller title, tighter spacing, smaller inputs |
+| Auth pages showing PublicNav | Moved to `(auth)` route group (no nav layout) |
+| Admin圆角过多 | Unified: containers `rounded-md`, inputs `rounded`, reduced visual noise |
+| Event edit: too many individual cards | Single card container + `border-b` separators |
+| Capacity showing exact numbers publicly | Changed to "Seats Available" / "Waitlist Open" only |
+| QR code not loading | Switched from external API to local `qrcode` lib |
+| Blacklist reason truncated | Removed `max-w-xs truncate` |
+| Events not open for demo | Pushed all seed event dates to Apr 16-26, 2026 |
+| Create Event: no Save as Draft | Added dual action: "Save as Draft" + "Create & Publish" |
+| Turbopack HMR crashes | Documented in CLAUDE.md: always restart dev server after file changes |
+
+### Architecture Summary
+
+```
+app/
+├── (public)/          ← PublicNav + Footer layout
+│   ├── events/        ← listing (Server) + filters (Client)
+│   ├── events/[id]/   ← detail (Server) + sidebar (Client)
+│   ├── register/[id]/ ← form (Server + Client)
+│   ├── my-registrations/ ← Client Component
+│   └── public-nav.tsx
+├── (auth)/            ← No nav, standalone layouts
+│   ├── login/
+│   ├── signup/
+│   └── forgot-password/
+├── admin/
+│   ├── login/         ← Standalone admin login
+│   └── (dashboard)/   ← Sidebar layout + auth check
+│       ├── page.tsx (dashboard)
+│       ├── events/, events/new, events/[id]/
+│       ├── blacklist/
+│       ├── audit-log/
+│       └── accounts/
+├── certificate/[id]/  ← Standalone print-friendly certificate
+├── layout.tsx         ← Root: fonts, background accents
+└── globals.css        ← Tailwind v4 @theme + utilities
+```
+
+**Build**: 0 TypeScript errors, 16 frontend pages + 28 API routes compiled.

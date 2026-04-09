@@ -1,7 +1,7 @@
 # Data Flow Reference — GovEvent
 
 > Walkthrough preparation material — covers all data flows end-to-end.
-> Updated through Phase 2.4 (participant auth + power features).
+> Updated through v5.0 (complete UI rebuild + featured events + certificates).
 
 ---
 

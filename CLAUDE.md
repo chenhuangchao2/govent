@@ -76,9 +76,21 @@ app/
 - **v1.0-mvp** (git tag) — 2026-04-08 — Bare-bones MVP. All core flows wired up but rough edges throughout. See `docs/V1_STATUS.md` for known gaps.
 - **v2.0** — 2026-04-08 — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 - **v4.0** — 2026-04-09 — Security audit (17 bugs fixed), admin accounts, UX polish. See BUILD_LOG.md for full details.
+- **v5.0** — 2026-04-09 — Complete UI rebuild with "The Ethereal State" design system. 16 pages, 3 phases. See BUILD_LOG.md v5.0 section.
 
 ## Current Status
-**Version**: v4.0 complete (security audit + admin accounts + UX fixes)
+**Version**: v5.0 complete (UI rebuild + new features)
+
+**v5.0 — Complete UI Rebuild: "The Ethereal State" ✅ (2026-04-09)**
+- Full frontend rebuilt from scratch with premium design system (glassmorphism, Manrope/Inter typography, Material Design 3 colors)
+- 16 pages across 3 phases: Public (5), Auth (4), Admin (7) + certificate page
+- Schema: added `isFeatured Boolean` to Event for admin-managed featured events
+- New features: CPD Hours Tracker (dynamic), Event Certificates (printable), Featured Event admin toggle, Save as Draft
+- Design: Tailwind v4 CSS-based config, custom `glass-panel`/`glass-card`/`state-glow` utilities
+- Admin: SVG donut chart, horizontal bar chart, scrollable schedule, inline field editing
+- UX: 15+ iterations on spacing, corners, fonts, capacity display, search/filter layout
+**Integrations**: Resend ✅ · Stripe ✅ (local webhook via CLI) · NorthFlank deployment pending
+**Next step**: Final polish + deployment
 
 **v4.0 — Security Audit, Admin Accounts & UX Fixes ✅ (2026-04-09)**
 - Security: 17 bugs fixed via 8 parallel audit agents + 6 parallel fix agents
@@ -248,13 +260,23 @@ See `docs/V1_STATUS.md` for full gap list and `docs/superpowers/specs/2026-04-08
 - **`CLAUDE.md`** — update `Current Status` after each phase
 - **`prisma/schema.prisma`** — update when data model changes
 
-## After Batch File Changes
-When multiple files are modified in a short time (e.g. parallel agent fixes), Turbopack hot-reload can break and show "Internal Server Error". **Fix:**
+## After ANY File Changes (CRITICAL)
+Turbopack HMR is unreliable — editing even a single `.tsx` file can cause "Internal Server Error" in the browser. This is a known Next.js 15 + Turbopack issue, NOT a code bug.
+
+**Rule: After EVERY file modification, restart the dev server before telling the user to test.**
+
 ```bash
-# Kill existing dev server and restart
-lsof -i :3000 -t | xargs kill -9 2>/dev/null; sleep 1; npx next dev --turbopack -p 3000
+lsof -i :3000 -t | xargs kill -9 2>/dev/null; sleep 2; npx next dev --turbopack -p 3000
 ```
-Always restart the dev server after batch modifications before testing.
+
+**Workflow:**
+1. Make file changes
+2. Run `npx next build --turbopack` to verify no TS errors
+3. Restart dev server (command above)
+4. Verify with `curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/...`
+5. THEN tell the user to refresh
+
+**Never** tell the user to "just refresh" without first confirming the dev server is alive and returning 200.
 
 ## Do NOT
 - Do not add test files — out of scope

@@ -81,6 +81,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (body.cpdHours !== undefined) data.cpdHours = Number(body.cpdHours)
   if (body.isPaid !== undefined) data.isPaid = Boolean(body.isPaid)
   if (body.price !== undefined) data.price = body.price != null ? Number(body.price) : null
+  if (body.isFeatured !== undefined) {
+    const wantFeatured = Boolean(body.isFeatured)
+    if (wantFeatured) {
+      // Max 2 featured events allowed
+      const featuredCount = await db.event.count({ where: { isFeatured: true, id: { not: id } } })
+      if (featuredCount >= 2) {
+        return NextResponse.json({ data: null, error: 'Maximum 2 featured events allowed. Please unfeature one first.' }, { status: 400 })
+      }
+    }
+    data.isFeatured = wantFeatured
+  }
 
   // Ownership check for general update
   const existing = await db.event.findUnique({ where: { id } })

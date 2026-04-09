@@ -11,7 +11,10 @@ export async function GET(req: NextRequest) {
 
   const logs = await db.auditLog.findMany({
     where: eventId ? { eventId } : {},
-    include: { actor: { select: { name: true, email: true } } },
+    include: {
+      actor: { select: { name: true, email: true } },
+      event: { select: { title: true } },
+    },
     orderBy: { createdAt: 'desc' },
     take: 200,
   })

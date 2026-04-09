@@ -1,0 +1,164 @@
+@import "tailwindcss";
+
+/*
+ * Design System: The Ethereal State (Sovereign Prism)
+ * Tailwind v4 CSS-based configuration
+ */
+
+@theme {
+  /* ── Colors: Primary ── */
+  --color-primary: #00478d;
+  --color-primary-container: #005eb8;
+  --color-primary-fixed: #d6e3ff;
+  --color-primary-fixed-dim: #a9c7ff;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #c8daff;
+  --color-on-primary-fixed: #001b3d;
+  --color-on-primary-fixed-variant: #00468c;
+  --color-inverse-primary: #a9c7ff;
+
+  /* ── Colors: Secondary ── */
+  --color-secondary: #4858ab;
+  --color-secondary-container: #96a5ff;
+  --color-secondary-fixed: #dee0ff;
+  --color-secondary-fixed-dim: #bac3ff;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #27378a;
+  --color-on-secondary-fixed: #00105b;
+  --color-on-secondary-fixed-variant: #2f3f92;
+
+  /* ── Colors: Tertiary ── */
+  --color-tertiary: #004f5a;
+  --color-tertiary-container: #006977;
+  --color-tertiary-fixed: #a1efff;
+  --color-tertiary-fixed-dim: #44d8f1;
+  --color-on-tertiary: #ffffff;
+  --color-on-tertiary-container: #78e9ff;
+  --color-on-tertiary-fixed: #001f25;
+  --color-on-tertiary-fixed-variant: #004e59;
+
+  /* ── Colors: Surface & Background ── */
+  --color-surface: #f8f9fa;
+  --color-surface-dim: #d9dadb;
+  --color-surface-bright: #f8f9fa;
+  --color-surface-variant: #e1e3e4;
+  --color-surface-tint: #005db6;
+  --color-surface-container: #edeeef;
+  --color-surface-container-low: #f3f4f5;
+  --color-surface-container-high: #e7e8e9;
+  --color-surface-container-highest: #e1e3e4;
+  --color-surface-container-lowest: #ffffff;
+  --color-background: #f8f9fa;
+  --color-on-surface: #191c1d;
+  --color-on-surface-variant: #424752;
+  --color-on-background: #191c1d;
+  --color-inverse-surface: #2e3132;
+  --color-inverse-on-surface: #f0f1f2;
+
+  /* ── Colors: Outline ── */
+  --color-outline: #727783;
+  --color-outline-variant: #c2c6d4;
+
+  /* ── Colors: Error ── */
+  --color-error: #ba1a1a;
+  --color-error-container: #ffdad6;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+
+  /* ── Border Radius ── */
+  --radius-DEFAULT: 1rem;
+  --radius-lg: 2rem;
+  --radius-xl: 3rem;
+  --radius-full: 9999px;
+
+  /* ── Font Families ── */
+  --font-headline: "Manrope", sans-serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Inter", sans-serif;
+}
+
+/* ── Utility Classes (use @layer to survive Tailwind v4 cascade) ── */
+
+@layer utilities {
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.82);
+    backdrop-filter: blur(40px) saturate(1.6);
+    -webkit-backdrop-filter: blur(40px) saturate(1.6);
+    border: 1px solid rgba(194, 198, 212, 0.2);
+  }
+
+  .iridescent-glow {
+    background: radial-gradient(
+      circle at center,
+      rgba(161, 239, 255, 0.15) 0%,
+      transparent 70%
+    );
+  }
+
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(40px) saturate(1.6);
+    -webkit-backdrop-filter: blur(40px) saturate(1.6);
+    border: 1px solid rgba(194, 198, 212, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(0, 71, 141, 0.08);
+  }
+
+  .state-glow {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(161, 239, 255, 0.15) 0%, transparent 70%);
+    filter: blur(100px);
+    opacity: 0.15;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  .iridescent-bg {
+    background: radial-gradient(circle at 0% 0%, #dee0ff 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, #a1efff 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #f8f9fa 0%, #edeeef 100%);
+  }
+
+  .accent-spot {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(161, 239, 255, 0.15) 0%, transparent 70%);
+    filter: blur(100px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .noise-overlay {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.02;
+    pointer-events: none;
+  }
+}
+
+/* ── Form reset (in @layer base so Tailwind utilities can override) ── */
+@layer base {
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="tel"],
+  textarea,
+  select {
+    appearance: none;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    background-color: transparent;
+  }
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  input[type="tel"]:focus,
+  textarea:focus,
+  select:focus {
+    box-shadow: none;
+    outline: none;
+  }
+}

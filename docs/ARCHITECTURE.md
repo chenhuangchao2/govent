@@ -14,11 +14,13 @@ Government agencies run workshops and training sessions using Google Forms. This
 │                                                                  │
 │   Public Pages                      Admin Pages                  │
 │   /events          (Server+Client) /admin            (Server+C)  │
-│   /events/[id]     (Server+Client) /admin/events     (Server)    │
-│   /register/[id]   (Client)        /admin/events/[id](S+Client)  │
-│   /my-registrations(Client)        /admin/audit-log  (S+Client)  │
+│   /events/[id]     (Server+Client) /admin/events     (Server+C)  │
+│   /register/[id]   (Server+Client) /admin/events/new (Client)    │
+│   /my-registrations(Client)        /admin/events/[id](S+Client)  │
 │   /login           (Client)        /admin/blacklist  (S+Client)  │
-│   /signup          (Client)                                      │
+│   /signup          (Client)        /admin/audit-log  (Client)    │
+│   /forgot-password (Client)        /admin/accounts   (S+Client)  │
+│   /certificate/[id](Server)                                      │
 └──────────────┬───────────────────────────────┬───────────────────┘
                │ HTTP                           │ HTTP
                ▼                               ▼
