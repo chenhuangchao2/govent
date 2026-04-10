@@ -996,7 +996,7 @@ Created `/api/seed` endpoint (protected by `CRON_SECRET` header):
 | Registrations | 130+ | Realistic distribution: PENDING, APPROVED, WAITLISTED (only on full events), REJECTED, CANCELLED |
 | Blacklist | 3 | AUTO_NO_SHOW, AUTO_PAYMENT, MANUAL sources |
 | Audit log | 12 | CREATE, PUBLISH, APPROVE, REJECT, BULK_APPROVE, CHECKIN, BROADCAST, EDIT |
-| Participant | 1 | demo@gov.sg / demo123 (verified, with CPD history) |
+| Participant | 1 | chenhuangchao2@gmail.com / demo123 (verified, with CPD history) |
 
 ### Environment Variables (NorthFlank)
 

@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GovEvent — Documentation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --primary: #00478d;
+    --primary-container: #005eb8;
+    --primary-fixed: #d6e3ff;
+    --primary-fixed-dim: #a9c7ff;
+    --secondary: #4858ab;
+    --secondary-fixed: #dee0ff;
+    --tertiary: #004f5a;
+    --tertiary-fixed: #a1efff;
+    --surface: #f8f9fa;
+    --surface-container: #edeeef;
+    --surface-container-high: #e7e8e9;
+    --surface-container-low: #f3f4f5;
+    --on-surface: #191c1d;
+    --on-surface-variant: #424752;
+    --outline: #727783;
+    --outline-variant: #c2c6d4;
+    --error: #ba1a1a;
+    --error-container: #ffdad6;
+  }
+
+  body {
+    font-family: 'Manrope', system-ui, sans-serif;
+    background: var(--surface);
+    color: var(--on-surface);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Slide System ── */
+  .slide {
+    position: fixed; inset: 0;
+    display: none; flex-direction: column;
+    padding: 48px 64px;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; }
+
+  /* ── Background: iridescent-bg from globals.css ── */
+  .slide::before {
+    content: '';
+    position: absolute; inset: 0; z-index: -2;
+    background:
+      radial-gradient(circle at 0% 0%, #dee0ff 0%, transparent 40%),
+      radial-gradient(circle at 100% 100%, #a1efff 0%, transparent 40%),
+      radial-gradient(circle at 50% 50%, #f8f9fa 0%, #edeeef 100%);
+  }
+  /* accent spots matching layout.tsx */
+  .slide::after {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(161,239,255,0.15) 0%, transparent 70%);
+    filter: blur(100px);
+    z-index: -1; pointer-events: none;
+  }
+
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ── Typography (matching app) ── */
+  .font-headline { font-family: 'Manrope', sans-serif; }
+  .font-label { font-family: 'Inter', sans-serif; }
+
+  h1 {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800; font-size: 3.2rem;
+    letter-spacing: -0.04em; color: var(--primary);
+    line-height: 1.1;
+  }
+  h2 {
+    font-family: 'Manrope', sans-serif;
+    font-weight: 800; font-size: 1.5rem;
+    letter-spacing: -0.03em; color: var(--on-surface);
+    line-height: 1.2; margin-bottom: 24px;
+  }
+  h3 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700; font-size: 0.68rem;
+    letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--primary); margin-bottom: 10px;
+  }
+
+  p { font-size: 0.88rem; line-height: 1.55; color: var(--on-surface-variant); }
+  li { font-size: 0.84rem; line-height: 1.5; color: var(--on-surface-variant); margin-bottom: 3px; }
+  strong { color: var(--on-surface); font-weight: 700; }
+  ul { padding-left: 16px; }
+
+  /* ── Section label ── */
+  .section-label {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--outline); margin-bottom: 8px;
+  }
+
+  /* ── Glass components (exact match from globals.css) ── */
+  .glass-panel {
+    background: rgba(255,255,255,0.82);
+    backdrop-filter: blur(40px) saturate(1.6);
+    -webkit-backdrop-filter: blur(40px) saturate(1.6);
+    border: 1px solid rgba(194,198,212,0.2);
+    border-radius: 16px;
+    padding: 24px;
+  }
+  .glass-card {
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(40px) saturate(1.6);
+    -webkit-backdrop-filter: blur(40px) saturate(1.6);
+    border: 1px solid rgba(194,198,212,0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 32px 0 rgba(0,71,141,0.08);
+  }
+
+  /* ── Pills (rounded-full like app) ── */
+  .pill {
+    display: inline-block; padding: 3px 12px;
+    border-radius: 9999px; font-family: 'Inter', sans-serif;
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .pill-primary { background: var(--primary-fixed); color: var(--primary); }
+  .pill-secondary { background: var(--secondary-fixed); color: var(--secondary); }
+  .pill-tertiary { background: rgba(161,239,255,0.3); color: var(--tertiary); }
+  .pill-surface { background: var(--surface-container-high); color: var(--on-surface-variant); }
+  .pill-error { background: var(--error-container); color: var(--error); }
+  .pill-success { background: #d4edda; color: #155724; }
+
+  /* ── Layout helpers ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+  .flex-col { display: flex; flex-direction: column; }
+  .gap-8 { gap: 8px; }
+  .gap-10 { gap: 10px; }
+  .gap-12 { gap: 12px; }
+  .flex-1 { flex: 1; }
+
+  /* ── Tables ── */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--outline); text-align: left;
+    padding: 6px 10px; border-bottom: 1px solid rgba(194,198,212,0.3);
+  }
+  td {
+    font-size: 0.82rem; color: var(--on-surface-variant);
+    padding: 7px 10px; border-bottom: 1px solid rgba(194,198,212,0.1);
+    line-height: 1.4;
+  }
+
+  /* ── State nodes (for lifecycle diagram) ── */
+  .state {
+    display: inline-flex; align-items: center;
+    padding: 5px 12px; border-radius: 8px;
+    font-size: 0.72rem; font-weight: 700;
+    font-family: 'Inter', sans-serif;
+    white-space: nowrap;
+  }
+  .arrow { color: var(--outline); font-size: 0.85rem; margin: 0 6px; }
+
+  /* ── Architecture boxes ── */
+  .arch-box {
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; padding: 12px 16px;
+    border-radius: 12px; text-align: center;
+  }
+  .arch-box strong { font-size: 0.8rem; }
+  .arch-box span { font-size: 0.65rem; color: inherit; opacity: 0.7; font-weight: 500; }
+
+  /* ── Navigation ── */
+  .nav {
+    position: fixed; bottom: 20px; left: 0; right: 0;
+    display: flex; justify-content: center; align-items: center; gap: 12px;
+    z-index: 100;
+  }
+  .nav-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--outline-variant); border: none;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .nav-dot.active { background: var(--primary); width: 24px; border-radius: 4px; }
+  .nav-counter {
+    position: fixed; bottom: 20px; right: 32px;
+    font-family: 'Inter', sans-serif; font-size: 0.7rem;
+    color: var(--outline); z-index: 100;
+  }
+  .nav-hint {
+    position: fixed; bottom: 20px; left: 32px;
+    font-family: 'Inter', sans-serif; font-size: 0.65rem;
+    color: var(--outline-variant); z-index: 100;
+  }
+
+  @media print {
+    .slide { display: flex !important; position: relative; min-height: 100vh; page-break-after: always; }
+    .nav, .nav-counter, .nav-hint { display: none; }
+    body { overflow: visible; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ SLIDE 0: TITLE ════════════════════ -->
+<div class="slide active" data-slide="0">
+  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:680px;">
+    <div class="section-label">DAP GovTech — Technical Consultant Assessment</div>
+    <h1 style="margin-bottom:16px;">GovEvent</h1>
+    <p style="font-size:1.15rem; color:var(--on-surface-variant); line-height:1.6; margin-bottom:40px; font-weight:500;">
+      Internal Government Event & Workshop Registration System.<br>
+      Automates the full lifecycle — from registration to check-in — replacing manual form-and-spreadsheet workflows.
+    </p>
+
+    <div class="glass-panel" style="display:inline-flex; gap:40px; padding:20px 28px; width:fit-content;">
+      <div>
+        <div class="section-label" style="margin-bottom:4px;">Candidate</div>
+        <strong style="font-size:0.9rem;">Huang Chao</strong>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:4px;">Live URL</div>
+        <strong style="font-size:0.9rem;">govevent.csaia.sg</strong>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:4px;">Source</div>
+        <strong style="font-size:0.9rem;">github.com/chenhuangchao2/govent</strong>
+      </div>
+      <div>
+        <div class="section-label" style="margin-bottom:4px;">Built With</div>
+        <strong style="font-size:0.9rem;">Claude Code + Stitch</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 1: PROBLEM ════════════════════ -->
+<div class="slide" data-slide="1">
+  <div class="section-label">01 — Problem Statement</div>
+  <h2>FormSG Collects Data — But Has No Concept of Registration State</h2>
+
+  <div class="grid-2" style="flex:1; align-items:start;">
+    <div class="flex-col gap-12">
+      <p>Agencies use <strong>FormSG</strong> to collect event sign-ups. But FormSG is a form builder — once data is submitted, <strong>everything else is manual</strong>.</p>
+
+      <div class="glass-card" style="border-left:3px solid var(--error);">
+        <h3 style="color:var(--error);">No Atomic State</h3>
+        <p>Cannot enforce capacity limits at registration time. No waitlist. No status tracking. Eligibility checked manually after the fact.</p>
+      </div>
+      <div class="glass-card" style="border-left:3px solid var(--error);">
+        <h3 style="color:var(--error);">Manual Operations</h3>
+        <p>Approval, payment, reminders, attendance — all via email chains and Excel. One coordinator manages everything.</p>
+      </div>
+      <div class="glass-card" style="border-left:3px solid var(--error);">
+        <h3 style="color:var(--error);">No Audit Trail</h3>
+        <p>No record of who approved whom or when. IM8 governance requires actor-level accountability.</p>
+      </div>
+    </div>
+
+    <div class="flex-col gap-12">
+      <p><strong>GovEvent</strong> automates the entire workflow, with every action auditable and every rule enforced server-side.</p>
+
+      <div class="glass-card" style="border-left:3px solid var(--primary);">
+        <h3>Server-Side Eligibility</h3>
+        <p>Email domain, blacklist, and capacity enforced atomically at registration time. Prisma <code style="font-size:0.78em; background:var(--surface-container-high); padding:1px 5px; border-radius:4px;">$transaction</code> prevents race conditions.</p>
+      </div>
+      <div class="glass-card" style="border-left:3px solid var(--primary);">
+        <h3>Automated State Machine</h3>
+        <p>PENDING → Approve → Payment → Check-in → No-Show. Every transition triggers email notification.</p>
+      </div>
+      <div class="glass-card" style="border-left:3px solid var(--primary);">
+        <h3>Immutable Audit Log</h3>
+        <p>Every organiser action logged with timestamp, actor, and context. Append-only design.</p>
+      </div>
+      <div class="glass-card" style="border-left:3px solid var(--primary);">
+        <h3>GCC-Portable Architecture</h3>
+        <p>Containerised — currently NorthFlank, portable to GCC-aligned infrastructure (AWS/Azure SG).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 2: ARCHITECTURE ════════════════════ -->
+<div class="slide" data-slide="2">
+  <div class="section-label">02 — Architecture Overview</div>
+  <h2>Single Service — Frontend, API, and Database in One Container</h2>
+
+  <div class="grid-2" style="flex:1; align-items:start;">
+    <!-- Diagram -->
+    <div class="glass-panel" style="display:flex; flex-direction:column; align-items:center; gap:12px; padding:28px;">
+      <div class="arch-box" style="background:var(--surface-container-high); width:200px;">
+        <strong>Browser</strong><span>16 pages</span>
+      </div>
+      <div style="color:var(--outline); font-size:0.8rem;">↓ HTTP</div>
+      <div class="arch-box" style="background:var(--primary); color:white; width:280px; padding:16px;">
+        <strong style="color:white;">Next.js 15 App Router</strong>
+        <span style="color:rgba(255,255,255,0.7);">Server Components + 28 API Routes</span>
+      </div>
+      <div style="color:var(--outline); font-size:0.8rem;">↓</div>
+      <div style="display:flex; gap:10px;">
+        <div class="arch-box" style="background:var(--primary-fixed); color:var(--primary); padding:10px 14px;">
+          <strong>PostgreSQL</strong><span>Prisma 5</span>
+        </div>
+        <div class="arch-box" style="background:var(--secondary-fixed); color:var(--secondary); padding:10px 14px;">
+          <strong>Stripe</strong><span>Pay + Webhook</span>
+        </div>
+        <div class="arch-box" style="background:rgba(161,239,255,0.3); color:var(--tertiary); padding:10px 14px;">
+          <strong>Resend</strong><span>Email + OTP</span>
+        </div>
+        <div class="arch-box" style="background:var(--surface-container-high); padding:10px 14px;">
+          <strong>Cron</strong><span>Hourly jobs</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tech stack + models -->
+    <div class="flex-col" style="gap:20px;">
+      <div>
+        <h3>Tech Stack</h3>
+        <table>
+          <tr><th style="width:30%;">Layer</th><th>Choice</th></tr>
+          <tr><td><strong>Framework</strong></td><td>Next.js 15 + TypeScript</td></tr>
+          <tr><td><strong>Database</strong></td><td>PostgreSQL (NorthFlank managed)</td></tr>
+          <tr><td><strong>ORM</strong></td><td>Prisma 5 — schema-first, AI-friendly</td></tr>
+          <tr><td><strong>UI</strong></td><td>Tailwind CSS v4 — utility-first</td></tr>
+          <tr><td><strong>Auth</strong></td><td>iron-session — simple, no third-party</td></tr>
+          <tr><td><strong>Deploy</strong></td><td>Docker → NorthFlank — auto on push</td></tr>
+        </table>
+      </div>
+
+      <div>
+        <h3>Data Models</h3>
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+          <div style="background:var(--primary-fixed); padding:8px 12px; border-radius:8px; text-align:center;">
+            <strong style="font-size:0.78rem; color:var(--primary);">Event</strong>
+          </div>
+          <div style="background:var(--primary-fixed); padding:8px 12px; border-radius:8px; text-align:center;">
+            <strong style="font-size:0.78rem; color:var(--primary);">Registration</strong>
+          </div>
+          <div style="background:var(--primary-fixed); padding:8px 12px; border-radius:8px; text-align:center;">
+            <strong style="font-size:0.78rem; color:var(--primary);">AuditLog</strong>
+          </div>
+          <div style="background:var(--surface-container-high); padding:8px 12px; border-radius:8px; text-align:center;">
+            <strong style="font-size:0.78rem;">User</strong>
+          </div>
+          <div style="background:var(--surface-container-high); padding:8px 12px; border-radius:8px; text-align:center;">
+            <strong style="font-size:0.78rem;">Participant</strong>
+          </div>
+          <div style="background:var(--surface-container-high); padding:8px 12px; border-radius:8px; text-align:center;">
+            <strong style="font-size:0.78rem;">Blacklist</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="glass-card" style="padding:12px 16px;">
+        <p style="font-size:0.82rem;"><strong>Why monolith?</strong> One container to deploy. Claude Code sees full data flow in one context window — produces more consistent output.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 3: COMPONENTS ════════════════════ -->
+<div class="slide" data-slide="3">
+  <div class="section-label">03 — Key Components</div>
+  <h2>16 Pages, 28 API Routes, 3 External Integrations</h2>
+
+  <div class="grid-3" style="flex:1; align-items:start; gap:20px;">
+    <!-- Frontend -->
+    <div>
+      <h3>Frontend — 16 Pages</h3>
+      <div class="glass-card" style="margin-bottom:10px;">
+        <div style="margin-bottom:6px;"><span class="pill pill-primary">Public</span> <span style="font-size:0.75rem; color:var(--outline); margin-left:4px;">5 pages</span></div>
+        <ul>
+          <li>Events listing + search & filters</li>
+          <li>Event detail + registration status</li>
+          <li>Registration form (eligibility check)</li>
+          <li>My Registrations (QR, CPD hours)</li>
+          <li>Event Certificate (printable A4)</li>
+        </ul>
+      </div>
+      <div class="glass-card" style="margin-bottom:10px;">
+        <div style="margin-bottom:6px;"><span class="pill pill-secondary">Auth</span> <span style="font-size:0.75rem; color:var(--outline); margin-left:4px;">4 pages</span></div>
+        <ul>
+          <li>Login, Signup (OTP verification)</li>
+          <li>Forgot password, Admin login</li>
+        </ul>
+      </div>
+      <div class="glass-card">
+        <div style="margin-bottom:6px;"><span class="pill pill-tertiary">Admin</span> <span style="font-size:0.75rem; color:var(--outline); margin-left:4px;">7 pages</span></div>
+        <ul>
+          <li>Dashboard (stats + SVG charts)</li>
+          <li>Events CRUD + inline editing</li>
+          <li>Registrations (bulk approve, CSV)</li>
+          <li>QR check-in + live stats</li>
+          <li>Blacklist, Audit Log, Accounts</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Backend -->
+    <div>
+      <h3>Backend — 28 API Routes</h3>
+      <div class="glass-card" style="margin-bottom:10px;">
+        <p style="margin-bottom:8px;">All routes return <code style="font-size:0.78em; background:var(--surface-container-high); padding:1px 5px; border-radius:4px;">{ data, error }</code></p>
+        <table>
+          <tr><td><strong>POST</strong></td><td>/registrations</td></tr>
+          <tr><td><strong>PATCH</strong></td><td>/registrations/[id]</td></tr>
+          <tr><td><strong>POST</strong></td><td>/bulk-approve</td></tr>
+          <tr><td><strong>POST</strong></td><td>/[id]/checkin</td></tr>
+          <tr><td><strong>POST</strong></td><td>/webhook/stripe</td></tr>
+          <tr><td><strong>GET</strong></td><td>/cron/*</td></tr>
+        </table>
+      </div>
+      <div class="glass-card">
+        <p style="font-size:0.82rem;"><strong>Atomic registration:</strong> <code style="font-size:0.78em; background:var(--surface-container-high); padding:1px 5px; border-radius:4px;">db.$transaction()</code> — capacity check + insert are one operation. No double-booking.</p>
+      </div>
+    </div>
+
+    <!-- Integrations -->
+    <div>
+      <h3>Integrations</h3>
+      <div class="glass-card" style="margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+          <strong style="font-size:0.88rem;">Stripe</strong>
+          <span class="pill pill-secondary" style="font-size:0.6rem;">Outbound + Inbound</span>
+        </div>
+        <p>Create Checkout Session → participant pays → webhook confirms → status updated. Signature verified, checks <code style="font-size:0.78em; background:var(--surface-container-high); padding:1px 5px; border-radius:4px;">isCancelled</code>.</p>
+      </div>
+      <div class="glass-card" style="margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+          <strong style="font-size:0.88rem;">Resend</strong>
+          <span class="pill pill-tertiary" style="font-size:0.6rem;">Outbound</span>
+        </div>
+        <p>Email at every transition: confirmation, approval, payment link, T-48h reminder, OTP, broadcast. Best-effort — failures don't roll back.</p>
+      </div>
+      <div class="glass-card">
+        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
+          <strong style="font-size:0.88rem;">NorthFlank Cron</strong>
+          <span class="pill pill-surface" style="font-size:0.6rem;">Hourly</span>
+        </div>
+        <p>Reminders (T-48h), No-Show marking + auto-blacklist, Payment timeout (24h) + waitlist promote. Idempotent via flags.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 4: DATA FLOW ════════════════════ -->
+<div class="slide" data-slide="4">
+  <div class="section-label">04 — Data Flow</div>
+  <h2>Registration Lifecycle — End-to-End State Machine</h2>
+
+  <div class="glass-panel" style="padding:28px; margin-bottom:16px;">
+    <!-- Row 1: Main flow -->
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
+      <span class="state" style="background:var(--surface-container-high);">Register</span>
+      <span class="arrow">→</span>
+      <span class="state" style="background:var(--primary-fixed); color:var(--primary);">PENDING</span>
+      <span class="arrow">→</span>
+      <span class="state" style="background:var(--surface-container-high);">Admin reviews</span>
+      <span class="arrow">→</span>
+      <span class="state pill-success">APPROVED</span>
+      <span style="font-size:0.72rem; color:var(--outline); margin:0 4px;">or</span>
+      <span class="state" style="background:var(--error-container); color:var(--error);">REJECTED</span>
+      <span style="font-size:0.72rem; color:var(--outline); margin:0 4px;">or</span>
+      <span class="state" style="background:var(--secondary-fixed); color:var(--secondary);">WAITLISTED</span>
+      <span style="font-size:0.72rem; color:var(--outline); margin-left:4px;">(if full)</span>
+    </div>
+
+    <!-- Row 2: Paid event branch -->
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:18px; padding-left:20px;">
+      <span style="font-size:0.72rem; color:var(--outline); margin-right:4px;">Paid event:</span>
+      <span class="state pill-success">APPROVED</span>
+      <span class="arrow">→</span>
+      <span class="state" style="background:var(--secondary-fixed); color:var(--secondary);">PENDING_PAYMENT</span>
+      <span class="arrow">→</span>
+      <span class="state" style="background:rgba(161,239,255,0.3); color:var(--tertiary);">Stripe pays</span>
+      <span class="arrow">→</span>
+      <span class="state pill-success">APPROVED</span>
+      <span style="font-size:0.72rem; color:var(--outline); margin:0 8px;">|</span>
+      <span style="font-size:0.72rem; color:var(--outline);">24h timeout →</span>
+      <span class="state" style="background:var(--error-container); color:var(--error);">FAILED</span>
+      <span class="arrow">→</span>
+      <span style="font-size:0.72rem; color:var(--outline);">waitlist promoted</span>
+    </div>
+
+    <!-- Row 3: Check-in branch -->
+    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding-left:20px;">
+      <span style="font-size:0.72rem; color:var(--outline); margin-right:4px;">Event day:</span>
+      <span class="state pill-success">APPROVED</span>
+      <span class="arrow">→</span>
+      <span class="state" style="background:var(--surface-container-high);">QR scan</span>
+      <span class="arrow">→</span>
+      <span class="state" style="background:var(--primary); color:white;">ATTENDED</span>
+      <span style="font-size:0.72rem; color:var(--outline); margin:0 8px;">|</span>
+      <span style="font-size:0.72rem; color:var(--outline);">absent →</span>
+      <span class="state" style="background:var(--error-container); color:var(--error);">NO_SHOW</span>
+      <span class="arrow">→</span>
+      <span style="font-size:0.72rem; color:var(--outline);">≥5 →</span>
+      <span class="state" style="background:var(--error); color:white;">Blacklisted</span>
+    </div>
+  </div>
+
+  <div class="grid-3" style="gap:14px;">
+    <div class="glass-card" style="padding:14px 18px;">
+      <p style="font-size:0.82rem;"><strong>Every transition</strong> triggers a Resend email and an audit log entry.</p>
+    </div>
+    <div class="glass-card" style="padding:14px 18px;">
+      <p style="font-size:0.82rem;"><strong>Waitlist</strong> auto-promotes when a seat opens (cancel, reject, or payment timeout).</p>
+    </div>
+    <div class="glass-card" style="padding:14px 18px;">
+      <p style="font-size:0.82rem;"><strong>Cron jobs</strong> run hourly: reminders, no-show marking, payment expiry. All idempotent.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 5: ASSUMPTIONS & IMPROVEMENTS ════════════════════ -->
+<div class="slide" data-slide="5">
+  <div class="section-label">05 — Assumptions, Limitations & Production Readiness</div>
+  <h2>What This Prototype Is — and What Production Would Require</h2>
+
+  <div class="grid-2" style="flex:1; align-items:start;">
+    <div class="flex-col" style="gap:16px;">
+      <div>
+        <h3>Prototype Scope</h3>
+        <div class="glass-card">
+          <ul>
+            <li>Single agency deployment (not multi-tenant)</li>
+            <li>Unclassified data only (no Confidential/Secret)</li>
+            <li>Email as participant identifier</li>
+            <li>Admin accounts managed by Super Admin</li>
+            <li>Stripe test mode — no real payments</li>
+          </ul>
+        </div>
+      </div>
+      <div>
+        <h3>Known Limitations</h3>
+        <div class="glass-card">
+          <ul>
+            <li>No Singpass/Corppass (email + password auth)</li>
+            <li>No real-time push (polling / page refresh)</li>
+            <li>No multi-level approval chain</li>
+            <li>No automated test suite</li>
+            <li>No data retention / deletion policy (PDPA)</li>
+            <li>Single-region (no HA/failover)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex-col" style="gap:10px;">
+      <h3 style="margin-top:0;">For Production</h3>
+
+      <div class="glass-card" style="padding:12px 18px;">
+        <div style="margin-bottom:4px;"><span class="pill pill-primary" style="font-size:0.6rem;">Compliance</span></div>
+        <ul>
+          <li><strong>Singpass/Corppass</strong> — national identity verification</li>
+          <li><strong>PDPA</strong> — data retention policy, DPIA assessment</li>
+          <li><strong>DSS + WCAG 2.1 AA</strong> — Digital Service Standards</li>
+          <li><strong>IM8</strong> — App Security classification before go-live</li>
+        </ul>
+      </div>
+
+      <div class="glass-card" style="padding:12px 18px;">
+        <div style="margin-bottom:4px;"><span class="pill pill-error" style="font-size:0.6rem;">Security</span></div>
+        <ul>
+          <li><strong>Zod validation</strong> on all API inputs</li>
+          <li><strong>OWASP Top 10</strong> penetration testing</li>
+          <li><strong>Rate limiting</strong> on auth + registration</li>
+        </ul>
+      </div>
+
+      <div class="glass-card" style="padding:12px 18px;">
+        <div style="margin-bottom:4px;"><span class="pill pill-tertiary" style="font-size:0.6rem;">Scalability</span></div>
+        <ul>
+          <li><strong>BullMQ</strong> — async email queue</li>
+          <li><strong>WebSocket</strong> — real-time check-in stats</li>
+          <li><strong>GCC</strong> — AWS/Azure Singapore region</li>
+        </ul>
+      </div>
+
+      <div class="glass-card" style="padding:12px 18px;">
+        <div style="margin-bottom:4px;"><span class="pill pill-surface" style="font-size:0.6rem;">Business Logic</span></div>
+        <ul>
+          <li><strong>Multi-level approval</strong> — coordinator → director</li>
+          <li><strong>Integration tests</strong> — core business flow</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 6: AI WORKFLOW ════════════════════ -->
+<div class="slide" data-slide="6">
+  <div class="section-label">06 — How I Built This</div>
+  <h2>AI-Assisted Development — What I Directed vs. What I Fixed</h2>
+
+  <div class="grid-2" style="flex:1; align-items:start;">
+    <div class="flex-col" style="gap:16px;">
+      <div>
+        <h3>Approach</h3>
+        <p style="margin-bottom:14px;">Claude Code as primary tool. Stitch for design mockups. Key technique: <strong>parallel agent execution</strong> — 5–8 agents on independent tasks simultaneously.</p>
+        <table>
+          <tr><th>Stage</th><th>Method</th></tr>
+          <tr><td>Schema + API</td><td>Single agent — sequential dependencies</td></tr>
+          <tr><td>Requirements</td><td>5 agents (PM, compliance, tech, UX, strategy)</td></tr>
+          <tr><td>Security audit</td><td>8 audit agents → 6 fix agents</td></tr>
+          <tr><td>UI rebuild</td><td>Stitch mockups → 5+4+7 build agents</td></tr>
+          <tr><td>Deployment</td><td>Single agent — sequential debugging</td></tr>
+        </table>
+      </div>
+
+      <div class="glass-card" style="padding:12px 16px;">
+        <p style="font-size:0.82rem;"><strong>Judgement:</strong> Parallel for independent tasks. Sequential for dependencies. Knowing when NOT to parallelise matters.</p>
+      </div>
+    </div>
+
+    <div class="flex-col" style="gap:10px;">
+      <h3 style="margin-top:0;">Where I Overrode the AI</h3>
+      <div class="glass-card" style="padding:12px 16px;">
+        <strong style="font-size:0.85rem;">Prisma 5 over 7</strong>
+        <p style="font-size:0.82rem;">AI installed latest. I downgraded — fewer errors with well-documented libs. Version familiarity > recency.</p>
+      </div>
+      <div class="glass-card" style="padding:12px 16px;">
+        <strong style="font-size:0.85rem;">Complete UI rebuild at v5</strong>
+        <p style="font-size:0.82rem;">4 versions of patches → inconsistent UI. Deleted 63 files, rebuilt with a design system. Faster than patching.</p>
+      </div>
+      <div class="glass-card" style="padding:12px 16px;">
+        <strong style="font-size:0.85rem;">No exact capacity numbers</strong>
+        <p style="font-size:0.82rem;">AI showed "45/100 seats". Changed to "Seats Available" / "Waitlist Open" — prevents gaming. My domain judgement.</p>
+      </div>
+      <div class="glass-card" style="padding:12px 16px;">
+        <strong style="font-size:0.85rem;">Dropped Luma → added Stripe</strong>
+        <p style="font-size:0.82rem;">Luma = foreign SaaS. Stripe gives bidirectional data flow: outbound Checkout + inbound webhook.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ SLIDE 7: SUMMARY + DEMO ════════════════════ -->
+<div class="slide" data-slide="7" style="justify-content:center; align-items:center;">
+  <div style="max-width:660px; text-align:center;">
+    <div class="section-label">07 — Summary</div>
+    <h2 style="font-size:1.6rem;">A production-grade, auditable system — built in 3 days with AI-assisted development</h2>
+    <p style="font-size:0.95rem; margin-bottom:32px;">I understand every component, every data flow, and every trade-off.<br>I also know exactly what it would take to harden it for production.</p>
+
+    <div class="glass-panel" style="text-align:left;">
+      <div class="grid-2" style="gap:28px;">
+        <div>
+          <h3>Public (Participant)</h3>
+          <p><strong>govevent.csaia.sg/events</strong></p>
+          <p style="margin-top:6px;">Demo: <strong>chenhuangchao2@gmail.com</strong> / demo123</p>
+          <p style="font-size:0.78rem; color:var(--outline); margin-top:4px;">4 past events · 15.5 CPD hours · 1 upcoming</p>
+        </div>
+        <div>
+          <h3>Admin (Organiser)</h3>
+          <p><strong>govevent.csaia.sg/admin/login</strong></p>
+          <table style="margin-top:6px;">
+            <tr><td><span class="pill pill-primary" style="font-size:0.58rem;">Super Admin</span></td><td>admin@tech.gov.sg / admin123</td></tr>
+            <tr><td><span class="pill pill-surface" style="font-size:0.58rem;">Admin</span></td><td>sarah@tech.gov.sg / admin123</td></tr>
+          </table>
+          <p style="font-size:0.78rem; color:var(--outline); margin-top:6px;">Credentials for evaluation only</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end slides wrapper (not needed, using fixed positioning) -->
+
+<!-- ── Navigation ── -->
+<div class="nav" id="nav"></div>
+<div class="nav-counter" id="counter">1 / 8</div>
+<div class="nav-hint">← → to navigate</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const nav = document.getElementById('nav');
+  const counter = document.getElementById('counter');
+  let current = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+    dot.onclick = () => show(i);
+    nav.appendChild(dot);
+  });
+
+  function show(n) {
+    slides[current].classList.remove('active');
+    nav.children[current].classList.remove('active');
+    current = (n + slides.length) % slides.length;
+    slides[current].classList.add('active');
+    nav.children[current].classList.add('active');
+    counter.textContent = `${current + 1} / ${slides.length}`;
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); show(current + 1); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); show(current - 1); }
+  });
+
+  let tx = 0;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    const d = tx - e.changedTouches[0].clientX;
+    if (Math.abs(d) > 50) d > 0 ? show(current + 1) : show(current - 1);
+  });
+</script>
+
+</body>
+</html>
