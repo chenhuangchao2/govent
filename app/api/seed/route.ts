@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
     APP_URL: process.env.APP_URL || '(not set)',
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || '(not set)',
     STRIPE_KEY_PREFIX: process.env.STRIPE_SECRET_KEY?.substring(0, 8) || '(not set)',
+    WEBHOOK_SECRET_PREFIX: process.env.STRIPE_WEBHOOK_SECRET?.substring(0, 12) || '(not set)',
+    WEBHOOK_SECRET_LENGTH: process.env.STRIPE_WEBHOOK_SECRET?.length || 0,
     resolved: process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || '(both empty)',
   })
 }
