@@ -81,10 +81,21 @@ app/
 - **v5.2** — 2026-04-10 — NorthFlank deployment: Dockerfile fixes, Prisma migration, seed API, production live.
 
 ## Current Status
-**Version**: v5.2 (deployed to NorthFlank)
+**Version**: v5.3 (deployed to NorthFlank)
 
 **Production URL**: https://govevent.csaia.sg
 **GitHub**: https://github.com/chenhuangchao2/govent
+**Documentation Slides**: https://govtech-slide.vercel.app
+**Build Log Report**: https://govtech-buildlog.vercel.app
+
+**v5.3 — Bug Fixes & Stripe Production Webhook ✅ (2026-04-10)**
+- Fix: Stripe Pay Now redirect uses runtime `APP_URL` instead of build-time `NEXT_PUBLIC_APP_URL`
+- Fix: Stripe `expires_at` minimum 1 hour (prevents 0-hour rejection)
+- Fix: Approve toast shows "Approved — pending payment" for paid events
+- Fix: Past events hidden from public listing (`endTime >= now`)
+- Fix: Stripe production webhook configured + signing secret updated
+- Docs: Documentation Slides (HTML + GSAP) deployed to Vercel
+- Docs: Build Log Summary (A4 HTML) deployed to Vercel
 
 **v5.2 — NorthFlank Deployment ✅ (2026-04-10)**
 - Deployed to NorthFlank with PostgreSQL addon

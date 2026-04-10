@@ -1048,3 +1048,25 @@ Demo account: `chenhuangchao2@gmail.com` / `demo123`
 | Admin | rajan@tech.gov.sg | admin123 |
 
 **Build**: 0 TypeScript errors. Production deployed and verified at https://govevent.csaia.sg
+
+---
+
+## v5.3 — Bug Fixes & Stripe Production Webhook (2026-04-10)
+
+### Fixes
+
+| Issue | Root Cause | Fix |
+|-------|-----------|-----|
+| Stripe Pay Now redirects to localhost | `NEXT_PUBLIC_APP_URL` inlined at Docker build time as `localhost:3000` | Added runtime `APP_URL` env var; Stripe URLs read `APP_URL` at runtime with fallback |
+| Stripe `expires_at` rejected | `paymentDeadlineHours` could be 0 → `expires_at = now` | Added minimum 1-hour floor: `Math.max(Math.min(hours, 24), 1)` |
+| Approve toast unclear for paid events | Showed generic "Action completed" | Now shows "Approved — pending payment" for paid events |
+| Payment doesn't update registration status | Stripe webhook signing secret not configured for production | Configured production webhook endpoint in Stripe Dashboard + `STRIPE_WEBHOOK_SECRET` on NorthFlank |
+| Past events showing on public listing | Query only filtered `isPublished` + `isCancelled` | Added `endTime: { gte: new Date() }` filter |
+| `APP_URL` had spaces | NorthFlank env var contained leading/trailing whitespace | Trimmed value in NorthFlank dashboard |
+
+### Deployment Documents
+
+| Document | URL |
+|----------|-----|
+| Documentation Slides | https://govtech-slide.vercel.app |
+| Build Log Report | https://govtech-buildlog.vercel.app |
