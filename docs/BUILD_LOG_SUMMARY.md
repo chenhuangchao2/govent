@@ -1,5 +1,7 @@
 # Build Log — GovEvent
 
+> How I used AI-assisted development to build this system.
+> For architecture, components, and data flow, see the Documentation Slides.
 > Full detailed log: [BUILD_LOG.md](BUILD_LOG.md)
 
 ---
@@ -15,6 +17,7 @@
 | **Security Audit (v4)** | Claude Code — 8 audit agents + 6 fix agents | 8 agents audited different areas in parallel (public pages, registration flow, payment, API security, etc.). Found 17 bugs. 6 agents fixed all issues in one pass. |
 | **Design References** | Stitch (AI design tool) | Created visual mockups for each page in Stitch, exported as HTML/CSS code, imported into `design_reference/` as design specs for the rebuild. |
 | **UI Rebuild (v5)** | Claude Code — 5+4+7 parallel agents | Deleted 63 files, rebuilt from scratch. Agents used Stitch-exported design references as templates — extracted structure and injected real data/logic. Stage 1: 5 public pages, Stage 2: 4 auth pages, Stage 3: 7 admin pages. |
+| **Code Editing & Debugging** | Cursor (AI code editor) | VS Code fork with AI integration. Used for editing generated code, debugging runtime issues, inspecting Turbopack errors, and iterating on styling details that required visual feedback. |
 | **Polish (v5.1)** | Claude Code — single agent | Targeted fixes: 10 bugs, demo data, dev workflow changes. Single agent for sequential, interdependent fixes. |
 | **Deployment (Phase 6)** | Claude Code | Dockerfile multi-stage build, Prisma migration strategy, seed API endpoint, NorthFlank configuration, custom domain setup. |
 
@@ -48,14 +51,15 @@
 
 ## 3. Decisions to Override, Refactor, or Discard AI Output
 
-| Decision | What AI Did / Would Have Done | What I Did Instead | Why |
-|----------|-------------------------------|---------------------|-----|
-| **Prisma 5 over 7** | Installed latest (Prisma 7) | Downgraded to v5 | AI generates fewer errors with libraries it has more training data on. Version familiarity > recency. |
-| **Dropped Luma integration** | Initial spec included Luma API | Replaced with Stripe | Luma requires paid plan + stores data on foreign SaaS — contradicts government data sovereignty. Stripe gives better data flow demo (outbound Checkout + inbound webhook). |
-| **Complete UI rebuild at v5.0** | Could have continued iterating v4 UI | Deleted 63 files, rebuilt from scratch | After 4 versions of incremental patches, the UI was inconsistent. A clean rebuild with a proper design system was faster than continuing to patch. |
-| **Template-first UI approach** | AI would generate pages from text descriptions | Generated HTML mockups first as design references, then had agents extract structure + inject data | More visually consistent than page-by-page text-to-code generation. |
-| **Monorepo architecture** | Could have separated frontend/backend | Kept everything in Next.js App Router | One Docker service to deploy, and the AI can see full data flow in one context window — better output quality. |
-| **No exact capacity numbers** | AI showed "45/100 seats" on public pages | Show only "Seats Available" / "Waitlist Open" | Government context: exact numbers let participants game registration timing. My domain judgment, not AI-suggested. |
+| Decision | What AI Did | What I Did Instead | Why |
+|----------|-------------|---------------------|-----|
+| **Prisma 5 over 7** | Installed latest (v7) | Downgraded to v5 | AI generates fewer errors with well-documented libraries. Version familiarity > recency. |
+| **Dropped Luma → Stripe** | Initial spec included Luma API | Replaced with Stripe | Luma requires paid plan + foreign SaaS — contradicts government data sovereignty. Stripe gives bidirectional data flow (outbound Checkout + inbound webhook). |
+| **Complete UI rebuild (v5)** | Could have continued iterating | Deleted 63 files, rebuilt from scratch | After 4 versions of incremental patches, the UI was inconsistent. A clean rebuild with a proper design system was faster than continuing to patch. |
+| **Template-first UI** | Generate pages from text descriptions | Generated HTML mockups in Stitch first, then agents extracted structure + injected data | More visually consistent than page-by-page text-to-code generation. |
+| **Monorepo architecture** | Could separate frontend/backend | Kept everything in Next.js App Router | One container to deploy, and the AI sees full data flow in one context window — better output quality. |
+| **No exact capacity** | Showed "45/100 seats" publicly | "Seats Available" / "Waitlist Open" only | Government context: exact numbers let participants game registration timing. My domain judgment, not AI-suggested. |
+| **Auth route restructure** | Login inside auth-protected layout | Moved login outside `(protected)/` route group | AI generated correct auth logic but placed the file in the wrong directory — caused infinite redirect loop. |
 
 ---
 
@@ -63,27 +67,21 @@
 
 **Security & Trust**
 
-| Area | What I'd Change | Why |
-|------|-----------------|-----|
-| Auth | Singpass/Corppass instead of email+password | Government identity verification is stronger and more realistic for agency use |
-| Input validation | Zod schema validation on all API inputs | Currently trusting client input shape; Zod catches malformed data at the boundary |
+- **Singpass/Corppass** — replace email+password with national identity verification. Eliminates fake registrations and ties into existing government infrastructure.
+- **Zod on all API inputs** — currently trusting client input shape. Zod validates at the API boundary: wrong shape → reject immediately before touching DB.
 
 **Scalability & Performance**
 
-| Area | What I'd Change | Why |
-|------|-----------------|-----|
-| Email | Background queue (BullMQ or similar) | Email sending currently blocks the API response; a queue decouples latency |
-| Real-time | WebSocket for check-in stats and seat updates | Current polling creates unnecessary load; WebSocket gives instant feedback |
+- **Email queue (BullMQ)** — currently email blocks the API response. A queue decouples: save to DB, return success, send email async. Failed emails auto-retry.
+- **WebSocket** — check-in stats poll every 10s. 50 concurrent users = 50 requests/10s. WebSocket flips it: server pushes on change. Better UX, less load.
 
 **Quality & Compliance**
 
-| Area | What I'd Change | Why |
-|------|-----------------|-----|
-| Testing | Integration tests for registration → approval → payment | This is the core business flow and needs automated validation |
-| Accessibility | WCAG 2.1 AA audit | Government services must be accessible; current UI hasn't been audited |
+- **Integration tests** — registration → approval → payment → check-in is the core flow. One code change could break the Stripe webhook. Automated tests catch this in seconds.
+- **WCAG 2.1 AA** — government digital services require accessibility. Glassmorphism UI hasn't been audited for contrast, screen readers, keyboard nav.
+- **PDPA** — no data retention or deletion policy. Production needs a Data Protection Impact Assessment.
+- **IM8** — mandatory security classification for government ICT systems before go-live.
 
 **Business Logic**
 
-| Area | What I'd Change | Why |
-|------|-----------------|-----|
-| Approval workflow | Multi-level approval (registrant → manager → coordinator) | Some government events require hierarchical sign-off beyond simple admin approve |
+- **Multi-level approval** — current system has flat approve/reject. Government events may need coordinator → director sign-off, especially for paid events or external speakers.

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Build Log — GovEvent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --primary:#00478d;--primary-fixed:#d6e3ff;
+    --secondary:#4858ab;--secondary-fixed:#dee0ff;
+    --tertiary:#004f5a;--tertiary-fixed:#a1efff;
+    --surface:#f8f9fa;--surface-container:#edeeef;--surface-container-high:#e7e8e9;
+    --on-surface:#191c1d;--on-surface-variant:#424752;
+    --outline:#727783;--outline-variant:#c2c6d4;
+    --error:#ba1a1a;--error-container:#ffdad6;
+    --success:#155724;--success-bg:#d4edda;
+  }
+  @page{size:A4;margin:0;}
+  body{font-family:'Manrope',system-ui,sans-serif;background:white;color:var(--on-surface);-webkit-font-smoothing:antialiased;width:210mm;margin:0 auto;}
+
+  .page{width:210mm;height:297mm;padding:12mm 14mm 10mm;position:relative;overflow:hidden;page-break-after:always;}
+  @media print{.page{padding:10mm 12mm 8mm;height:auto;max-height:297mm;}body{width:auto;}}
+  .page::before{content:'';position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 0% 0%,rgba(222,224,255,0.25) 0%,transparent 40%),radial-gradient(circle at 100% 100%,rgba(161,239,255,0.15) 0%,transparent 40%),white;}
+
+  h1{font-family:'Manrope';font-weight:800;font-size:1.6rem;letter-spacing:-0.04em;color:var(--primary);line-height:1.15;margin-bottom:4px;}
+  h2{font-family:'Manrope';font-weight:800;font-size:0.95rem;letter-spacing:-0.02em;color:var(--on-surface);line-height:1.3;margin-bottom:6px;}
+  h3{font-family:'Inter';font-weight:700;font-size:0.55rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--primary);margin-bottom:4px;margin-top:10px;}
+  p{font-size:0.72rem;line-height:1.45;color:var(--on-surface-variant);}
+  li{font-size:0.68rem;line-height:1.4;color:var(--on-surface-variant);margin-bottom:0;}
+  strong{color:var(--on-surface);font-weight:700;}
+  ul{padding-left:12px;}
+  code{font-family:'SF Mono',monospace;font-size:0.7em;background:var(--surface-container-high);padding:0 3px;border-radius:2px;}
+
+  .subtitle{font-size:0.7rem;color:var(--outline);margin-bottom:12px;}
+
+  .section-header{display:flex;align-items:baseline;gap:8px;margin-bottom:6px;margin-top:12px;}
+  .section-header:first-child{margin-top:0;}
+  .section-header .num{font-family:'Manrope';font-weight:800;font-size:1.6rem;color:var(--primary);opacity:0.15;line-height:1;letter-spacing:-0.04em;}
+
+  .glass-panel{background:rgba(255,255,255,0.82);border:1px solid rgba(194,198,212,0.2);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+
+  table{width:100%;border-collapse:collapse;font-size:0.67rem;margin-bottom:6px;}
+  th{font-family:'Inter';font-size:0.54rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--outline);text-align:left;padding:4px 6px;border-bottom:1px solid rgba(194,198,212,0.3);}
+  td{padding:3px 6px;color:var(--on-surface-variant);border-bottom:1px solid rgba(194,198,212,0.08);line-height:1.35;vertical-align:top;}
+
+  .pill{display:inline-block;padding:1px 7px;border-radius:9999px;font-family:'Inter';font-size:0.5rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+  .pill-primary{background:var(--primary-fixed);color:var(--primary);}
+  .pill-error{background:var(--error-container);color:var(--error);}
+  .pill-tertiary{background:rgba(161,239,255,0.3);color:var(--tertiary);}
+  .pill-surface{background:var(--surface-container-high);color:var(--on-surface-variant);}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+  .highlight{background:linear-gradient(135deg,rgba(214,227,255,0.3) 0%,rgba(161,239,255,0.1) 100%);border-left:2px solid var(--primary);border-radius:0 6px 6px 0;padding:5px 10px;margin:6px 0;}
+  .highlight p{font-size:0.68rem;color:var(--on-surface);}
+
+  .page-footer{position:absolute;bottom:6mm;left:14mm;right:14mm;display:flex;justify-content:space-between;font-family:'Inter';font-size:0.5rem;color:var(--outline-variant);}
+
+  @media screen{body{padding:20px 0;background:var(--surface-container);}.page{box-shadow:0 4px 24px rgba(0,0,0,0.08);}}
+</style>
+</head>
+<body>
+
+<div class="page">
+  <h1>Build Log — GovEvent</h1>
+  <p class="subtitle">Phoenix Chen &nbsp;|&nbsp; DAP GovTech Technical Consultant Assessment &nbsp;|&nbsp; AI-Assisted Development with Claude Code · Cursor · Stitch</p>
+
+  <!-- Section 1: Tools -->
+  <div class="section-header" style="margin-top:8px;">
+    <div class="num">01</div>
+    <h2>AI Tools at Each Stage</h2>
+  </div>
+
+  <table>
+    <tr><th style="width:15%;">Stage</th><th style="width:22%;">Tool</th><th>Approach</th></tr>
+    <tr><td><strong>Schema & API</strong></td><td>Claude Code</td><td>5 Prisma models + 28 API routes in one pass. Schema-first — all types from one source.</td></tr>
+    <tr><td><strong>Requirements</strong></td><td>Claude Code — 5 parallel agents</td><td>PM, compliance, tech, UX, strategy agents simultaneously. Dropped Luma, added Stripe.</td></tr>
+    <tr><td><strong>Frontend</strong></td><td>Claude Code — parallel agents</td><td>16 feature blocks (v2–v3.6). Each block = independent agent. Auth, tags, permissions.</td></tr>
+    <tr><td><strong>Security Audit</strong></td><td>Claude Code — 14 parallel agents</td><td>8 audit agents found 17 bugs, then 6 fix agents resolved all in one pass.</td></tr>
+    <tr><td><strong>Design</strong></td><td>Stitch</td><td>Visual mockups per page → export HTML/CSS → design specs for rebuild.</td></tr>
+    <tr><td><strong>UI Rebuild (v5)</strong></td><td>Claude Code — 16 parallel agents</td><td>Deleted 63 files. Rebuilt from Stitch templates across 3 stages (public, auth, admin).</td></tr>
+    <tr><td><strong>Code Editing</strong></td><td>Cursor</td><td>AI code editor for debugging, Turbopack issues, and styling iteration with visual feedback.</td></tr>
+    <tr><td><strong>Deployment</strong></td><td>Claude Code</td><td>Docker multi-stage build, Prisma migration, seed API, NorthFlank config, custom domain.</td></tr>
+  </table>
+
+  <div class="highlight">
+    <p><strong>Key technique:</strong> Parallel agents for independent tasks (5–8 simultaneous), single agent for sequential dependencies. Compressed multi-day work into hours.</p>
+  </div>
+
+  <!-- Section 2: Worked Well + Corrections + Overrides (merged) -->
+  <div class="section-header">
+    <div class="num">02</div>
+    <h2>Where AI Worked, Where It Didn't, and Where I Overrode It</h2>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h3 style="color:var(--success);margin-top:0;">Worked Well</h3>
+      <div class="glass-panel" style="margin-bottom:0;">
+        <ul>
+          <li><strong>Schema + 28 routes</strong> correct on first pass — transactions, idempotency, FK constraints</li>
+          <li><strong>16 parallel page builds</strong> — no merge conflicts, consistent patterns</li>
+          <li><strong>Security audit</strong> found 17 real bugs: missing auth, state machine gaps, race conditions</li>
+          <li><strong>Complex UI</strong> — glassmorphism, SVG charts, QR scanner, certificates from mockups</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <h3 style="color:var(--error);margin-top:0;">Needed Correction</h3>
+      <div class="glass-panel" style="margin-bottom:0;">
+        <ul>
+          <li><strong>Prisma 7 auto-installed</strong> → downgraded to v5 (AI fluency > latest)</li>
+          <li><strong>Auth redirect loop</strong> → restructured route groups</li>
+          <li><strong>.env key conflict</strong> → placeholders overwrote real keys</li>
+          <li><strong>Stale pages</strong> → added <code>force-dynamic</code> to 9 pages</li>
+          <li><strong>Turbopack crash</strong> → switched to build+start workflow</li>
+          <li><strong>Capacity "45/100"</strong> → "Seats Available" only (my domain call)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <h3>Key Override Decisions</h3>
+  <table>
+    <tr><th>Decision</th><th>What AI Did</th><th>My Override</th><th>Why</th></tr>
+    <tr><td><strong>Prisma 5</strong></td><td>Installed v7</td><td>Downgraded</td><td>AI fluency with well-documented libs > latest version</td></tr>
+    <tr><td><strong>Luma → Stripe</strong></td><td>Included Luma API</td><td>Replaced with Stripe</td><td>Luma = foreign SaaS. Stripe = bidirectional data flow</td></tr>
+    <tr><td><strong>UI rebuild v5</strong></td><td>Keep patching v4</td><td>Deleted 63 files, rebuilt</td><td>4 patch versions → inconsistent. Clean rebuild faster</td></tr>
+    <tr><td><strong>Template-first</strong></td><td>Text → code</td><td>Stitch mockups → code</td><td>Visual mockups = more consistent output</td></tr>
+    <tr><td><strong>No exact capacity</strong></td><td>"45/100 seats"</td><td>"Seats Available" only</td><td>Prevents gaming. Government domain judgment</td></tr>
+  </table>
+
+  <!-- Section 3: What I'd do differently -->
+  <div class="section-header">
+    <div class="num">03</div>
+    <h2>What I Would Do Differently with More Time</h2>
+  </div>
+
+  <div class="grid-2">
+    <div>
+      <h3 style="margin-top:0;"><span class="pill pill-primary">Compliance</span> &nbsp;<span class="pill pill-error">Security</span></h3>
+      <div class="glass-panel">
+        <ul>
+          <li><strong>Singpass/Corppass</strong> — national identity, eliminate fake registrations</li>
+          <li><strong>PDPA</strong> — data retention policy + impact assessment</li>
+          <li><strong>IM8</strong> — security classification before go-live</li>
+          <li><strong>DSS + WCAG 2.1 AA</strong> — government accessibility standards</li>
+          <li><strong>Zod</strong> — validate all API inputs at boundary</li>
+          <li><strong>OWASP Top 10</strong> pen testing + rate limiting</li>
+        </ul>
+      </div>
+    </div>
+    <div>
+      <h3 style="margin-top:0;"><span class="pill pill-tertiary">Scalability</span> &nbsp;<span class="pill pill-surface">Business</span></h3>
+      <div class="glass-panel">
+        <ul>
+          <li><strong>BullMQ</strong> — async email queue, don't block API response</li>
+          <li><strong>WebSocket</strong> — real-time check-in instead of 10s polling</li>
+          <li><strong>GCC deployment</strong> — AWS/Azure Singapore for gov compliance</li>
+          <li><strong>Multi-level approval</strong> — coordinator → director sign-off</li>
+          <li><strong>Integration tests</strong> — automate registration → payment → check-in flow</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <span>Build Log — GovEvent — Phoenix Chen</span>
+    <span>AI-Assisted Development (Vibe Coding) Assessment</span>
+  </div>
+</div>
+
+</body>
+</html>

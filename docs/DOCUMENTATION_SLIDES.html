@@ -6,715 +6,710 @@
 <title>GovEvent — Documentation</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <style>
-  * { margin:0; padding:0; box-sizing:border-box; }
-
-  :root {
-    --primary: #00478d;
-    --primary-container: #005eb8;
-    --primary-fixed: #d6e3ff;
-    --primary-fixed-dim: #a9c7ff;
-    --secondary: #4858ab;
-    --secondary-fixed: #dee0ff;
-    --tertiary: #004f5a;
-    --tertiary-fixed: #a1efff;
-    --surface: #f8f9fa;
-    --surface-container: #edeeef;
-    --surface-container-high: #e7e8e9;
-    --surface-container-low: #f3f4f5;
-    --on-surface: #191c1d;
-    --on-surface-variant: #424752;
-    --outline: #727783;
-    --outline-variant: #c2c6d4;
-    --error: #ba1a1a;
-    --error-container: #ffdad6;
+  *{margin:0;padding:0;box-sizing:border-box;}
+  :root{
+    --primary:#00478d;--primary-container:#005eb8;--primary-fixed:#d6e3ff;
+    --primary-fixed-dim:#a9c7ff;--secondary:#4858ab;--secondary-fixed:#dee0ff;
+    --tertiary:#004f5a;--tertiary-fixed:#a1efff;
+    --surface:#f8f9fa;--surface-container:#edeeef;--surface-container-high:#e7e8e9;
+    --on-surface:#191c1d;--on-surface-variant:#424752;
+    --outline:#727783;--outline-variant:#c2c6d4;
+    --error:#ba1a1a;--error-container:#ffdad6;
+    --success:#155724;--success-bg:#d4edda;
   }
+  body{font-family:'Manrope',system-ui,sans-serif;background:var(--surface);color:var(--on-surface);overflow:hidden;-webkit-font-smoothing:antialiased;}
 
-  body {
-    font-family: 'Manrope', system-ui, sans-serif;
-    background: var(--surface);
-    color: var(--on-surface);
-    overflow: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
+  /* ── Slides ── */
+  .slide{position:fixed;inset:0;display:none;flex-direction:column;padding:40px 56px 48px;overflow:hidden;}
+  .slide.active{display:flex;}
 
-  /* ── Slide System ── */
-  .slide {
-    position: fixed; inset: 0;
-    display: none; flex-direction: column;
-    padding: 48px 64px;
-    overflow: hidden;
-  }
-  .slide.active { display: flex; }
+  /* ── Section header ── */
+  .section-header{display:flex;align-items:baseline;gap:14px;margin-bottom:20px;}
+  .section-header .num{font-family:'Manrope';font-weight:800;font-size:3.2rem;color:var(--primary);opacity:0.15;line-height:1;letter-spacing:-0.04em;}
+  .section-header h2{margin-bottom:0;}
+  .slide::before{content:'';position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 0% 0%,#dee0ff 0%,transparent 40%),radial-gradient(circle at 100% 100%,#a1efff 0%,transparent 40%),radial-gradient(circle at 50% 50%,#f8f9fa 0%,#edeeef 100%);}
+  .slide::after{content:'';position:absolute;top:-100px;right:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(161,239,255,0.15)0%,transparent 70%);filter:blur(100px);z-index:-1;pointer-events:none;}
+  .slide>*{position:relative;z-index:1;}
 
-  /* ── Background: iridescent-bg from globals.css ── */
-  .slide::before {
-    content: '';
-    position: absolute; inset: 0; z-index: -2;
-    background:
-      radial-gradient(circle at 0% 0%, #dee0ff 0%, transparent 40%),
-      radial-gradient(circle at 100% 100%, #a1efff 0%, transparent 40%),
-      radial-gradient(circle at 50% 50%, #f8f9fa 0%, #edeeef 100%);
-  }
-  /* accent spots matching layout.tsx */
-  .slide::after {
-    content: '';
-    position: absolute;
-    top: -100px; right: -100px;
-    width: 400px; height: 400px;
-    background: radial-gradient(circle, rgba(161,239,255,0.15) 0%, transparent 70%);
-    filter: blur(100px);
-    z-index: -1; pointer-events: none;
-  }
+  /* ── Type ── */
+  h1{font-family:'Manrope';font-weight:800;font-size:3.4rem;letter-spacing:-0.04em;color:var(--primary);line-height:1.1;}
+  h2{font-family:'Manrope';font-weight:800;font-size:1.6rem;letter-spacing:-0.03em;color:var(--on-surface);line-height:1.25;margin-bottom:22px;}
+  h3{font-family:'Inter';font-weight:700;font-size:0.72rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--primary);margin-bottom:8px;}
+  p{font-size:0.92rem;line-height:1.55;color:var(--on-surface-variant);}
+  li{font-size:0.88rem;line-height:1.5;color:var(--on-surface-variant);margin-bottom:2px;}
+  strong{color:var(--on-surface);font-weight:700;}
+  ul{padding-left:16px;}
+  code{font-family:'SF Mono',monospace;font-size:0.78em;background:var(--surface-container-high);padding:1px 5px;border-radius:4px;}
+  .label{font-family:'Inter';font-weight:700;font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--outline);margin-bottom:8px;}
 
-  .slide > * { position: relative; z-index: 1; }
+  /* ── Glass ── */
+  .glass-panel{background:rgba(255,255,255,0.82);backdrop-filter:blur(40px) saturate(1.6);-webkit-backdrop-filter:blur(40px) saturate(1.6);border:1px solid rgba(194,198,212,0.2);border-radius:16px;padding:22px 24px;}
+  .glass-card{background:rgba(255,255,255,0.7);backdrop-filter:blur(40px) saturate(1.6);-webkit-backdrop-filter:blur(40px) saturate(1.6);border:1px solid rgba(194,198,212,0.2);border-radius:12px;padding:14px 18px;box-shadow:0 8px 32px rgba(0,71,141,0.06);}
 
-  /* ── Typography (matching app) ── */
-  .font-headline { font-family: 'Manrope', sans-serif; }
-  .font-label { font-family: 'Inter', sans-serif; }
+  /* ── Pills ── */
+  .pill{display:inline-block;padding:3px 12px;border-radius:9999px;font-family:'Inter';font-size:0.68rem;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;}
+  .pill-primary{background:var(--primary-fixed);color:var(--primary);}
+  .pill-secondary{background:var(--secondary-fixed);color:var(--secondary);}
+  .pill-tertiary{background:rgba(161,239,255,0.3);color:var(--tertiary);}
+  .pill-surface{background:var(--surface-container-high);color:var(--on-surface-variant);}
+  .pill-error{background:var(--error-container);color:var(--error);}
+  .pill-success{background:var(--success-bg);color:var(--success);}
 
-  h1 {
-    font-family: 'Manrope', sans-serif;
-    font-weight: 800; font-size: 3.2rem;
-    letter-spacing: -0.04em; color: var(--primary);
-    line-height: 1.1;
-  }
-  h2 {
-    font-family: 'Manrope', sans-serif;
-    font-weight: 800; font-size: 1.5rem;
-    letter-spacing: -0.03em; color: var(--on-surface);
-    line-height: 1.2; margin-bottom: 24px;
-  }
-  h3 {
-    font-family: 'Inter', sans-serif;
-    font-weight: 700; font-size: 0.68rem;
-    letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--primary); margin-bottom: 10px;
-  }
-
-  p { font-size: 0.88rem; line-height: 1.55; color: var(--on-surface-variant); }
-  li { font-size: 0.84rem; line-height: 1.5; color: var(--on-surface-variant); margin-bottom: 3px; }
-  strong { color: var(--on-surface); font-weight: 700; }
-  ul { padding-left: 16px; }
-
-  /* ── Section label ── */
-  .section-label {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.65rem; font-weight: 700;
-    letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--outline); margin-bottom: 8px;
-  }
-
-  /* ── Glass components (exact match from globals.css) ── */
-  .glass-panel {
-    background: rgba(255,255,255,0.82);
-    backdrop-filter: blur(40px) saturate(1.6);
-    -webkit-backdrop-filter: blur(40px) saturate(1.6);
-    border: 1px solid rgba(194,198,212,0.2);
-    border-radius: 16px;
-    padding: 24px;
-  }
-  .glass-card {
-    background: rgba(255,255,255,0.7);
-    backdrop-filter: blur(40px) saturate(1.6);
-    -webkit-backdrop-filter: blur(40px) saturate(1.6);
-    border: 1px solid rgba(194,198,212,0.2);
-    border-radius: 12px;
-    padding: 16px 20px;
-    box-shadow: 0 8px 32px 0 rgba(0,71,141,0.08);
-  }
-
-  /* ── Pills (rounded-full like app) ── */
-  .pill {
-    display: inline-block; padding: 3px 12px;
-    border-radius: 9999px; font-family: 'Inter', sans-serif;
-    font-size: 0.65rem; font-weight: 700;
-    letter-spacing: 0.04em; text-transform: uppercase;
-  }
-  .pill-primary { background: var(--primary-fixed); color: var(--primary); }
-  .pill-secondary { background: var(--secondary-fixed); color: var(--secondary); }
-  .pill-tertiary { background: rgba(161,239,255,0.3); color: var(--tertiary); }
-  .pill-surface { background: var(--surface-container-high); color: var(--on-surface-variant); }
-  .pill-error { background: var(--error-container); color: var(--error); }
-  .pill-success { background: #d4edda; color: #155724; }
-
-  /* ── Layout helpers ── */
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
-  .flex-col { display: flex; flex-direction: column; }
-  .gap-8 { gap: 8px; }
-  .gap-10 { gap: 10px; }
-  .gap-12 { gap: 12px; }
-  .flex-1 { flex: 1; }
+  /* ── Layout ── */
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+  .flex-col{display:flex;flex-direction:column;}
 
   /* ── Tables ── */
-  table { width: 100%; border-collapse: collapse; }
-  th {
-    font-family: 'Inter', sans-serif; font-size: 0.65rem; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--outline); text-align: left;
-    padding: 6px 10px; border-bottom: 1px solid rgba(194,198,212,0.3);
-  }
-  td {
-    font-size: 0.82rem; color: var(--on-surface-variant);
-    padding: 7px 10px; border-bottom: 1px solid rgba(194,198,212,0.1);
-    line-height: 1.4;
-  }
+  table{width:100%;border-collapse:collapse;}
+  th{font-family:'Inter';font-size:0.68rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--outline);text-align:left;padding:7px 10px;border-bottom:1px solid rgba(194,198,212,0.25);}
+  td{font-size:0.88rem;color:var(--on-surface-variant);padding:7px 10px;border-bottom:1px solid rgba(194,198,212,0.1);line-height:1.4;}
 
-  /* ── State nodes (for lifecycle diagram) ── */
-  .state {
-    display: inline-flex; align-items: center;
-    padding: 5px 12px; border-radius: 8px;
-    font-size: 0.72rem; font-weight: 700;
-    font-family: 'Inter', sans-serif;
-    white-space: nowrap;
-  }
-  .arrow { color: var(--outline); font-size: 0.85rem; margin: 0 6px; }
+  /* ── Animated elements ── */
+  .anim{opacity:0;transform:translateY(20px);}
+  .anim-left{opacity:0;transform:translateX(-30px);}
+  .anim-right{opacity:0;transform:translateX(30px);}
+  .anim-scale{opacity:0;transform:scale(0.85);}
 
-  /* ── Architecture boxes ── */
-  .arch-box {
-    display: flex; align-items: center; justify-content: center;
-    flex-direction: column; padding: 12px 16px;
-    border-radius: 12px; text-align: center;
-  }
-  .arch-box strong { font-size: 0.8rem; }
-  .arch-box span { font-size: 0.65rem; color: inherit; opacity: 0.7; font-weight: 500; }
+  /* ── Icon containers ── */
+  .icon-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .icon-circle svg{width:22px;height:22px;}
 
-  /* ── Navigation ── */
-  .nav {
-    position: fixed; bottom: 20px; left: 0; right: 0;
-    display: flex; justify-content: center; align-items: center; gap: 12px;
-    z-index: 100;
-  }
-  .nav-dot {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: var(--outline-variant); border: none;
-    cursor: pointer; transition: all 0.2s;
-  }
-  .nav-dot.active { background: var(--primary); width: 24px; border-radius: 4px; }
-  .nav-counter {
-    position: fixed; bottom: 20px; right: 32px;
-    font-family: 'Inter', sans-serif; font-size: 0.7rem;
-    color: var(--outline); z-index: 100;
-  }
-  .nav-hint {
-    position: fixed; bottom: 20px; left: 32px;
-    font-family: 'Inter', sans-serif; font-size: 0.65rem;
-    color: var(--outline-variant); z-index: 100;
-  }
+  /* ── Problem cards ── */
+  .problem-card{display:flex;gap:14px;align-items:start;padding:14px 16px;}
+  .problem-card .icon-circle{margin-top:2px;}
 
-  @media print {
-    .slide { display: flex !important; position: relative; min-height: 100vh; page-break-after: always; }
-    .nav, .nav-counter, .nav-hint { display: none; }
-    body { overflow: visible; }
+  /* ── Arch flow ── */
+  .arch-node{display:flex;align-items:center;justify-content:center;flex-direction:column;padding:12px 16px;border-radius:12px;text-align:center;gap:2px;position:relative;}
+  .arch-node strong{font-size:0.78rem;}
+  .arch-node span{font-size:0.62rem;opacity:0.7;font-weight:500;}
+  .flow-line{position:absolute;background:var(--primary-fixed-dim);opacity:0;}
+  .flow-dot{width:6px;height:6px;border-radius:50%;background:var(--primary);position:absolute;opacity:0;}
+
+  /* ── State machine ── */
+  .state{display:inline-flex;align-items:center;padding:6px 14px;border-radius:8px;font-size:0.78rem;font-weight:700;font-family:'Inter';white-space:nowrap;}
+  .arrow-animated{color:var(--outline);font-size:0.85rem;margin:0 5px;opacity:0;}
+  .lane{display:grid;grid-template-columns:80px 1fr;align-items:stretch;margin-bottom:6px;}
+  .lane-label{display:flex;align-items:center;justify-content:flex-end;padding-right:10px;font-family:'Inter';font-size:0.6rem;font-weight:700;letter-spacing:0.07em;text-transform:uppercase;}
+  .lane-content{display:flex;align-items:center;gap:5px;padding:12px 16px;flex-wrap:nowrap;}
+
+  /* ── Stats ── */
+  .stat-number{font-family:'Manrope';font-weight:800;font-size:2.4rem;color:var(--primary);line-height:1;}
+  .stat-label{font-family:'Inter';font-size:0.65rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--outline);margin-top:4px;}
+
+  /* ── Divider ── */
+  .divider{border-top:1px solid rgba(194,198,212,0.15);margin:8px 0;padding-top:8px;}
+
+  /* ── Nav ── */
+  .nav{position:fixed;bottom:18px;left:0;right:0;display:flex;justify-content:center;gap:8px;z-index:100;}
+  .nav-dot{width:7px;height:7px;border-radius:50%;background:var(--outline-variant);border:none;cursor:pointer;transition:all 0.2s;padding:0;}
+  .nav-dot.active{background:var(--primary);width:22px;border-radius:4px;}
+  .nav-counter{position:fixed;bottom:18px;right:28px;font-family:'Inter';font-size:0.68rem;color:var(--outline);z-index:100;}
+  .nav-hint{position:fixed;bottom:18px;left:28px;font-family:'Inter';font-size:0.62rem;color:var(--outline-variant);z-index:100;}
+
+  @media print{
+    @page{size:297mm 210mm;margin:0;}
+    *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;}
+    html,body{
+      overflow:visible!important;
+      background:white!important;
+      width:297mm!important;
+      height:auto!important;
+      margin:0!important;
+      padding:0!important;
+    }
+    .slide{
+      display:flex!important;
+      position:static!important;
+      float:none!important;
+      width:297mm!important;
+      height:210mm!important;
+      min-height:0!important;
+      max-height:210mm!important;
+      padding:10mm 14mm!important;
+      margin:0!important;
+      page-break-after:always;
+      page-break-inside:avoid;
+      overflow:hidden!important;
+      box-sizing:border-box!important;
+    }
+    .slide:last-of-type{page-break-after:avoid;}
+    .slide::before,.slide::after{position:absolute!important;}
+    .anim,.anim-left,.anim-right,.anim-scale,.arrow-animated,.section-header{
+      opacity:1!important;transform:none!important;
+    }
+    .nav,.nav-counter,.nav-hint{display:none!important;}
   }
 </style>
 </head>
 <body>
 
-<!-- ════════════════════ SLIDE 0: TITLE ════════════════════ -->
+<!-- ═══════════ 0: TITLE ═══════════ -->
 <div class="slide active" data-slide="0">
-  <div style="flex:1; display:flex; flex-direction:column; justify-content:center; max-width:680px;">
-    <div class="section-label">DAP GovTech — Technical Consultant Assessment</div>
-    <h1 style="margin-bottom:16px;">GovEvent</h1>
-    <p style="font-size:1.15rem; color:var(--on-surface-variant); line-height:1.6; margin-bottom:40px; font-weight:500;">
+  <div style="flex:1;display:flex;flex-direction:column;justify-content:center;max-width:680px;">
+    <div class="label anim">DAP GovTech — Technical Consultant Assessment</div>
+    <h1 class="anim" style="margin-bottom:14px;">GovEvent</h1>
+    <p class="anim" style="font-size:1.1rem;line-height:1.6;margin-bottom:36px;font-weight:500;">
       Internal Government Event & Workshop Registration System.<br>
-      Automates the full lifecycle — from registration to check-in — replacing manual form-and-spreadsheet workflows.
+      Automates the full lifecycle — from registration to check-in.
     </p>
 
-    <div class="glass-panel" style="display:inline-flex; gap:40px; padding:20px 28px; width:fit-content;">
-      <div>
-        <div class="section-label" style="margin-bottom:4px;">Candidate</div>
-        <strong style="font-size:0.9rem;">Huang Chao</strong>
+    <!-- Stats row -->
+    <div class="anim" style="display:flex;gap:40px;margin-bottom:36px;">
+      <div><div class="stat-number" data-count="2">0</div><div class="stat-label">Days</div></div>
+      <div><div class="stat-number" data-count="12" data-suffix="K">0</div><div class="stat-label">Lines of Code</div></div>
+      <div><div class="stat-number" data-count="17">0</div><div class="stat-label">Iterations</div></div>
+      <div><div class="stat-number" data-count="17">0</div><div class="stat-label">Bugs Fixed</div></div>
+      <div><div class="stat-number" data-count="3">0</div><div class="stat-label">Integrations</div></div>
+    </div>
+
+    <div class="glass-panel anim-scale" style="display:inline-flex;flex-direction:column;gap:8px;padding:16px 26px;width:fit-content;">
+      <div style="display:flex;gap:28px;">
+        <div><span class="label" style="margin:0;">Candidate</span> <strong style="font-size:0.9rem;margin-left:5px;">Phoenix Chen</strong></div>
+        <div><span class="label" style="margin:0;">Tools</span> <strong style="font-size:0.9rem;margin-left:5px;">Claude Code · Cursor · Stitch</strong></div>
       </div>
-      <div>
-        <div class="section-label" style="margin-bottom:4px;">Live URL</div>
-        <strong style="font-size:0.9rem;">govevent.csaia.sg</strong>
-      </div>
-      <div>
-        <div class="section-label" style="margin-bottom:4px;">Source</div>
-        <strong style="font-size:0.9rem;">github.com/chenhuangchao2/govent</strong>
-      </div>
-      <div>
-        <div class="section-label" style="margin-bottom:4px;">Built With</div>
-        <strong style="font-size:0.9rem;">Claude Code + Stitch</strong>
+      <div style="display:flex;gap:28px;">
+        <div><span class="label" style="margin:0;">Live</span> <strong style="font-size:0.9rem;margin-left:5px;">govevent.csaia.sg</strong></div>
+        <div><span class="label" style="margin:0;">Source</span> <strong style="font-size:0.9rem;margin-left:5px;">github.com/chenhuangchao2/govent</strong></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 1: PROBLEM ════════════════════ -->
-<div class="slide" data-slide="1">
-  <div class="section-label">01 — Problem Statement</div>
-  <h2>FormSG Collects Data — But Has No Concept of Registration State</h2>
+<!-- ═══════════ 1: PROBLEM ═══════════ -->
+<div class="slide" data-slide="1" style="justify-content:center;">
+  <div class="section-header anim">
+    <div class="num">01</div>
+    <div><div class="label" style="margin-bottom:2px;">Problem Statement</div><h2>FormSG Collects Data — But Has No Registration State</h2></div>
+  </div>
 
-  <div class="grid-2" style="flex:1; align-items:start;">
-    <div class="flex-col gap-12">
-      <p>Agencies use <strong>FormSG</strong> to collect event sign-ups. But FormSG is a form builder — once data is submitted, <strong>everything else is manual</strong>.</p>
+  <div class="grid-2" style="align-items:start;gap:22px;">
+    <div class="flex-col" style="gap:12px;">
+      <p class="anim">Agencies use <strong>FormSG</strong> for event sign-ups. Once submitted, everything else is <strong>manual</strong>.</p>
 
-      <div class="glass-card" style="border-left:3px solid var(--error);">
-        <h3 style="color:var(--error);">No Atomic State</h3>
-        <p>Cannot enforce capacity limits at registration time. No waitlist. No status tracking. Eligibility checked manually after the fact.</p>
+      <div class="glass-card problem-card anim-left" style="border-left:3px solid var(--error);">
+        <div class="icon-circle" style="background:var(--error-container);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+        </div>
+        <div><h3 style="color:var(--error);">No Atomic State</h3><p style="font-size:0.82rem;">No capacity enforcement, no waitlist, no status tracking at registration time.</p></div>
       </div>
-      <div class="glass-card" style="border-left:3px solid var(--error);">
-        <h3 style="color:var(--error);">Manual Operations</h3>
-        <p>Approval, payment, reminders, attendance — all via email chains and Excel. One coordinator manages everything.</p>
+      <div class="glass-card problem-card anim-left" style="border-left:3px solid var(--error);">
+        <div class="icon-circle" style="background:var(--error-container);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>
+        </div>
+        <div><h3 style="color:var(--error);">Manual Operations</h3><p style="font-size:0.82rem;">Approval, payment, reminders, attendance — all via email chains and Excel.</p></div>
       </div>
-      <div class="glass-card" style="border-left:3px solid var(--error);">
-        <h3 style="color:var(--error);">No Audit Trail</h3>
-        <p>No record of who approved whom or when. IM8 governance requires actor-level accountability.</p>
+      <div class="glass-card problem-card anim-left" style="border-left:3px solid var(--error);">
+        <div class="icon-circle" style="background:var(--error-container);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--error)" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <div><h3 style="color:var(--error);">No Audit Trail</h3><p style="font-size:0.82rem;">No record of who approved whom. IM8 requires actor-level accountability.</p></div>
       </div>
     </div>
 
-    <div class="flex-col gap-12">
-      <p><strong>GovEvent</strong> automates the entire workflow, with every action auditable and every rule enforced server-side.</p>
+    <div class="flex-col" style="gap:12px;">
+      <p class="anim"><strong>GovEvent</strong> — every rule enforced server-side, every action in an immutable audit trail.</p>
 
-      <div class="glass-card" style="border-left:3px solid var(--primary);">
-        <h3>Server-Side Eligibility</h3>
-        <p>Email domain, blacklist, and capacity enforced atomically at registration time. Prisma <code style="font-size:0.78em; background:var(--surface-container-high); padding:1px 5px; border-radius:4px;">$transaction</code> prevents race conditions.</p>
+      <div class="glass-card problem-card anim-right" style="border-left:3px solid var(--primary);">
+        <div class="icon-circle" style="background:var(--primary-fixed);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <div><h3>Server-Side Eligibility</h3><p style="font-size:0.82rem;">Domain, blacklist, capacity enforced atomically. <code>$transaction()</code> prevents races.</p></div>
       </div>
-      <div class="glass-card" style="border-left:3px solid var(--primary);">
-        <h3>Automated State Machine</h3>
-        <p>PENDING → Approve → Payment → Check-in → No-Show. Every transition triggers email notification.</p>
+      <div class="glass-card problem-card anim-right" style="border-left:3px solid var(--primary);">
+        <div class="icon-circle" style="background:var(--primary-fixed);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div><h3>Automated State Machine</h3><p style="font-size:0.82rem;">PENDING → Approve → Payment → Check-in → No-Show. Every transition triggers email + audit.</p></div>
       </div>
-      <div class="glass-card" style="border-left:3px solid var(--primary);">
-        <h3>Immutable Audit Log</h3>
-        <p>Every organiser action logged with timestamp, actor, and context. Append-only design.</p>
-      </div>
-      <div class="glass-card" style="border-left:3px solid var(--primary);">
-        <h3>GCC-Portable Architecture</h3>
-        <p>Containerised — currently NorthFlank, portable to GCC-aligned infrastructure (AWS/Azure SG).</p>
+      <div class="glass-card problem-card anim-right" style="border-left:3px solid var(--primary);">
+        <div class="icon-circle" style="background:var(--primary-fixed);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg>
+        </div>
+        <div><h3>Integrated & Auditable</h3><p style="font-size:0.82rem;">Stripe + Resend + Cron connected. Immutable audit log. GCC-portable container.</p></div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 2: ARCHITECTURE ════════════════════ -->
-<div class="slide" data-slide="2">
-  <div class="section-label">02 — Architecture Overview</div>
-  <h2>Single Service — Frontend, API, and Database in One Container</h2>
+<!-- ═══════════ 2: ARCHITECTURE ═══════════ -->
+<div class="slide" data-slide="2" style="justify-content:center;">
+  <div class="section-header anim">
+    <div class="num">02</div>
+    <div><div class="label" style="margin-bottom:2px;">Architecture Overview</div><h2>Single Service — Frontend, API, and Database in One Container</h2></div>
+  </div>
 
-  <div class="grid-2" style="flex:1; align-items:start;">
-    <!-- Diagram -->
-    <div class="glass-panel" style="display:flex; flex-direction:column; align-items:center; gap:12px; padding:28px;">
-      <div class="arch-box" style="background:var(--surface-container-high); width:200px;">
-        <strong>Browser</strong><span>16 pages</span>
+  <div class="grid-2" style="align-items:start;gap:22px;">
+    <div class="glass-panel anim-scale" style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:22px;" id="arch-diagram">
+      <!-- Users -->
+      <div class="anim" style="display:flex;gap:12px;">
+        <div class="arch-node" style="background:var(--primary-fixed);color:var(--primary);padding:8px 16px;"><strong>Participant</strong><span>Public pages</span></div>
+        <div class="arch-node" style="background:var(--secondary-fixed);color:var(--secondary);padding:8px 16px;"><strong>Admin</strong><span>Dashboard</span></div>
       </div>
-      <div style="color:var(--outline); font-size:0.8rem;">↓ HTTP</div>
-      <div class="arch-box" style="background:var(--primary); color:white; width:280px; padding:16px;">
-        <strong style="color:white;">Next.js 15 App Router</strong>
-        <span style="color:rgba(255,255,255,0.7);">Server Components + 28 API Routes</span>
+      <div style="font-size:0.7rem;color:var(--outline);">↓ HTTPS ↑</div>
+      <!-- NorthFlank container -->
+      <div class="anim" style="border:2px dashed var(--outline-variant);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;align-items:center;gap:8px;width:100%;">
+        <div style="font-family:'Inter';font-size:0.6rem;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:var(--outline);align-self:flex-start;">Docker Container — NorthFlank</div>
+        <div class="arch-node" style="background:var(--primary);color:white;width:100%;padding:12px;">
+          <strong style="color:white;">Next.js 15 App Router</strong>
+          <span style="color:rgba(255,255,255,0.7);">Server Components + 28 API Routes + iron-session Auth</span>
+        </div>
+        <div style="display:flex;gap:6px;width:100%;">
+          <div class="arch-node" style="background:var(--primary-fixed);color:var(--primary);flex:1;padding:8px;">
+            <strong>PostgreSQL</strong><span>Prisma 5 ORM</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;flex:1;">
+            <div style="display:flex;gap:6px;">
+              <div class="arch-node" style="background:var(--secondary-fixed);color:var(--secondary);flex:1;padding:6px 8px;">
+                <strong style="font-size:0.72rem;">Stripe</strong><span style="font-size:0.58rem;">Pay → ← Webhook</span>
+              </div>
+              <div class="arch-node" style="background:rgba(161,239,255,0.3);color:var(--tertiary);flex:1;padding:6px 8px;">
+                <strong style="font-size:0.72rem;">Resend</strong><span style="font-size:0.58rem;">Email + OTP →</span>
+              </div>
+            </div>
+            <div class="arch-node" style="background:var(--surface-container-high);padding:6px 8px;">
+              <strong style="font-size:0.72rem;">NorthFlank Cron</strong><span style="font-size:0.58rem;">← Hourly: reminders, no-show, timeout</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <div style="color:var(--outline); font-size:0.8rem;">↓</div>
-      <div style="display:flex; gap:10px;">
-        <div class="arch-box" style="background:var(--primary-fixed); color:var(--primary); padding:10px 14px;">
-          <strong>PostgreSQL</strong><span>Prisma 5</span>
-        </div>
-        <div class="arch-box" style="background:var(--secondary-fixed); color:var(--secondary); padding:10px 14px;">
-          <strong>Stripe</strong><span>Pay + Webhook</span>
-        </div>
-        <div class="arch-box" style="background:rgba(161,239,255,0.3); color:var(--tertiary); padding:10px 14px;">
-          <strong>Resend</strong><span>Email + OTP</span>
-        </div>
-        <div class="arch-box" style="background:var(--surface-container-high); padding:10px 14px;">
-          <strong>Cron</strong><span>Hourly jobs</span>
-        </div>
-      </div>
+      <div class="anim" style="font-size:0.7rem;color:var(--outline);text-align:center;">GitHub push → auto-build → deploy</div>
     </div>
 
-    <!-- Tech stack + models -->
-    <div class="flex-col" style="gap:20px;">
-      <div>
+    <div class="flex-col" style="gap:18px;gap:12px;">
+      <div class="anim">
         <h3>Tech Stack</h3>
         <table>
-          <tr><th style="width:30%;">Layer</th><th>Choice</th></tr>
+          <tr><th style="width:28%;">Layer</th><th>Choice</th></tr>
           <tr><td><strong>Framework</strong></td><td>Next.js 15 + TypeScript</td></tr>
-          <tr><td><strong>Database</strong></td><td>PostgreSQL (NorthFlank managed)</td></tr>
+          <tr><td><strong>Database</strong></td><td>PostgreSQL (NorthFlank)</td></tr>
           <tr><td><strong>ORM</strong></td><td>Prisma 5 — schema-first, AI-friendly</td></tr>
-          <tr><td><strong>UI</strong></td><td>Tailwind CSS v4 — utility-first</td></tr>
-          <tr><td><strong>Auth</strong></td><td>iron-session — simple, no third-party</td></tr>
-          <tr><td><strong>Deploy</strong></td><td>Docker → NorthFlank — auto on push</td></tr>
+          <tr><td><strong>UI</strong></td><td>Tailwind CSS v4</td></tr>
+          <tr><td><strong>Auth</strong></td><td>iron-session — no third-party</td></tr>
+          <tr><td><strong>Deploy</strong></td><td>Docker → NorthFlank (auto on push)</td></tr>
         </table>
       </div>
-
-      <div>
-        <h3>Data Models</h3>
-        <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
-          <div style="background:var(--primary-fixed); padding:8px 12px; border-radius:8px; text-align:center;">
-            <strong style="font-size:0.78rem; color:var(--primary);">Event</strong>
-          </div>
-          <div style="background:var(--primary-fixed); padding:8px 12px; border-radius:8px; text-align:center;">
-            <strong style="font-size:0.78rem; color:var(--primary);">Registration</strong>
-          </div>
-          <div style="background:var(--primary-fixed); padding:8px 12px; border-radius:8px; text-align:center;">
-            <strong style="font-size:0.78rem; color:var(--primary);">AuditLog</strong>
-          </div>
-          <div style="background:var(--surface-container-high); padding:8px 12px; border-radius:8px; text-align:center;">
-            <strong style="font-size:0.78rem;">User</strong>
-          </div>
-          <div style="background:var(--surface-container-high); padding:8px 12px; border-radius:8px; text-align:center;">
-            <strong style="font-size:0.78rem;">Participant</strong>
-          </div>
-          <div style="background:var(--surface-container-high); padding:8px 12px; border-radius:8px; text-align:center;">
-            <strong style="font-size:0.78rem;">Blacklist</strong>
-          </div>
+      <div class="anim">
+        <h3>Data Models (6)</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;">
+          <div style="background:var(--primary-fixed);padding:7px 10px;border-radius:8px;text-align:center;"><strong style="font-size:0.75rem;color:var(--primary);">Event</strong></div>
+          <div style="background:var(--primary-fixed);padding:7px 10px;border-radius:8px;text-align:center;"><strong style="font-size:0.75rem;color:var(--primary);">Registration</strong></div>
+          <div style="background:var(--primary-fixed);padding:7px 10px;border-radius:8px;text-align:center;"><strong style="font-size:0.75rem;color:var(--primary);">AuditLog</strong></div>
+          <div style="background:var(--surface-container-high);padding:7px 10px;border-radius:8px;text-align:center;"><strong style="font-size:0.75rem;">User</strong></div>
+          <div style="background:var(--surface-container-high);padding:7px 10px;border-radius:8px;text-align:center;"><strong style="font-size:0.75rem;">Participant</strong></div>
+          <div style="background:var(--surface-container-high);padding:7px 10px;border-radius:8px;text-align:center;"><strong style="font-size:0.75rem;">Blacklist</strong></div>
         </div>
       </div>
-
-      <div class="glass-card" style="padding:12px 16px;">
-        <p style="font-size:0.82rem;"><strong>Why monolith?</strong> One container to deploy. Claude Code sees full data flow in one context window — produces more consistent output.</p>
+      <div class="glass-card anim" style="padding:10px 14px;">
+        <p style="font-size:0.8rem;"><strong>Why one service?</strong> Frontend + API + DB in a single container — simpler deployment, and the AI can see the entire data flow in one context window, producing more consistent code.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 3: COMPONENTS ════════════════════ -->
+<!-- ═══════════ 3: COMPONENTS ═══════════ -->
 <div class="slide" data-slide="3">
-  <div class="section-label">03 — Key Components</div>
-  <h2>16 Pages, 28 API Routes, 3 External Integrations</h2>
+  <div class="section-header anim">
+    <div class="num">03</div>
+    <div><div class="label" style="margin-bottom:2px;">Key Components</div><h2>16 Pages, 28 API Routes, 3 External Integrations</h2></div>
+  </div>
 
-  <div class="grid-3" style="flex:1; align-items:start; gap:20px;">
-    <!-- Frontend -->
-    <div>
+  <div class="grid-3" style="flex:1;align-items:stretch;gap:20px;">
+    <div class="glass-panel anim-left" style="display:flex;flex-direction:column;padding:18px 20px;">
       <h3>Frontend — 16 Pages</h3>
-      <div class="glass-card" style="margin-bottom:10px;">
-        <div style="margin-bottom:6px;"><span class="pill pill-primary">Public</span> <span style="font-size:0.75rem; color:var(--outline); margin-left:4px;">5 pages</span></div>
-        <ul>
-          <li>Events listing + search & filters</li>
-          <li>Event detail + registration status</li>
-          <li>Registration form (eligibility check)</li>
-          <li>My Registrations (QR, CPD hours)</li>
-          <li>Event Certificate (printable A4)</li>
-        </ul>
+      <div style="padding-bottom:8px;"><span class="pill pill-primary">Public — 5</span>
+        <ul style="margin-top:6px;"><li>Events listing + search & filters</li><li>Event detail + registration status</li><li>Registration form (eligibility check)</li><li>My Registrations (QR, CPD hours)</li><li>Event Certificate (printable A4)</li></ul>
       </div>
-      <div class="glass-card" style="margin-bottom:10px;">
-        <div style="margin-bottom:6px;"><span class="pill pill-secondary">Auth</span> <span style="font-size:0.75rem; color:var(--outline); margin-left:4px;">4 pages</span></div>
-        <ul>
-          <li>Login, Signup (OTP verification)</li>
-          <li>Forgot password, Admin login</li>
-        </ul>
+      <div class="divider"><span class="pill pill-secondary">Auth — 4</span>
+        <ul style="margin-top:6px;"><li>Login, Signup (OTP verification)</li><li>Forgot password, Admin login</li></ul>
       </div>
-      <div class="glass-card">
-        <div style="margin-bottom:6px;"><span class="pill pill-tertiary">Admin</span> <span style="font-size:0.75rem; color:var(--outline); margin-left:4px;">7 pages</span></div>
+      <div class="divider"><span class="pill pill-primary">Admin — 7</span>
+        <ul style="margin-top:6px;"><li>Dashboard (stats + SVG charts)</li><li>Events CRUD + inline editing</li><li>Registrations (bulk approve, CSV)</li><li>QR check-in + live stats</li><li>Blacklist, Audit Log, Accounts</li></ul>
+      </div>
+    </div>
+
+    <div class="glass-panel anim" style="display:flex;flex-direction:column;padding:18px 20px;">
+      <h3>Backend — 28 Routes</h3>
+      <p style="margin-bottom:8px;font-size:0.8rem;">All return <code>{ data, error }</code>. Role-based session protection.</p>
+      <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px;">
+        <div style="font-size:0.8rem;"><span class="pill pill-primary" style="font-size:0.56rem;width:40px;text-align:center;">POST</span> <span style="margin-left:4px;">/registrations</span></div>
+        <div style="font-size:0.8rem;"><span class="pill pill-surface" style="font-size:0.56rem;width:40px;text-align:center;">PATCH</span> <span style="margin-left:4px;">/registrations/[id]</span></div>
+        <div style="font-size:0.8rem;"><span class="pill pill-primary" style="font-size:0.56rem;width:40px;text-align:center;">POST</span> <span style="margin-left:4px;">/bulk-approve</span></div>
+        <div style="font-size:0.8rem;"><span class="pill pill-primary" style="font-size:0.56rem;width:40px;text-align:center;">POST</span> <span style="margin-left:4px;">/[id]/checkin</span></div>
+        <div style="font-size:0.8rem;"><span class="pill pill-secondary" style="font-size:0.56rem;width:40px;text-align:center;">POST</span> <span style="margin-left:4px;">/webhook/stripe</span></div>
+        <div style="font-size:0.8rem;"><span class="pill pill-surface" style="font-size:0.56rem;width:40px;text-align:center;">GET</span> <span style="margin-left:4px;">/cron/*</span></div>
+        <div style="font-size:0.8rem;"><span class="pill pill-primary" style="font-size:0.56rem;width:40px;text-align:center;">POST</span> <span style="margin-left:4px;">/events + PATCH /events/[id]</span></div>
+        <div style="font-size:0.8rem;"><span class="pill pill-primary" style="font-size:0.56rem;width:40px;text-align:center;">POST</span> <span style="margin-left:4px;">/auth/participant/*</span></div>
+      </div>
+      <div class="divider">
+        <h3 style="margin-bottom:4px;">Key Patterns</h3>
         <ul>
-          <li>Dashboard (stats + SVG charts)</li>
-          <li>Events CRUD + inline editing</li>
-          <li>Registrations (bulk approve, CSV)</li>
-          <li>QR check-in + live stats</li>
-          <li>Blacklist, Audit Log, Accounts</li>
+          <li><strong>Atomic insert</strong> — <code>$transaction()</code> prevents double-booking</li>
+          <li><strong>Admin routes</strong> — <code>requireAdmin()</code> session check</li>
+          <li><strong>Cron routes</strong> — <code>CRON_SECRET</code> header protection</li>
+          <li><strong>Email</strong> — best-effort, never blocks state</li>
         </ul>
       </div>
     </div>
 
-    <!-- Backend -->
-    <div>
-      <h3>Backend — 28 API Routes</h3>
-      <div class="glass-card" style="margin-bottom:10px;">
-        <p style="margin-bottom:8px;">All routes return <code style="font-size:0.78em; background:var(--surface-container-high); padding:1px 5px; border-radius:4px;">{ data, error }</code></p>
-        <table>
-          <tr><td><strong>POST</strong></td><td>/registrations</td></tr>
-          <tr><td><strong>PATCH</strong></td><td>/registrations/[id]</td></tr>
-          <tr><td><strong>POST</strong></td><td>/bulk-approve</td></tr>
-          <tr><td><strong>POST</strong></td><td>/[id]/checkin</td></tr>
-          <tr><td><strong>POST</strong></td><td>/webhook/stripe</td></tr>
-          <tr><td><strong>GET</strong></td><td>/cron/*</td></tr>
-        </table>
-      </div>
-      <div class="glass-card">
-        <p style="font-size:0.82rem;"><strong>Atomic registration:</strong> <code style="font-size:0.78em; background:var(--surface-container-high); padding:1px 5px; border-radius:4px;">db.$transaction()</code> — capacity check + insert are one operation. No double-booking.</p>
-      </div>
-    </div>
-
-    <!-- Integrations -->
-    <div>
+    <div class="glass-panel anim-right" style="display:flex;flex-direction:column;padding:18px 20px;">
       <h3>Integrations</h3>
-      <div class="glass-card" style="margin-bottom:10px;">
-        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-          <strong style="font-size:0.88rem;">Stripe</strong>
-          <span class="pill pill-secondary" style="font-size:0.6rem;">Outbound + Inbound</span>
+      <div style="padding-bottom:8px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div class="icon-circle" style="background:var(--secondary-fixed);width:32px;height:32px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div><strong style="font-size:0.84rem;">Stripe</strong><br><span style="font-size:0.62rem;color:var(--outline);">App → Stripe → Webhook → App</span></div>
         </div>
-        <p>Create Checkout Session → participant pays → webhook confirms → status updated. Signature verified, checks <code style="font-size:0.78em; background:var(--surface-container-high); padding:1px 5px; border-radius:4px;">isCancelled</code>.</p>
+        <p style="font-size:0.8rem;">Admin approves → create Checkout Session → participant pays → webhook verifies signature + checks <code>isCancelled</code> → status updated to APPROVED.</p>
       </div>
-      <div class="glass-card" style="margin-bottom:10px;">
-        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-          <strong style="font-size:0.88rem;">Resend</strong>
-          <span class="pill pill-tertiary" style="font-size:0.6rem;">Outbound</span>
+      <div class="divider">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div class="icon-circle" style="background:rgba(161,239,255,0.3);width:32px;height:32px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--tertiary)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          </div>
+          <div><strong style="font-size:0.84rem;">Resend</strong><br><span style="font-size:0.62rem;color:var(--outline);">App → Resend → Participant</span></div>
         </div>
-        <p>Email at every transition: confirmation, approval, payment link, T-48h reminder, OTP, broadcast. Best-effort — failures don't roll back.</p>
+        <p style="font-size:0.8rem;">Confirmation, approval, rejection, payment link, T-48h reminder, OTP verification, admin broadcast. Best-effort — never blocks state changes.</p>
       </div>
-      <div class="glass-card">
-        <div style="display:flex; align-items:center; gap:6px; margin-bottom:6px;">
-          <strong style="font-size:0.88rem;">NorthFlank Cron</strong>
-          <span class="pill pill-surface" style="font-size:0.6rem;">Hourly</span>
+      <div class="divider">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+          <div class="icon-circle" style="background:var(--surface-container-high);width:32px;height:32px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--on-surface-variant)" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <div><strong style="font-size:0.84rem;">Cron</strong><br><span style="font-size:0.62rem;color:var(--outline);">Cron → App → DB (hourly)</span></div>
         </div>
-        <p>Reminders (T-48h), No-Show marking + auto-blacklist, Payment timeout (24h) + waitlist promote. Idempotent via flags.</p>
+        <p style="font-size:0.8rem;">T-48h reminders to APPROVED. Mark unchecked-in as NO_SHOW → auto-blacklist at ≥5. Expire PENDING_PAYMENT after 24h → promote waitlist. All idempotent via flags.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 4: DATA FLOW ════════════════════ -->
-<div class="slide" data-slide="4">
-  <div class="section-label">04 — Data Flow</div>
-  <h2>Registration Lifecycle — End-to-End State Machine</h2>
+<!-- ═══════════ 4: DATA FLOW ═══════════ -->
+<div class="slide" data-slide="4" style="justify-content:center;">
+  <div class="section-header anim">
+    <div class="num">04</div>
+    <div><div class="label" style="margin-bottom:2px;">Data Flow</div><h2>Registration Lifecycle — End-to-End State Machine</h2></div>
+  </div>
 
-  <div class="glass-panel" style="padding:28px; margin-bottom:16px;">
-    <!-- Row 1: Main flow -->
-    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:18px;">
-      <span class="state" style="background:var(--surface-container-high);">Register</span>
-      <span class="arrow">→</span>
-      <span class="state" style="background:var(--primary-fixed); color:var(--primary);">PENDING</span>
-      <span class="arrow">→</span>
-      <span class="state" style="background:var(--surface-container-high);">Admin reviews</span>
-      <span class="arrow">→</span>
-      <span class="state pill-success">APPROVED</span>
-      <span style="font-size:0.72rem; color:var(--outline); margin:0 4px;">or</span>
-      <span class="state" style="background:var(--error-container); color:var(--error);">REJECTED</span>
-      <span style="font-size:0.72rem; color:var(--outline); margin:0 4px;">or</span>
-      <span class="state" style="background:var(--secondary-fixed); color:var(--secondary);">WAITLISTED</span>
-      <span style="font-size:0.72rem; color:var(--outline); margin-left:4px;">(if full)</span>
+  <div class="flex-col" style="gap:8px;">
+    <div class="lane">
+      <div class="lane-label" style="color:var(--on-surface-variant);">Core</div>
+      <div class="glass-panel lane-content" style="border-radius:12px;">
+        <span class="state anim" style="background:var(--surface-container-high);">Register</span>
+        <span class="arrow-animated">→</span>
+        <span class="state anim" style="background:var(--primary-fixed);color:var(--primary);">PENDING</span>
+        <span class="arrow-animated">→</span>
+        <span class="state anim" style="background:var(--surface-container-high);">Admin reviews</span>
+        <span class="arrow-animated">→</span>
+        <span class="state anim pill-success">APPROVED</span>
+        <span style="font-size:0.62rem;color:var(--outline);margin:0 2px;opacity:0;" class="arrow-animated">/</span>
+        <span class="state anim" style="background:var(--error-container);color:var(--error);">REJECTED</span>
+        <span style="font-size:0.62rem;color:var(--outline);margin:0 2px;opacity:0;" class="arrow-animated">/</span>
+        <span class="state anim" style="background:var(--secondary-fixed);color:var(--secondary);">WAITLISTED</span>
+      </div>
     </div>
 
-    <!-- Row 2: Paid event branch -->
-    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:18px; padding-left:20px;">
-      <span style="font-size:0.72rem; color:var(--outline); margin-right:4px;">Paid event:</span>
-      <span class="state pill-success">APPROVED</span>
-      <span class="arrow">→</span>
-      <span class="state" style="background:var(--secondary-fixed); color:var(--secondary);">PENDING_PAYMENT</span>
-      <span class="arrow">→</span>
-      <span class="state" style="background:rgba(161,239,255,0.3); color:var(--tertiary);">Stripe pays</span>
-      <span class="arrow">→</span>
-      <span class="state pill-success">APPROVED</span>
-      <span style="font-size:0.72rem; color:var(--outline); margin:0 8px;">|</span>
-      <span style="font-size:0.72rem; color:var(--outline);">24h timeout →</span>
-      <span class="state" style="background:var(--error-container); color:var(--error);">FAILED</span>
-      <span class="arrow">→</span>
-      <span style="font-size:0.72rem; color:var(--outline);">waitlist promoted</span>
+    <div class="lane">
+      <div class="lane-label" style="color:var(--secondary);">Payment</div>
+      <div class="glass-panel lane-content" style="border-left:3px solid var(--secondary);border-radius:12px;">
+        <span class="state anim" style="background:var(--secondary-fixed);color:var(--secondary);">PENDING_PAYMENT</span>
+        <span class="arrow-animated">→</span>
+        <span class="state anim" style="background:rgba(161,239,255,0.3);color:var(--tertiary);">Stripe pays ✓</span>
+        <span class="arrow-animated">→</span>
+        <span class="state anim pill-success">APPROVED</span>
+        <span style="font-size:0.62rem;color:var(--outline);margin:0 6px;" class="arrow-animated">or 24h →</span>
+        <span class="state anim" style="background:var(--error-container);color:var(--error);">PAYMENT_FAILED</span>
+        <span class="arrow-animated">→</span>
+        <span style="font-size:0.68rem;color:var(--outline);" class="anim">waitlist promoted</span>
+      </div>
     </div>
 
-    <!-- Row 3: Check-in branch -->
-    <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; padding-left:20px;">
-      <span style="font-size:0.72rem; color:var(--outline); margin-right:4px;">Event day:</span>
-      <span class="state pill-success">APPROVED</span>
-      <span class="arrow">→</span>
-      <span class="state" style="background:var(--surface-container-high);">QR scan</span>
-      <span class="arrow">→</span>
-      <span class="state" style="background:var(--primary); color:white;">ATTENDED</span>
-      <span style="font-size:0.72rem; color:var(--outline); margin:0 8px;">|</span>
-      <span style="font-size:0.72rem; color:var(--outline);">absent →</span>
-      <span class="state" style="background:var(--error-container); color:var(--error);">NO_SHOW</span>
-      <span class="arrow">→</span>
-      <span style="font-size:0.72rem; color:var(--outline);">≥5 →</span>
-      <span class="state" style="background:var(--error); color:white;">Blacklisted</span>
+    <div class="lane">
+      <div class="lane-label" style="color:var(--primary);">Event Day</div>
+      <div class="glass-panel lane-content" style="border-left:3px solid var(--primary);border-radius:12px;">
+        <span class="state anim pill-success">APPROVED</span>
+        <span class="arrow-animated">→</span>
+        <span class="state anim" style="background:var(--surface-container-high);">QR scan</span>
+        <span class="arrow-animated">→</span>
+        <span class="state anim" style="background:var(--primary);color:white;">ATTENDED</span>
+        <span style="font-size:0.62rem;color:var(--outline);margin:0 6px;" class="arrow-animated">or absent →</span>
+        <span class="state anim" style="background:var(--error-container);color:var(--error);">NO_SHOW</span>
+        <span class="arrow-animated">→</span>
+        <span style="font-size:0.62rem;color:var(--outline);" class="arrow-animated">≥5 →</span>
+        <span class="state anim" style="background:var(--error);color:white;">Blacklisted</span>
+      </div>
     </div>
   </div>
 
-  <div class="grid-3" style="gap:14px;">
-    <div class="glass-card" style="padding:14px 18px;">
-      <p style="font-size:0.82rem;"><strong>Every transition</strong> triggers a Resend email and an audit log entry.</p>
+  <div class="grid-3" style="gap:14px;margin-top:16px;">
+    <div class="glass-card anim" style="padding:14px 18px;display:flex;gap:12px;align-items:start;">
+      <div class="icon-circle" style="background:rgba(161,239,255,0.3);width:36px;height:36px;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--tertiary)" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
+      <div><h3 style="margin-bottom:3px;">Notifications</h3><p style="font-size:0.8rem;">Every transition → Resend email + audit log entry.</p></div>
     </div>
-    <div class="glass-card" style="padding:14px 18px;">
-      <p style="font-size:0.82rem;"><strong>Waitlist</strong> auto-promotes when a seat opens (cancel, reject, or payment timeout).</p>
+    <div class="glass-card anim" style="padding:14px 18px;display:flex;gap:12px;align-items:start;">
+      <div class="icon-circle" style="background:var(--primary-fixed);width:36px;height:36px;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      </div>
+      <div><h3 style="margin-bottom:3px;">Waitlist</h3><p style="font-size:0.8rem;">Auto-promotes when seat opens (cancel / reject / timeout).</p></div>
     </div>
-    <div class="glass-card" style="padding:14px 18px;">
-      <p style="font-size:0.82rem;"><strong>Cron jobs</strong> run hourly: reminders, no-show marking, payment expiry. All idempotent.</p>
+    <div class="glass-card anim" style="padding:14px 18px;display:flex;gap:12px;align-items:start;">
+      <div class="icon-circle" style="background:var(--secondary-fixed);width:36px;height:36px;flex-shrink:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--secondary)" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      </div>
+      <div><h3 style="margin-bottom:3px;">Certificate + Concurrency</h3><p style="font-size:0.8rem;">ATTENDED → printable A4 certificate (CPD hours). <code>$transaction()</code> — atomic capacity, no double-booking.</p></div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 5: ASSUMPTIONS & IMPROVEMENTS ════════════════════ -->
+<!-- ═══════════ 5: AI WORKFLOW + ASSUMPTIONS MERGED ═══════════ -->
 <div class="slide" data-slide="5">
-  <div class="section-label">05 — Assumptions, Limitations & Production Readiness</div>
-  <h2>What This Prototype Is — and What Production Would Require</h2>
+  <div class="section-header anim">
+    <div class="num">05</div>
+    <div><div class="label" style="margin-bottom:2px;">Features, Scope & Production Readiness</div><h2>What's Built, What's Scoped, and What Production Would Require</h2></div>
+  </div>
 
-  <div class="grid-2" style="flex:1; align-items:start;">
-    <div class="flex-col" style="gap:16px;">
-      <div>
-        <h3>Prototype Scope</h3>
-        <div class="glass-card">
-          <ul>
-            <li>Single agency deployment (not multi-tenant)</li>
-            <li>Unclassified data only (no Confidential/Secret)</li>
-            <li>Email as participant identifier</li>
-            <li>Admin accounts managed by Super Admin</li>
-            <li>Stripe test mode — no real payments</li>
-          </ul>
-        </div>
-      </div>
-      <div>
-        <h3>Known Limitations</h3>
-        <div class="glass-card">
-          <ul>
-            <li>No Singpass/Corppass (email + password auth)</li>
-            <li>No real-time push (polling / page refresh)</li>
-            <li>No multi-level approval chain</li>
-            <li>No automated test suite</li>
-            <li>No data retention / deletion policy (PDPA)</li>
-            <li>Single-region (no HA/failover)</li>
-          </ul>
-        </div>
+  <div class="grid-3" style="flex:1;align-items:stretch;gap:18px;">
+    <!-- Col 1: Feature Highlights -->
+    <div class="glass-panel anim-left" style="display:flex;flex-direction:column;padding:18px 20px;">
+      <h3>Feature Highlights</h3>
+      <ul>
+        <li><strong>Featured Events</strong> — admin-managed hero display on public listing page with ★ toggle</li>
+        <li><strong>CPD Hours Tracker</strong> — auto-calculated from attended events, shown to logged-in participants</li>
+        <li><strong>Event Certificates</strong> — formal A4 landscape, government-style, print-optimised with <code>@media print</code></li>
+        <li><strong>QR Check-in</strong> — camera scanner via @zxing + name/email search fallback + live stats polling</li>
+        <li><strong>Blacklist System</strong> — auto-triggered at ≥5 no-shows, manual add/remove, blocks registration at submit</li>
+        <li><strong>Save as Draft</strong> — dual action: "Save as Draft" + "Create & Publish" for event creation</li>
+        <li><strong>CSV Export</strong> — download all registrations for an event</li>
+        <li><strong>Bulk Approve</strong> — select multiple registrations, approve in one action</li>
+        <li><strong>Admin Broadcast</strong> — email all APPROVED/WAITLISTED participants</li>
+      </ul>
+      <div class="divider">
+        <h3 style="margin-bottom:4px;">Design System</h3>
+        <p style="font-size:0.82rem;">"The Ethereal State" — glassmorphism, Manrope/Inter typography, Material Design 3 colors. Built from Stitch mockups → Claude Code agents.</p>
       </div>
     </div>
 
-    <div class="flex-col" style="gap:10px;">
-      <h3 style="margin-top:0;">For Production</h3>
-
-      <div class="glass-card" style="padding:12px 18px;">
-        <div style="margin-bottom:4px;"><span class="pill pill-primary" style="font-size:0.6rem;">Compliance</span></div>
+    <!-- Col 2: Assumptions + Limitations -->
+    <div class="glass-panel anim" style="display:flex;flex-direction:column;padding:18px 20px;">
+      <h3>Prototype Scope</h3>
+      <ul style="margin-bottom:10px;">
+        <li>Single agency (not multi-tenant)</li>
+        <li>Unclassified data only</li>
+        <li>Email as participant identifier</li>
+        <li>Admin managed by Super Admin</li>
+        <li>Stripe test mode</li>
+      </ul>
+      <div class="divider">
+        <h3 style="margin-bottom:4px;">Known Limitations</h3>
         <ul>
-          <li><strong>Singpass/Corppass</strong> — national identity verification</li>
-          <li><strong>PDPA</strong> — data retention policy, DPIA assessment</li>
-          <li><strong>DSS + WCAG 2.1 AA</strong> — Digital Service Standards</li>
-          <li><strong>IM8</strong> — App Security classification before go-live</li>
+          <li>No Singpass/Corppass</li>
+          <li>No real-time push (polling)</li>
+          <li>No multi-level approval</li>
+          <li>No automated tests</li>
+          <li>No PDPA retention policy</li>
+          <li>Single-region (no HA)</li>
         </ul>
       </div>
+    </div>
 
-      <div class="glass-card" style="padding:12px 18px;">
-        <div style="margin-bottom:4px;"><span class="pill pill-error" style="font-size:0.6rem;">Security</span></div>
+    <!-- Col 3: Production Improvements -->
+    <div class="glass-panel anim-right" style="display:flex;flex-direction:column;padding:18px 20px;">
+      <h3>For Production</h3>
+      <div style="margin-bottom:6px;">
+        <div style="margin-bottom:2px;"><span class="pill pill-primary" style="font-size:0.58rem;">Compliance</span></div>
         <ul>
-          <li><strong>Zod validation</strong> on all API inputs</li>
-          <li><strong>OWASP Top 10</strong> penetration testing</li>
-          <li><strong>Rate limiting</strong> on auth + registration</li>
+          <li><strong>Singpass/Corppass</strong> — national identity, no fake registrations</li>
+          <li><strong>PDPA</strong> — data retention + impact assessment</li>
+          <li><strong>DSS + WCAG 2.1 AA</strong> — government accessibility</li>
+          <li><strong>IM8</strong> — security classification before go-live</li>
         </ul>
       </div>
-
-      <div class="glass-card" style="padding:12px 18px;">
-        <div style="margin-bottom:4px;"><span class="pill pill-tertiary" style="font-size:0.6rem;">Scalability</span></div>
+      <div class="divider">
+        <div style="margin-bottom:2px;"><span class="pill pill-error" style="font-size:0.58rem;">Security</span></div>
         <ul>
-          <li><strong>BullMQ</strong> — async email queue</li>
-          <li><strong>WebSocket</strong> — real-time check-in stats</li>
+          <li><strong>Zod</strong> — reject malformed data at API boundary</li>
+          <li><strong>OWASP Top 10</strong> — penetration testing</li>
+          <li><strong>Rate limiting</strong> — prevent brute-force attacks</li>
+        </ul>
+      </div>
+      <div class="divider">
+        <div style="margin-bottom:2px;"><span class="pill pill-tertiary" style="font-size:0.58rem;">Scalability</span></div>
+        <ul>
+          <li><strong>BullMQ</strong> — async email, don't block users</li>
+          <li><strong>WebSocket</strong> — instant check-in updates</li>
           <li><strong>GCC</strong> — AWS/Azure Singapore region</li>
         </ul>
       </div>
-
-      <div class="glass-card" style="padding:12px 18px;">
-        <div style="margin-bottom:4px;"><span class="pill pill-surface" style="font-size:0.6rem;">Business Logic</span></div>
+      <div class="divider">
+        <div style="margin-bottom:2px;"><span class="pill pill-surface" style="font-size:0.58rem;">Business</span></div>
         <ul>
           <li><strong>Multi-level approval</strong> — coordinator → director</li>
-          <li><strong>Integration tests</strong> — core business flow</li>
+          <li><strong>Integration tests</strong> — automate core flow</li>
         </ul>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ════════════════════ SLIDE 6: AI WORKFLOW ════════════════════ -->
-<div class="slide" data-slide="6">
-  <div class="section-label">06 — How I Built This</div>
-  <h2>AI-Assisted Development — What I Directed vs. What I Fixed</h2>
+<!-- ═══════════ 6: SUMMARY ═══════════ -->
+<div class="slide" data-slide="6" style="justify-content:center;align-items:center;">
+  <div style="max-width:720px;text-align:center;">
+    <h1 class="anim" style="font-size:2.2rem;margin-bottom:12px;">Thank You</h1>
+    <p class="anim" style="font-size:0.95rem;margin-bottom:28px;line-height:1.6;">
+      A production-grade, auditable event system — built in 2 days with AI-assisted development.<br>
+      I understand every component, every data flow, and every trade-off.
+    </p>
 
-  <div class="grid-2" style="flex:1; align-items:start;">
-    <div class="flex-col" style="gap:16px;">
-      <div>
-        <h3>Approach</h3>
-        <p style="margin-bottom:14px;">Claude Code as primary tool. Stitch for design mockups. Key technique: <strong>parallel agent execution</strong> — 5–8 agents on independent tasks simultaneously.</p>
-        <table>
-          <tr><th>Stage</th><th>Method</th></tr>
-          <tr><td>Schema + API</td><td>Single agent — sequential dependencies</td></tr>
-          <tr><td>Requirements</td><td>5 agents (PM, compliance, tech, UX, strategy)</td></tr>
-          <tr><td>Security audit</td><td>8 audit agents → 6 fix agents</td></tr>
-          <tr><td>UI rebuild</td><td>Stitch mockups → 5+4+7 build agents</td></tr>
-          <tr><td>Deployment</td><td>Single agent — sequential debugging</td></tr>
-        </table>
-      </div>
-
-      <div class="glass-card" style="padding:12px 16px;">
-        <p style="font-size:0.82rem;"><strong>Judgement:</strong> Parallel for independent tasks. Sequential for dependencies. Knowing when NOT to parallelise matters.</p>
-      </div>
-    </div>
-
-    <div class="flex-col" style="gap:10px;">
-      <h3 style="margin-top:0;">Where I Overrode the AI</h3>
-      <div class="glass-card" style="padding:12px 16px;">
-        <strong style="font-size:0.85rem;">Prisma 5 over 7</strong>
-        <p style="font-size:0.82rem;">AI installed latest. I downgraded — fewer errors with well-documented libs. Version familiarity > recency.</p>
-      </div>
-      <div class="glass-card" style="padding:12px 16px;">
-        <strong style="font-size:0.85rem;">Complete UI rebuild at v5</strong>
-        <p style="font-size:0.82rem;">4 versions of patches → inconsistent UI. Deleted 63 files, rebuilt with a design system. Faster than patching.</p>
-      </div>
-      <div class="glass-card" style="padding:12px 16px;">
-        <strong style="font-size:0.85rem;">No exact capacity numbers</strong>
-        <p style="font-size:0.82rem;">AI showed "45/100 seats". Changed to "Seats Available" / "Waitlist Open" — prevents gaming. My domain judgement.</p>
-      </div>
-      <div class="glass-card" style="padding:12px 16px;">
-        <strong style="font-size:0.85rem;">Dropped Luma → added Stripe</strong>
-        <p style="font-size:0.82rem;">Luma = foreign SaaS. Stripe gives bidirectional data flow: outbound Checkout + inbound webhook.</p>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════════ SLIDE 7: SUMMARY + DEMO ════════════════════ -->
-<div class="slide" data-slide="7" style="justify-content:center; align-items:center;">
-  <div style="max-width:660px; text-align:center;">
-    <div class="section-label">07 — Summary</div>
-    <h2 style="font-size:1.6rem;">A production-grade, auditable system — built in 3 days with AI-assisted development</h2>
-    <p style="font-size:0.95rem; margin-bottom:32px;">I understand every component, every data flow, and every trade-off.<br>I also know exactly what it would take to harden it for production.</p>
-
-    <div class="glass-panel" style="text-align:left;">
-      <div class="grid-2" style="gap:28px;">
+    <div class="glass-panel anim-scale" style="text-align:left;">
+      <div class="grid-2" style="gap:24px;">
         <div>
           <h3>Public (Participant)</h3>
           <p><strong>govevent.csaia.sg/events</strong></p>
-          <p style="margin-top:6px;">Demo: <strong>chenhuangchao2@gmail.com</strong> / demo123</p>
-          <p style="font-size:0.78rem; color:var(--outline); margin-top:4px;">4 past events · 15.5 CPD hours · 1 upcoming</p>
+          <p style="margin-top:4px;">Demo: <strong>chenhuangchao2@gmail.com</strong> / demo123</p>
+          <p style="font-size:0.72rem;color:var(--outline);margin-top:3px;">4 past events · 15.5 CPD hours · 1 upcoming</p>
         </div>
         <div>
           <h3>Admin (Organiser)</h3>
           <p><strong>govevent.csaia.sg/admin/login</strong></p>
-          <table style="margin-top:6px;">
-            <tr><td><span class="pill pill-primary" style="font-size:0.58rem;">Super Admin</span></td><td>admin@tech.gov.sg / admin123</td></tr>
-            <tr><td><span class="pill pill-surface" style="font-size:0.58rem;">Admin</span></td><td>sarah@tech.gov.sg / admin123</td></tr>
+          <table style="margin-top:4px;white-space:nowrap;">
+            <tr><td style="padding-right:12px;"><span class="pill pill-primary" style="font-size:0.6rem;">Super Admin</span></td><td style="font-size:0.84rem;">admin@tech.gov.sg / admin123</td></tr>
+            <tr><td style="padding-right:12px;"><span class="pill pill-surface" style="font-size:0.6rem;">Admin</span></td><td style="font-size:0.84rem;">sarah@tech.gov.sg / admin123</td></tr>
           </table>
-          <p style="font-size:0.78rem; color:var(--outline); margin-top:6px;">Credentials for evaluation only</p>
+          <p style="font-size:0.72rem;color:var(--outline);margin-top:4px;">Credentials for evaluation only</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-</div><!-- end slides wrapper (not needed, using fixed positioning) -->
-
-<!-- ── Navigation ── -->
+<!-- ── Nav ── -->
 <div class="nav" id="nav"></div>
-<div class="nav-counter" id="counter">1 / 8</div>
+<div class="nav-counter" id="counter">1 / 7</div>
 <div class="nav-hint">← → to navigate</div>
 
 <script>
-  const slides = document.querySelectorAll('.slide');
-  const nav = document.getElementById('nav');
-  const counter = document.getElementById('counter');
-  let current = 0;
+// ── Slide management ──
+const slides = document.querySelectorAll('.slide');
+const nav = document.getElementById('nav');
+const counter = document.getElementById('counter');
+let cur = 0, animating = false;
 
-  // Build dots
-  slides.forEach((_, i) => {
-    const dot = document.createElement('button');
-    dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
-    dot.onclick = () => show(i);
-    nav.appendChild(dot);
+slides.forEach((_, i) => {
+  const d = document.createElement('button');
+  d.className = 'nav-dot' + (i === 0 ? ' active' : '');
+  d.onclick = () => go(i);
+  nav.appendChild(d);
+});
+
+function go(n) {
+  if (animating || n === cur) return;
+  animating = true;
+  const oldSlide = slides[cur];
+  const newSlide = slides[(n + slides.length) % slides.length];
+
+  // Fade out current
+  gsap.to(oldSlide, {
+    opacity: 0, duration: 0.25, ease: 'power2.in',
+    onComplete: () => {
+      oldSlide.classList.remove('active');
+      oldSlide.style.opacity = 1;
+      nav.children[cur].classList.remove('active');
+
+      cur = (n + slides.length) % slides.length;
+      newSlide.classList.add('active');
+      nav.children[cur].classList.add('active');
+      counter.textContent = `${cur + 1} / ${slides.length}`;
+
+      animateSlide(newSlide);
+    }
   });
+}
 
-  function show(n) {
-    slides[current].classList.remove('active');
-    nav.children[current].classList.remove('active');
-    current = (n + slides.length) % slides.length;
-    slides[current].classList.add('active');
-    nav.children[current].classList.add('active');
-    counter.textContent = `${current + 1} / ${slides.length}`;
+function animateSlide(slide) {
+  const tl = gsap.timeline({ onComplete: () => { animating = false; } });
+
+  // Reset all animated elements
+  const sh = slide.querySelector('.section-header');
+  const anims = slide.querySelectorAll('.anim');
+  const animsLeft = slide.querySelectorAll('.anim-left');
+  const animsRight = slide.querySelectorAll('.anim-right');
+  const animsScale = slide.querySelectorAll('.anim-scale');
+  const arrows = slide.querySelectorAll('.arrow-animated');
+
+  if (sh) gsap.set(sh, { opacity: 0, y: -15 });
+  gsap.set(anims, { opacity: 0, y: 20 });
+  gsap.set(animsLeft, { opacity: 0, x: -30 });
+  gsap.set(animsRight, { opacity: 0, x: 30 });
+  gsap.set(animsScale, { opacity: 0, scale: 0.88 });
+  gsap.set(arrows, { opacity: 0 });
+
+  // Section header first
+  if (sh) tl.to(sh, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, 0);
+  // Stagger in
+  tl.to(anims, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' }, 0.1);
+  tl.to(animsLeft, { opacity: 1, x: 0, duration: 0.45, stagger: 0.08, ease: 'power2.out' }, 0.15);
+  tl.to(animsRight, { opacity: 1, x: 0, duration: 0.45, stagger: 0.08, ease: 'power2.out' }, 0.2);
+  tl.to(animsScale, { opacity: 1, scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out(1.4)' }, 0.25);
+
+  // Arrows appear sequentially after states
+  tl.to(arrows, { opacity: 1, duration: 0.15, stagger: 0.04, ease: 'power1.out' }, 0.5);
+
+  // Counter animation for title slide
+  if (slide.dataset.slide === '0') {
+    slide.querySelectorAll('[data-count]').forEach(el => {
+      const target = parseInt(el.dataset.count);
+      const suffix = el.dataset.suffix || '';
+      gsap.fromTo(el, { textContent: 0 }, {
+        textContent: target, duration: 1.2, ease: 'power2.out', delay: 0.4,
+        snap: { textContent: 1 },
+        onUpdate: function() { el.textContent = Math.round(gsap.getProperty(el, 'textContent')) + suffix; }
+      });
+    });
   }
+}
 
-  document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); show(current + 1); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); show(current - 1); }
-  });
+// Animate first slide on load
+setTimeout(() => animateSlide(slides[0]), 100);
 
-  let tx = 0;
-  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
-  document.addEventListener('touchend', e => {
-    const d = tx - e.changedTouches[0].clientX;
-    if (Math.abs(d) > 50) d > 0 ? show(current + 1) : show(current - 1);
+// Keyboard
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); go(cur + 1); }
+  if (e.key === 'ArrowLeft') { e.preventDefault(); go(cur - 1); }
+});
+
+// Touch
+let tx = 0;
+document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+document.addEventListener('touchend', e => { const d = tx - e.changedTouches[0].clientX; if (Math.abs(d) > 50) d > 0 ? go(cur + 1) : go(cur - 1); });
+
+// ── Print: strip GSAP inline styles before print, restore after ──
+let savedStyles = [];
+window.addEventListener('beforeprint', () => {
+  savedStyles = [];
+  // Save and clear all inline styles set by GSAP
+  document.querySelectorAll('.anim,.anim-left,.anim-right,.anim-scale,.arrow-animated,.section-header,.stat-number').forEach(el => {
+    savedStyles.push({ el, style: el.getAttribute('style') });
+    el.style.opacity = '1';
+    el.style.transform = 'none';
   });
+  // Make sure stat numbers show final values
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const suffix = el.dataset.suffix || '';
+    el.textContent = el.dataset.count + suffix;
+  });
+});
+window.addEventListener('afterprint', () => {
+  // Restore all inline styles
+  savedStyles.forEach(({ el, style }) => {
+    if (style) el.setAttribute('style', style);
+    else el.removeAttribute('style');
+  });
+});
 </script>
 
 </body>
