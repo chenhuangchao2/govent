@@ -21,7 +21,7 @@ function formatSecondaryTime(date: Date): string {
 
 export default async function EventsPage() {
   const events = await db.event.findMany({
-    where: { isPublished: true, isCancelled: false },
+    where: { isPublished: true, isCancelled: false, endTime: { gte: new Date() } },
     include: {
       _count: {
         select: {
