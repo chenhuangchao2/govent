@@ -24,7 +24,7 @@ export async function createCheckoutSession(opts: {
     success_url: `${process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL}/my-registrations?payment=success`,
     cancel_url: `${process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL}/my-registrations?payment=cancelled`,
     metadata: { registrationId: opts.registrationId },
-    expires_at: Math.floor(Date.now() / 1000) + Math.min(opts.deadlineHours, 24) * 3600,
+    expires_at: Math.floor(Date.now() / 1000) + Math.max(Math.min(opts.deadlineHours || 24, 24), 1) * 3600,
   })
   return session.url as string
 }

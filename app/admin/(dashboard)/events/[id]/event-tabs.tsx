@@ -1137,7 +1137,8 @@ function RegistrationsTab({ event }: { event: SerializedEvent }) {
       showToast(json.error, "error");
       return;
     }
-    showToast(`Action "${action}" completed`);
+    const label = json.data?.status === 'PENDING_PAYMENT' ? 'Approved — pending payment' : action === 'approve' ? 'Approved' : `Action "${action}" completed`;
+    showToast(label);
     fetchRegistrations();
   };
 

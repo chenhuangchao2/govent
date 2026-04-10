@@ -32,13 +32,20 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     if (reg.event.isPaid && reg.event.price) {
       // Paid: create Stripe session
-      const paymentUrl = await createCheckoutSession({
-        registrationId: reg.id,
-        eventTitle: reg.event.title,
-        price: reg.event.price,
-        participantEmail: reg.email,
-        deadlineHours: reg.event.paymentDeadlineHours,
-      })
+      let paymentUrl: string
+      try {
+        paymentUrl = await createCheckoutSession({
+          registrationId: reg.id,
+          eventTitle: reg.event.title,
+          price: reg.event.price,
+          participantEmail: reg.email,
+          deadlineHours: reg.event.paymentDeadlineHours,
+        })
+      } catch (stripeErr) {
+        console.error('[Stripe Error]', stripeErr)
+        const msg = stripeErr instanceof Error ? stripeErr.message : 'Stripe session creation failed'
+        return NextResponse.json({ data: null, error: `Stripe error: ${msg}` }, { status: 500 })
+      }
 
       const deadline = new Date(Date.now() + reg.event.paymentDeadlineHours * 3600 * 1000)
       const updated = await db.registration.update({
