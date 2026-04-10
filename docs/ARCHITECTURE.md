@@ -210,7 +210,7 @@ GitHub (main branch) ──auto-push──→ NorthFlank Build (Dockerfile)
 - Seed data via protected HTTP endpoint `/api/seed` (NorthFlank shell doesn't inherit runtime env vars)
 - `force-dynamic` on all DB pages (prevents stale pre-rendered content)
 
-**Production URL:** https://p01--govent--c2c7vkvx9sv9.code.run
+**Production URL:** https://govevent.csaia.sg
 
 ## What I Would Improve for Production
 

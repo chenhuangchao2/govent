@@ -688,15 +688,6 @@ Dispatched 5 specialist agents (UX/Demo reviewer, Backend architect, GovTech ass
 
 ---
 
-## Phase 6 — Deployment
-**Date**: _TBD_ | **Target**: NorthFlank
-
-- Docker multi-stage build (`output: "standalone"` in next.config.ts)
-- NorthFlank managed PostgreSQL
-- NorthFlank Cron Job (hourly) for `/api/cron/*` endpoints
-- Stripe webhook production endpoint registration
-- Environment variables via NorthFlank secrets
-
 ---
 
 ## What I Would Do Differently
@@ -783,7 +774,7 @@ Dispatched 8 specialised agents to audit the entire codebase in parallel: public
 ### Overview
 Deleted the entire v4.0 frontend (63 files) and rebuilt from scratch using a new design system called **"The Ethereal State" (Sovereign Prism)**. The rebuild was driven by visual reference mockups in `design_reference/` and guided by `docs/FRONTEND_SPEC.md` (logic spec) + `docs/DESIGN.md` (visual spec).
 
-**Approach**: Template-first — extract Tailwind classes and structure from design reference HTML files, inject real data/logic. Parallel agent execution (5-7 agents per phase) for independent pages.
+**Approach**: Template-first — extract Tailwind classes and structure from design reference HTML files, inject real data/logic. Parallel agent execution (5-7 agents per stage) for independent pages.
 
 ### Design System: The Ethereal State
 
@@ -798,7 +789,7 @@ Deleted the entire v4.0 frontend (63 files) and rebuilt from scratch using a new
 | **Backgrounds** | Iridescent radial gradients + noise-overlay texture at 2% opacity |
 | **Tailwind** | v4 with CSS-based `@theme` config (not `tailwind.config.js`), custom colors in `globals.css`, form reset in `@layer base` |
 
-### Phase 1 — Public Core (5 parallel agents)
+### Stage 1 — Public Core (5 parallel agents)
 
 | Page | Route | Key Features |
 |------|-------|-------------|
@@ -812,7 +803,7 @@ Deleted the entire v4.0 frontend (63 files) and rebuilt from scratch using a new
 - Capacity display: Public shows "Seats Available" / "Waitlist Open" (no exact numbers) — prevents gaming.
 - QR generation: Switched from external `api.qrserver.com` to local `qrcode` npm package via dynamic import — no network dependency.
 
-### Phase 2 — Authentication (4 parallel agents)
+### Stage 2 — Authentication (4 parallel agents)
 
 | Page | Route | Key Features |
 |------|-------|-------------|
@@ -826,7 +817,7 @@ Deleted the entire v4.0 frontend (63 files) and rebuilt from scratch using a new
 - Signup compacted: title `text-3xl`, inputs `py-3 text-sm`, `space-y-3` — fits one screen
 - Shared visual: iridescent-bg gradient + accent-spot glow effects + glass-panel container
 
-### Phase 3 — Admin Dashboard (7 parallel agents + layout)
+### Stage 3 — Admin Dashboard (7 parallel agents + layout)
 
 | Page | Route | Key Features |
 |------|-------|-------------|
@@ -953,7 +944,7 @@ Added 4 past ATTENDED events for Phoenix Chen (chenhuangchao2@gmail.com):
 
 ---
 
-## v5.2 — NorthFlank Deployment (2026-04-10)
+## Phase 6 — NorthFlank Deployment (2026-04-10)
 
 ### Deployment Architecture
 
@@ -971,7 +962,7 @@ NorthFlank Service (govent)
 NorthFlank PostgreSQL Addon (govent-db)
     │ PostgreSQL 16, US-Central
     ▼
-Live URL: https://p01--govent--c2c7vkvx9sv9.code.run
+Live URL: https://govevent.csaia.sg
 ```
 
 ### Deployment Issues & Resolutions
@@ -1020,21 +1011,40 @@ Created `/api/seed` endpoint (protected by `CRON_SECRET` header):
 | `RESEND_FROM` | Email sender address |
 | `NEXT_PUBLIC_APP_URL` | Public URL for Stripe redirects |
 
-### Production URLs
+### Custom Domain Setup
+
+Configured custom domain `govevent.csaia.sg` on NorthFlank to replace the default `p01--govent--c2c7vkvx9sv9.code.run` URL.
+
+| Step | Action |
+|------|--------|
+| 1 | Added custom domain `govevent.csaia.sg` in NorthFlank service → Networking → Domains |
+| 2 | Created CNAME record: `govevent.csaia.sg` → NorthFlank-provided DNS target |
+| 3 | NorthFlank auto-provisions TLS certificate via Let's Encrypt |
+| 4 | Updated `NEXT_PUBLIC_APP_URL` env var to `https://govevent.csaia.sg` |
+
+### Production URLs & Demo Accounts
+
+**Public (Participant)**
 
 | Page | URL |
 |------|-----|
-| Public events | https://p01--govent--c2c7vkvx9sv9.code.run/events |
-| Participant login | https://p01--govent--c2c7vkvx9sv9.code.run/login |
-| Admin login | https://p01--govent--c2c7vkvx9sv9.code.run/admin/login |
+| Events listing | https://govevent.csaia.sg/events |
+| Login | https://govevent.csaia.sg/login |
+| Sign up | https://govevent.csaia.sg/signup |
 
-### Demo Accounts
+Demo account: `chenhuangchao2@gmail.com` / `demo123`
+
+**Admin (Organiser)**
+
+| Page | URL |
+|------|-----|
+| Admin login | https://govevent.csaia.sg/admin/login |
+| Dashboard | https://govevent.csaia.sg/admin |
 
 | Role | Email | Password |
 |------|-------|----------|
 | Super Admin | admin@tech.gov.sg | admin123 |
 | Admin | sarah@tech.gov.sg | admin123 |
 | Admin | rajan@tech.gov.sg | admin123 |
-| Participant | demo@gov.sg | demo123 |
 
-**Build**: 0 TypeScript errors. Production deployed and verified.
+**Build**: 0 TypeScript errors. Production deployed and verified at https://govevent.csaia.sg

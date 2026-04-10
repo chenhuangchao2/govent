@@ -166,7 +166,7 @@ export async function POST(req: NextRequest) {
 
   // Create participant account for demo login
   await db.participant.create({ data: {
-    email: 'demo@gov.sg', name: 'Demo User', organisation: 'GovTech',
+    email: 'chenhuangchao2@gmail.com', name: 'Huang Chao', organisation: 'GovTech',
     passwordHash: hash('demo123'), isVerified: true,
   }})
 
@@ -175,7 +175,7 @@ export async function POST(req: NextRequest) {
     const pastEvent = await db.event.findFirst({ where: { title: pe.title } })
     if (pastEvent) {
       await db.registration.create({ data: {
-        eventId: pastEvent.id, name: 'Demo User', email: 'demo@gov.sg',
+        eventId: pastEvent.id, name: 'Huang Chao', email: 'chenhuangchao2@gmail.com',
         organisation: 'GovTech', status: 'ATTENDED',
         checkedInAt: pastEvent.startTime,
       }}).catch(() => {})
@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
 
   // Demo user has one upcoming APPROVED registration
   await db.registration.create({ data: {
-    eventId: events[0].id, name: 'Demo User', email: 'demo@gov.sg',
+    eventId: events[0].id, name: 'Huang Chao', email: 'chenhuangchao2@gmail.com',
     organisation: 'GovTech', status: 'APPROVED',
   }}).catch(() => {})
 
@@ -232,7 +232,7 @@ export async function POST(req: NextRequest) {
       registrations: regCount + pastEvents.length,
       blacklist: 3,
       auditLogs: auditEntries.length,
-      participant: 'demo@gov.sg / demo123',
+      participant: 'chenhuangchao2@gmail.com / demo123',
     },
     error: null,
   })

@@ -76,14 +76,14 @@ app/
 - **v1.0-mvp** (git tag) — 2026-04-08 — Bare-bones MVP. All core flows wired up but rough edges throughout. See `docs/V1_STATUS.md` for known gaps.
 - **v2.0** — 2026-04-08 — Full UX pass + new features. See `docs/superpowers/specs/2026-04-08-govent-v2-design.md` for complete spec.
 - **v4.0** — 2026-04-09 — Security audit (17 bugs fixed), admin accounts, UX polish. See BUILD_LOG.md for full details.
-- **v5.0** — 2026-04-09 — Complete UI rebuild with "The Ethereal State" design system. 16 pages, 3 phases. See BUILD_LOG.md v5.0 section.
+- **v5.0** — 2026-04-09 — Complete UI rebuild with "The Ethereal State" design system. 16 pages, 3 stages. See BUILD_LOG.md v5.0 section.
 - **v5.1** — 2026-04-09 — Polish pass: 10 bug fixes, UX cleanup, demo data, dev workflow stabilisation. See BUILD_LOG.md v5.1 section.
 - **v5.2** — 2026-04-10 — NorthFlank deployment: Dockerfile fixes, Prisma migration, seed API, production live.
 
 ## Current Status
 **Version**: v5.2 (deployed to NorthFlank)
 
-**Production URL**: https://p01--govent--c2c7vkvx9sv9.code.run
+**Production URL**: https://govevent.csaia.sg
 **GitHub**: https://github.com/chenhuangchao2/govent
 
 **v5.2 — NorthFlank Deployment ✅ (2026-04-10)**
@@ -92,7 +92,7 @@ app/
 - Prisma migration: version-controlled SQL, auto-runs on container start
 - Seed API: `/api/seed` with reset support, creates full demo dataset
 - 3 admins, 11 events, 130+ registrations, 3 blacklist, 12 audit logs
-- Demo accounts: admin@tech.gov.sg/admin123, demo@gov.sg/demo123
+- Demo accounts: admin@tech.gov.sg/admin123, chenhuangchao2@gmail.com/demo123
 
 **v5.1 — Polish, Bug Fixes & Demo Data ✅ (2026-04-09)**
 - 10 bug fixes: Stripe env key override, featured API whitelist, bulk approve error handling, static page caching, audit log titles
@@ -104,7 +104,7 @@ app/
 
 **v5.0 — Complete UI Rebuild: "The Ethereal State" ✅ (2026-04-09)**
 - Full frontend rebuilt from scratch with premium design system (glassmorphism, Manrope/Inter typography, Material Design 3 colors)
-- 16 pages across 3 phases: Public (5), Auth (4), Admin (7) + certificate page
+- 16 pages across 3 stages: Public (5), Auth (4), Admin (7) + certificate page
 - Schema: added `isFeatured Boolean` to Event for admin-managed featured events
 - New features: CPD Hours Tracker (dynamic), Event Certificates (printable), Featured Event admin toggle, Save as Draft
 - Design: Tailwind v4 CSS-based config, custom `glass-panel`/`glass-card`/`state-glow` utilities
