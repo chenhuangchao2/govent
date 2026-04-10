@@ -2,6 +2,20 @@ import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
 import { createHash } from 'crypto'
 
+// Debug: check env vars (protected by CRON_SECRET)
+export async function GET(req: NextRequest) {
+  const secret = req.headers.get('x-cron-secret')
+  if (secret !== process.env.CRON_SECRET) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  return NextResponse.json({
+    APP_URL: process.env.APP_URL || '(not set)',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || '(not set)',
+    STRIPE_KEY_PREFIX: process.env.STRIPE_SECRET_KEY?.substring(0, 8) || '(not set)',
+    resolved: process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || '(both empty)',
+  })
+}
+
 // One-time seed endpoint — protected by CRON_SECRET
 export async function POST(req: NextRequest) {
   const secret = req.headers.get('x-cron-secret')
