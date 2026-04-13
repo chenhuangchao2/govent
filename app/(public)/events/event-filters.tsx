@@ -257,10 +257,15 @@ export default function EventFilters({ events }: { events: SerializedEvent[] }) 
                       {event.description}
                     </p>
                   </div>
-                  <div className="mt-8">
+                  <div className="mt-8 flex items-center gap-3">
                     <span className="text-[10px] font-bold font-label text-white/60 uppercase">
                       {timeLabel}
                     </span>
+                    {priceLabel && (
+                      <span className="text-[10px] font-bold font-label text-amber-300 uppercase">
+                        {priceLabel}
+                      </span>
+                    )}
                   </div>
                 </Link>
               );

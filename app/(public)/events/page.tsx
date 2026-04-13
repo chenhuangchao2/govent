@@ -104,6 +104,15 @@ export default async function EventsPage() {
                   <span className="text-white/80 font-label text-[10px] font-bold tracking-widest uppercase">
                     {formatFeaturedDate(featured.startTime)}
                   </span>
+                  {featured.isPaid && featured.price ? (
+                    <span className="bg-amber-400/90 text-amber-950 px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase font-label">
+                      SGD {featured.price.toFixed(2)}
+                    </span>
+                  ) : (
+                    <span className="bg-white/20 text-white px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase font-label">
+                      FREE
+                    </span>
+                  )}
                 </div>
                 <h2 className="text-4xl md:text-5xl font-extrabold text-white tracking-tighter mb-4 max-w-xl">
                   {featured.title}
